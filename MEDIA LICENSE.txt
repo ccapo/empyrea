@@ -1,0 +1,7 @@
+All the media in this project is included under the Creative Commons Attribution license unless otherwise specified by its author:
+
+http://creativecommons.org/licenses/by/3.0/us/
+
+The original 'Cult' soundtrack is by Joe Morgan. The game tileset is by David Hagar.
+
+All other sounds/musical files have been credited to their individual authors in the appropriate folders.

@@ -18,7 +18,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    The original Perl module Lingua::EN::Inflect by Damian Conway is 
+    The original Perl module Lingua::EN::Inflect by Damian Conway is
     available from http://search.cpan.org/~dconway/
 
     This module can be downloaded at http://pypi.python.org/pypi/inflect
@@ -41,10 +41,10 @@ methods:
           plural plural_noun plural_verb plural_adj singular_noun no num
           compare compare_nouns compare_verbs compare_adjs
 
-    COMPARISONS:    classical 
+    COMPARISONS:    classical
           compare compare_nouns compare_verbs compare_adjs
 
-    ARTICLES:   classical inflect num a an 
+    ARTICLES:   classical inflect num a an
 
     NUMERICAL:      ordinal number_to_words
 
@@ -105,7 +105,7 @@ def joinstem(cutpoint=0, words=''):
     e.g.
     joinstem(-2, ["ephemeris", "iris", ".*itis"]) returns
     (?:ephemer|ir|.*it
- 
+
     '''
     return enclose('|'.join(w[:cutpoint] for w in words))
 
@@ -131,7 +131,7 @@ def make_pl_si_lists(lst, plending, siendginsize, dojoinstem=True):
     pl_bysize = bysize(lst)
     si_bysize = bysize(si_list)
     if dojoinstem:
-        stem = joinstem(siendginsize, lst)        
+        stem = joinstem(siendginsize, lst)
         return si_list, si_bysize, pl_bysize, stem
     else:
         return si_list, si_bysize, pl_bysize
@@ -213,7 +213,7 @@ for k in keys:
         k1, k2 = k.split('|')
         si_sb_irregular_compound[k1] = si_sb_irregular_compound[k2] = si_sb_irregular_compound[k]
         del si_sb_irregular_compound[k]
-        
+
 #si_sb_irregular_keys = enclose('|'.join(si_sb_irregular.keys()))
 
 # Z's that don't double
@@ -239,7 +239,7 @@ pl_sb_C_is_ides_complete = [
 pl_sb_C_is_ides_endings = [
 # INFLAMATIONS...
 
-    "itis", 
+    "itis",
 
 ]
 
@@ -319,9 +319,9 @@ pl_sb_C_um_a_list = (
     "quantum",  "cranium",    "curriculum", "dictum",
     "phylum",   "aquarium",   "compendium", "emporium",
     "enconium", "gymnasium",  "honorarium", "interregnum",
-    "lustrum",  "memorandum", "millennium", "rostrum", 
+    "lustrum",  "memorandum", "millennium", "rostrum",
     "spectrum", "speculum",   "stadium",    "trapezium",
-    "ultimatum",    "medium",   "vacuum",   "velum", 
+    "ultimatum",    "medium",   "vacuum",   "velum",
     "consortium",
 )
 
@@ -407,7 +407,7 @@ pl_sb_U_o_os_complete = set((
 ))
 si_sb_U_o_os_complete = set('%ss' % w for w in pl_sb_U_o_os_complete)
 
-    
+
 pl_sb_U_o_os_endings = [
     "aficionado",   "aggro",
     "albino",       "allegro",      "ammo",
@@ -419,7 +419,7 @@ pl_sb_U_o_os_endings = [
     "Cairo",        "canto",        "cappuccino",
     "casino",       "cello",        "Chicago",
     "Chimango",     "cilantro",     "cochito",
-    "coco",         "Colombo",      "Colorado",     
+    "coco",         "Colombo",      "Colorado",
     "commando",     "concertino",   "contango",
     "credo",        "crescendo",    "cyano",
     "demo",         "ditto",        "Draco",
@@ -437,7 +437,7 @@ pl_sb_U_o_os_endings = [
     "junto",        "Kakapo",       "kilo",
     "Kinkimavo",    "Kokako",       "Kosovo",
     "Lesotho",      "libero",       "libido",
-    "libretto",     "lido",         "Lilo", 
+    "libretto",     "lido",         "Lilo",
     "limbo",        "limo",         "lineno",
     "lingo",        "lino",         "livedo",
     "loco",         "logo",         "lumbago",
@@ -446,12 +446,12 @@ pl_sb_U_o_os_endings = [
     "Malabo",       "manifesto",    "Maputo",
     "Maracaibo",    "medico",       "memo",
     "metro",        "Mexico",       "micro",
-    "Milano",       "Monaco",       "mono", 
+    "Milano",       "Monaco",       "mono",
     "Montenegro",   "Morocco",      "Muqdisho",
-    "myo",          
+    "myo",
     "neutrino",     "Ningbo",
     "octavo",       "oregano",      "Orinoco",
-    "Orlando",      "Oslo",         
+    "Orlando",      "Oslo",
     "panto",        "Paramaribo",   "Pardusco",
     "pedalo",       "photo",        "pimento",
     "pinto",        "pleco",        "Pluto",
@@ -473,9 +473,9 @@ pl_sb_U_o_os_endings = [
     "typo",         "tyro",         "ufo",
     "UNESCO",       "vaquero",      "vermicello",
     "verso",        "vibrato",      "violoncello",
-    "Virgo",        "weirdo",       "WHO",  
-    "WTO",          "Yamoussoukro", "yo-yo",        
-    "zero",         "Zibo",         
+    "Virgo",        "weirdo",       "WHO",
+    "WTO",          "Yamoussoukro", "yo-yo",
+    "zero",         "Zibo",
     ] + pl_sb_C_o_i
 
 pl_sb_U_o_os_bysize = bysize(pl_sb_U_o_os_endings)
@@ -562,7 +562,7 @@ pl_sb_U_man_mans_list = """
 """.split()
 pl_sb_U_man_mans_caps_list = """
     Alabaman Bahaman Burman German
-    Hiroshiman Liman Nakayaman Norman Oklahoman 
+    Hiroshiman Liman Nakayaman Norman Oklahoman
     Panaman Roman Selman Sonaman Tacoman Yakiman
     Yokohaman Yuman
 """.split()
@@ -588,7 +588,7 @@ pl_sb_uninflected_s_complete = [
 # RECENT IMPORTS...
     "contretemps", "corps", "debris",
     "siemens",
-    
+
 # DISEASES
     "mumps",
 
@@ -600,7 +600,7 @@ pl_sb_uninflected_s_complete = [
 pl_sb_uninflected_s_endings = [
 # RECENT IMPORTS...
     "ois",
-    
+
 # DISEASES
     "measles",
 ]
@@ -621,7 +621,7 @@ pl_sb_uninflected_herd = (
 pl_sb_uninflected_complete = [
 # SOME FISH AND HERD ANIMALS
     "tuna", "salmon", "mackerel", "trout",
-    "bream", "sea-bass", "sea bass", "carp", "cod", "flounder", "whiting", 
+    "bream", "sea-bass", "sea bass", "carp", "cod", "flounder", "whiting",
 
     "moose",
 
@@ -658,7 +658,7 @@ pl_sb_uninflected_endings = [
 
 
 # OTHER ODDITIES
-    'craft', 
+    'craft',
    ] + pl_sb_uninflected_s_endings
 # SOME WORDS ENDING IN ...s (OFTEN PAIRS TAKEN AS A WHOLE)
 
@@ -673,7 +673,7 @@ pl_sb_singular_s_complete = [
     "acropolis", "aegis", "alias", "asbestos", "bathos", "bias",
     "bronchitis", "bursitis", "caddis", "cannabis",
     "canvas", "chaos", "cosmos", "dais", "digitalis",
-    "epidermis", "ethos", "eyas", "gas", "glottis", 
+    "epidermis", "ethos", "eyas", "gas", "glottis",
     "hubris", "ibis", "lens", "mantis", "marquis", "metropolis",
     "pathos", "pelvis", "polis", "rhinoceros",
     "sassafras", "trellis",
@@ -713,11 +713,11 @@ si_sb_uses_use_case = (
 si_sb_uses_use = (
     'abuses', 'applauses', 'blouses',
     'carouses', 'causes', 'chartreuses', 'clauses',
-    'contuses', 'douses', 'excuses', 'fuses', 
+    'contuses', 'douses', 'excuses', 'fuses',
     'grouses', 'hypotenuses', 'masseuses',
     'menopauses', 'misuses', 'muses', 'overuses', 'pauses',
     'peruses', 'profuses', 'recluses', 'reuses',
-    'ruses', 'souses', 'spouses', 'suffuses', 'transfuses', 'uses', 
+    'ruses', 'souses', 'spouses', 'suffuses', 'transfuses', 'uses',
 )
 
 si_sb_ies_ie_case = (
@@ -786,7 +786,7 @@ si_sb_z_zes = (
 )
 
 si_sb_zzes_zz = (
-'buzzes', 'fizzes', 'frizzes', 'razzes' 
+'buzzes', 'fizzes', 'frizzes', 'razzes'
     )
 
 si_sb_ches_che_case = (
@@ -823,7 +823,7 @@ si_sb_ves_ve = (
 'interweaves', 'weaves',
 
 # *[nwl]ives -> [nwl]live
-'olives', 
+'olives',
 
 # *[eoa]lves -> [eoa]lve
 'bivalves', 'dissolves', 'resolves', 'salves', 'twelves', 'valves',
@@ -862,7 +862,7 @@ si_sb_es_is = (
 'cocces', 'crises', 'diagnoses', 'dialyses', 'diereses',
 'electrolyses', 'emphases', 'exegeses', 'geneses',
 'halitoses', 'hydrolyses', 'hypnoses', 'hypotheses', 'hystereses',
-'metamorphoses', 'metastases', 'misdiagnoses', 'mitoses', 
+'metamorphoses', 'metastases', 'misdiagnoses', 'mitoses',
 'mononucleoses', 'narcoses', 'necroses', 'nemeses', 'neuroses',
 'oases', 'osmoses', 'osteoporoses', 'paralyses', 'parentheses',
 'parthenogeneses', 'periphrases', 'photosyntheses', 'probosces',
@@ -975,7 +975,7 @@ for thecase, plur, gend, sing in (
         si_pron[thecase][plur] = {}
         si_pron[thecase][plur][gend] = sing
 
-        
+
 si_pron_acc_keys = enclose('|'.join(si_pron['acc'].keys()))
 si_pron_acc_keys_bysize = bysize(si_pron['acc'].keys())
 
@@ -991,7 +991,7 @@ def get_si_pron(thecase, word, gender):
 
 plverb_irregular_pres = {
 #   1st PERS. SING.     2ND PERS. SING.     3RD PERS. SINGULAR
-#               3RD PERS. (INDET.)  
+#               3RD PERS. (INDET.)
 
 "am"    : "are",   "are"   : "are",   "is"     : "are",
 "was"   : "were",  "were"  : "were",  "was"    : "were",
@@ -1001,7 +1001,7 @@ plverb_irregular_pres = {
 
 plverb_ambiguous_pres = {
 #   1st PERS. SING.     2ND PERS. SING.     3RD PERS. SINGULAR
-#               3RD PERS. (INDET.)  
+#               3RD PERS. (INDET.)
 
 "act"   : "act",   "act"   : "act",   "acts"    : "act",
 "blame" : "blame", "blame" : "blame", "blames"  : "blame",
@@ -1026,7 +1026,7 @@ plverb_ambiguous_pres_keys = enclose('|'.join(plverb_ambiguous_pres.keys()));
 
 
 plverb_irregular_non_pres = (
-"did", "had", "ate", "made", "put", 
+"did", "had", "ate", "made", "put",
 "spent", "fought", "sank", "gave", "sought",
 "shall", "could", "ought", "should",
 )
@@ -1207,11 +1207,11 @@ class engine:
                               )
     def __getattr__(self, meth):
         if meth in self.deprecated_methods:
-            print3('%s() deprecated, use %s()' % (meth, self.deprecated_methods[meth])) 
+            print3('%s() deprecated, use %s()' % (meth, self.deprecated_methods[meth]))
             raise DeprecationWarning
         raise AttributeError
 
- 
+
     def defnoun(self, singular, plural):
         '''
         Set the noun plural of singular to plural.
@@ -1292,7 +1292,7 @@ class engine:
         #except reerror:
         #    print3("\nBad user-defined plural pattern:\n\t%s\n" % pattern)
         #    raise BadUserDefinedPatternError
-       
+
     def ud_match(self, word, wordlist):
         for i in range(len(wordlist)-2, -2, -2): # backwards through even elements
             mo = search(r'^%s$' % wordlist[i], word, IGNORECASE)
@@ -1319,7 +1319,7 @@ class engine:
         classical(names=False)
 
         By default all classical modes are off except names.
-        
+
         unknown value in args or key in kwargs rasies exception: UnknownClasicalModeError
 
         """
@@ -1332,7 +1332,7 @@ class engine:
                 self.classical_dict = all_classical.copy()
             else:
                 self.classical_dict = no_classical.copy()
-                
+
         for k, v in kwargs.items():
             if k in classical_mode:
                 self.classical_dict[k] = v
@@ -1368,13 +1368,13 @@ class engine:
         f: feminine (they -> she)
         m: masculine (they -> he)
         t: they (they -> they) gender neutral singular
-        
+
         '''
         if gender in singular_pronoun_genders:
             self.thegender = gender
         else:
             raise BadGenderError
-    
+
     def nummo(self, matchobject):
         '''
         num but take a matchobject
@@ -1423,7 +1423,7 @@ class engine:
         use groups 1 and 3 in matchobject
         '''
         if matchobject.group(3) is None:
-            return self.a(matchobject.group(1))            
+            return self.a(matchobject.group(1))
         return self.a(matchobject.group(1), matchobject.group(3))
 
     def nomo(self, matchobject):
@@ -1546,7 +1546,7 @@ class engine:
         except AttributeError: # empty string
             return '', '', ''
 
-        
+
 #    def pl(self, *args, **kwds):
 #        print 'pl() deprecated, use plural()'
 #        raise DeprecationWarning
@@ -1591,7 +1591,7 @@ class engine:
         otherwise return the plural.
 
         Whitespace at the start and end is preserved.
-        
+
         '''
         pre, word, post = self.partition_word(text)
         if not word:
@@ -1602,7 +1602,7 @@ class engine:
               or self._plnoun(word, count))
         return "%s%s%s" % (pre, plural, post)
 
-        
+
     def plural_noun(self, text, count=None):
         '''
         Return the plural of text, where text is a noun.
@@ -1612,7 +1612,7 @@ class engine:
         otherwise return the plural.
 
         Whitespace at the start and end is preserved.
-        
+
         '''
         pre, word, post = self.partition_word(text)
         if not word:
@@ -1629,7 +1629,7 @@ class engine:
         otherwise return the plural.
 
         Whitespace at the start and end is preserved.
-        
+
         '''
         pre, word, post = self.partition_word(text)
         if not word:
@@ -1647,7 +1647,7 @@ class engine:
         otherwise return the plural.
 
         Whitespace at the start and end is preserved.
-        
+
         '''
         pre, word, post = self.partition_word(text)
         if not word:
@@ -1726,7 +1726,7 @@ class engine:
         If count supplied, then return the singular if count is one of:
             1, a, an, one, each, every, this, that or if count is None
         otherwise return text unchanged.
-        
+
         Whitespace at the start and end is preserved.
 
         '''
@@ -1739,8 +1739,8 @@ class engine:
                   self._sinoun(word, count=count, gender=gender))
             return "%s%s%s" % (pre, plural, post)
         return False
-    
-        
+
+
     def _plequal(self, word1, word2, pl):
         classval = self.classical_dict.copy()
         self.classical_dict = all_classical.copy()
@@ -1831,7 +1831,7 @@ class engine:
         #    if word2b and ( self._pl_check_plurals_N(word1b, word2b)
         #                    or self._pl_check_plurals_N(word2b, word1b) ):
         #        return True
-        
+
         return False
 
     def get_count(self, count=None):
@@ -1878,7 +1878,7 @@ class engine:
         for k, v in pl_sb_uninflected_bysize.iteritems():
             if lowerword[-k:] in v:
                 return word
-        
+
         if (self.classical_dict['herd'] and
                lowerword in pl_sb_uninflected_herd):
             return word
@@ -1904,17 +1904,17 @@ class engine:
                     return ' '.join(lowersplit[:numword-1] +
                         [self._plnoun(lowersplit[numword-1], 2)] +
                         lowersplit[numword:] )
-        
+
 
         lowersplit = lowerword.split('-')
         if len(lowersplit) >= 3:
             for numword in range(1, len(lowersplit)-1):
                 if lowersplit[numword] in pl_prep_list_da:
-                    return ' '.join(lowersplit[:numword-1] + 
+                    return ' '.join(lowersplit[:numword-1] +
                         [self._plnoun(lowersplit[numword-1], 2) +
                         '-' + lowersplit[numword] + '-']) + \
                         ' '.join(lowersplit[(numword+1):])
-        
+
 # HANDLE PRONOUNS
 
         for k, v in pl_pron_acc_keys_bysize.iteritems():
@@ -1934,12 +1934,12 @@ class engine:
         except KeyError:
             pass
 
-# HANDLE ISOLATED IRREGULAR PLURALS 
+# HANDLE ISOLATED IRREGULAR PLURALS
 
         wordsplit = word.split()
         wordlast = wordsplit[-1]
         lowerwordlast = wordlast.lower()
-        
+
         if wordlast in pl_sb_irregular_caps.keys():
             llen = len(wordlast)
             return '%s%s' % (word[:-llen],
@@ -1964,7 +1964,7 @@ class engine:
              else:
                  return word[:-4] + 'ople'
 
-# HANDLE FAMILIES OF IRREGULAR PLURALS 
+# HANDLE FAMILIES OF IRREGULAR PLURALS
 
         if lowerword[-3:] == 'man':
             for k, v in pl_sb_U_man_mans_bysize.iteritems():
@@ -2049,7 +2049,7 @@ class engine:
                     if lowerword[-k:] in v:
                         return word[:numend] + post
 
-                                
+
 # HANDLE SINGULAR NOUNS ENDING IN ...s OR OTHER SILIBANTS
 
         if lowerword in pl_sb_singular_s_complete:
@@ -2085,12 +2085,12 @@ class engine:
 
             if lowerword[-2:-1] != 'z':
                 return word + 'zes'
-            
+
         if lowerword[-2:] == 'ze':
             for k, v in pl_sb_ze_zes_bysize.iteritems():
                 if lowerword[-k:] in v:
                     return word + 's'
-            
+
         if lowerword[-2:] in ('ch', 'sh', 'zz', 'ss') or lowerword[-1] == 'x':
             return word + 'es'
 
@@ -2108,7 +2108,7 @@ class engine:
         if lowerword[-3:] == 'arf':
             return word[:-1] + 'ves'
 
-            
+
 # HANDLE ...y
 
         if lowerword[-1] == 'y':
@@ -2118,11 +2118,11 @@ class engine:
             if (self.classical_dict['names']):
                 if lowerword[-1] == 'y' and word[0] == word[0].upper():
                     return word + 's'
-              
+
             return word[:-1] + 'ies'
 
 # HANDLE ...o
-        
+
         if lowerword in pl_sb_U_o_os_complete:
             return word + 's'
 
@@ -2135,15 +2135,15 @@ class engine:
 
         if lowerword[-1] == 'o':
             return word + 'es'
-        
+
 # OTHERWISE JUST ADD ...s
 
         return "%ss" % word
 
 
     def _pl_special_verb(self, word, count=None):
-        
-        if (self.classical_dict['zero'] and 
+
+        if (self.classical_dict['zero'] and
             str(count).lower() in pl_count_zero):
                 return False
         count = self.get_count(count)
@@ -2164,12 +2164,12 @@ class engine:
             firstword = lowerword.split()[0]
         except IndexError:
             return False # word is ''
-        
+
         if firstword in plverb_irregular_pres.keys():
             return "%s%s" % (plverb_irregular_pres[firstword],
                                 word[len(firstword):])
 
-# HANDLE IRREGULAR FUTURE, PRETERITE AND PERFECT TENSES 
+# HANDLE IRREGULAR FUTURE, PRETERITE AND PERFECT TENSES
 
         if firstword in plverb_irregular_non_pres:
             return word
@@ -2240,7 +2240,7 @@ class engine:
             return "%s%s" % (plverb_ambiguous_pres[mo.group(1).lower()],
                                  mo.group(2))
 
-# HANDLE AMBIGUOUS PRETERITE AND PERFECT TENSES 
+# HANDLE AMBIGUOUS PRETERITE AND PERFECT TENSES
 
         mo = search(r"^(%s)((\s.*)?)$" % plverb_ambiguous_non_pres,
                     word, IGNORECASE)
@@ -2282,7 +2282,7 @@ class engine:
                     word)
         if mo:
             pl = self.plural_noun(mo.group(1))
-            trailing_s = "" if pl[-1] == 's' else "s" 
+            trailing_s = "" if pl[-1] == 's' else "s"
             return "%s'%s" % (pl, trailing_s)
 
 # OTHERWISE, NO IDEA
@@ -2305,10 +2305,10 @@ class engine:
             if gender is None:
                 gender = self.thegender
             elif gender not in singular_pronoun_genders:
-                raise BadGenderError            
+                raise BadGenderError
         except (TypeError, IndexError):
             raise BadGenderError
-        
+
 # HANDLE USER-DEFINED NOUNS
 
         value = self.ud_match(word, self.si_sb_user_defined)
@@ -2360,13 +2360,13 @@ class engine:
                     return ' '.join(lowersplit[:numword-1] +
                         [self._sinoun(lowersplit[numword-1], 1, gender=gender)] +
                         lowersplit[numword:] )
-        
+
 
         lowersplit = lowerword.split('-')
         if len(lowersplit) >= 3:
             for numword in range(1, len(lowersplit)-1):
                 if lowersplit[numword] in pl_prep_list_da:
-                    return ' '.join(lowersplit[:numword-1] + 
+                    return ' '.join(lowersplit[:numword-1] +
                         [self._sinoun(lowersplit[numword-1], 1, gender=gender) +
                         '-' + lowersplit[numword] + '-']) + \
                         ' '.join(lowersplit[(numword+1):])
@@ -2391,12 +2391,12 @@ class engine:
         except KeyError:
             pass
 
-# HANDLE ISOLATED IRREGULAR PLURALS 
+# HANDLE ISOLATED IRREGULAR PLURALS
 
         wordsplit = word.split()
         wordlast = wordsplit[-1]
         lowerwordlast = wordlast.lower()
-        
+
         if wordlast in si_sb_irregular_caps.keys():
             llen = len(wordlast)
             return '%s%s' % (word[:-llen],
@@ -2419,9 +2419,9 @@ class engine:
             return word[:-1]
         if lowerword[-6:] == 'people':
             return word[:-4] + 'rson'
-        
 
-# HANDLE FAMILIES OF IRREGULAR PLURALS 
+
+# HANDLE FAMILIES OF IRREGULAR PLURALS
 
         if lowerword[-4:] == 'mans':
             for k, v in si_sb_U_man_mans_bysize.iteritems():
@@ -2442,7 +2442,7 @@ class engine:
             return word[:-5] + 'tooth'
         if lowerword[-4:] == 'feet':
             return word[:-4] + 'foot'
-            
+
         if lowerword == 'dice':
             return 'die'
 
@@ -2535,7 +2535,7 @@ class engine:
 
         if lowerword[-4:] == 'eses' and word[0] == word[0].upper():
             return word[:-2]
-       
+
 # Wouldn't special words
 # ending with 's' always have been caught, regardless of them starting
 # with a capital letter (i.e. being names)
@@ -2573,7 +2573,7 @@ class engine:
 
         if lowerword[-3:] == 'xes':
             return word[:-2]
-            
+
 #                  (r"(.*)(us)es$", "%s%s"),  TODO: why is this commented?
 
 # HANDLE ...f -> ...ves
@@ -2591,7 +2591,7 @@ class engine:
                 return word[:-3] + 'fe'
             if lowerword[-5:-3] == 'ar':
                 return word[:-3] + 'f'
-                
+
 # HANDLE ...y
 
         if lowerword[-2:] == 'ys':
@@ -2609,7 +2609,7 @@ class engine:
 # HANDLE ...o
 
         if lowerword[-2:] == 'os':
-            
+
             if lowerword in si_sb_U_o_os_complete:
                 return word[:-1]
 
@@ -2770,7 +2770,7 @@ class engine:
         In the return value count is always followed by a space.
 
         Whitespace at the start and end is preserved.
-        
+
         '''
         if count is None and self.persistent_count is not None:
             count = self.persistent_count
@@ -2795,7 +2795,7 @@ class engine:
         Return the present participle for word.
 
         word is the 3rd person singular verb.
-        
+
         '''
         plv = self.plural_verb(word, 2)
 
@@ -2816,7 +2816,7 @@ class engine:
             if num:
                 return "%sing" % ans
         return "%sing" % ans
-            
+
 
 
 # NUMERICAL INFLECTIONS
@@ -2840,7 +2840,7 @@ class engine:
                     try:
                         n = int(num[-1]) # numbers after decimal, so only need last one for ordinal
                     except ValueError: # ends with '.', so need to use whole string
-                        n = int(num[:-1])                        
+                        n = int(num[:-1])
                 else:
                     n = int(num)
             try:
@@ -2856,17 +2856,17 @@ class engine:
             except AttributeError:
                 return "%sth" % num
 
-    
+
     def millfn(self, ind=0):
         if ind > len(mill)-1:
             print3("number out of range")
             raise NumOutOfRangeError
         return mill[ind]
-    
-    
+
+
     def unitfn(self, units, mindex=0):
         return "%s%s" % (unit[units], self.millfn(mindex))
-    
+
     def tenfn(self, tens, units, mindex=0):
         if tens != 1:
             return "%s%s%s%s" % (ten[tens],
@@ -2875,7 +2875,7 @@ class engine:
                                  self.millfn(mindex))
         return "%s%s" % (teen[units],
                          mill[mindex])
-    
+
     def hundfn(self, hundreds, tens, units, mindex):
         if hundreds:
             return "%s hundred%s%s%s, " % (unit[hundreds], #use unit not unitfn as simpler
@@ -2885,8 +2885,8 @@ class engine:
         if tens or units:
             return "%s%s, " % (self.tenfn(tens,units), self.millfn(mindex))
         return ''
-    
-    
+
+
     def group1sub(self, mo):
         units = int(mo.group(1))
         if units == 1:
@@ -2895,14 +2895,14 @@ class engine:
             return "%s, " % unit[units] #TODO: bug one and zero are padded with a space but other numbers aren't. check this in perl
         else:
             return " %s, " % self.number_args['zero']
-    
+
     def group1bsub(self, mo):
         units = int(mo.group(1))
         if units:
             return "%s, " % unit[units] #TODO: bug one and zero are padded with a space but other numbers aren't. check this in perl
         else:
             return " %s, " % self.number_args['zero']
-    
+
     def group2sub(self, mo):
         tens = int(mo.group(1))
         units = int(mo.group(2))
@@ -2911,7 +2911,7 @@ class engine:
         if units:
             return " %s %s, " % (self.number_args['zero'],unit[units])
         return " %s %s, " % (self.number_args['zero'], self.number_args['zero'])
-    
+
     def group3sub(self, mo):
         hundreds = int(mo.group(1))
         tens = int(mo.group(2))
@@ -2930,7 +2930,7 @@ class engine:
         else:
             tenword = " %s %s" % (self.number_args['zero'], self.number_args['zero'])
         return "%s %s, " % (hunword, tenword)
-    
+
     def hundsub(self, mo):
         ret = self.hundfn(int(mo.group(1)),
                      int(mo.group(2)),
@@ -2938,16 +2938,16 @@ class engine:
                      self.mill_count)
         self.mill_count += 1
         return ret
-    
+
     def tensub(self, mo):
         return "%s, " % self.tenfn(int(mo.group(1)),
                               int(mo.group(2)),
                               self.mill_count)
-    
+
     def unitsub(self, mo):
         return "%s, " % self.unitfn(int(mo.group(1)),
                               self.mill_count)
-    
+
     def enword(self, num, group):
         #import pdb
         #pdb.set_trace()
@@ -2982,14 +2982,14 @@ class engine:
             num = resub(r"(\d)(\d)(?=\D*\Z)", self.tensub, num, 1)
             num = resub(r"(\d)(?=\D*\Z)", self.unitsub, num, 1)
         return num
-    
+
     def blankfn(self, mo):
         ''' do a global blank replace
         TODO: surely this can be done with an option to resub
               rather than this fn
         '''
         return ''
-    
+
     def commafn(self, mo):
         ''' do a global ',' replace
         TODO: surely this can be done with an option to resub
@@ -3019,7 +3019,7 @@ class engine:
         one: word for '1'
         decimal: word for decimal point
         threshold: numbers above threshold not turned into words
-        
+
         parameters not remembered from last call. Departure from Perl version.
         '''
         self.number_args = dict(andword=andword, zero=zero, one=one)
@@ -3037,9 +3037,9 @@ class engine:
                 return "%s.%s" % (spnum[0], spnum[1])
             except IndexError:
                 return "%s" % spnum[0]
-            
+
         if group < 0 or group > 3:
-            raise BadChunkingOptionError 
+            raise BadChunkingOptionError
         nowhite = num.lstrip()
         if nowhite[0] == '+':
             sign = "plus"
@@ -3047,11 +3047,11 @@ class engine:
             sign = "minus"
         else:
             sign = ""
-    
+
         myord =  (num[-2:] in ('st', 'nd', 'rd', 'th'))
         if myord:
             num = num[:-2]
-        finalpoint = False 
+        finalpoint = False
         if decimal:
             if group != 0:
                 chunks = num.split('.')
@@ -3114,9 +3114,9 @@ class engine:
         for chunk in chunks[1:]:
             numchunks.append(decimal)
             numchunks.extend(chunk.split("%s " % comma))
-            
+
         if finalpoint:
-            numchunks.append(decimal)            
+            numchunks.append(decimal)
 
         #wantlist: Perl list context. can explictly specify in Python
         if wantlist:
@@ -3152,19 +3152,19 @@ class engine:
         Join words into a list.
 
         e.g. join(['ant', 'bee', 'fly']) returns 'ant, bee, and fly'
-        
+
         options:
         conj: replacement for 'and'
         sep: separator. default ',', unless ',' is in the list then ';'
         final_sep: final separator. default ',', unless ',' is in the list then ';'
         conj_spaced: boolean. Should conj have spaces around it
-        
+
 
         '''
         if not words:
             return ""
         if len(words) == 1:
-            return words[0] 
+            return words[0]
 
         if conj_spaced:
             if conj == '':
@@ -3182,11 +3182,11 @@ class engine:
                 sep = ','
         if final_sep is None:
             final_sep = sep
-    
+
         final_sep = "%s%s" % (final_sep, conj)
 
         if sep_spaced:
             sep += ' '
-            
+
         return "%s%s%s" %(sep.join(words[0:-1]), final_sep, words[-1])
 

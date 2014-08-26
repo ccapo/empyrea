@@ -529,7 +529,7 @@ class IntroGraphics(threading.Thread):
                     c = 255
                 col = libtcod.Color(c / 7, c / 7, c / 7)
                 try:
-                    mixcol = libtcod.color_lerp(self.color, col, min(self.cpercdict['%s,%s' % (x,y)] + (self.randnum * 0.01),1.0))                    
+                    mixcol = libtcod.color_lerp(self.color, col, min(self.cpercdict['%s,%s' % (x,y)] + (self.randnum * 0.01),1.0))
                 except KeyError:
                     mixcol = col
                 libtcod.console_set_char_background(self.con, x + self.xmod, y + self.ymod, mixcol, libtcod.BKGND_SET)
@@ -720,7 +720,7 @@ class CloudNoise(threading.Thread):
                             if cperc == 0:
                                 libtcod.console_set_char_background(self.window, nx, ny, color, libtcod.BKGND_SET)
                                 if (nx,ny) != (PCX,PCY):
-                                    libtcod.console_set_char_foreground(self.window, nx, ny, fcolor)                                
+                                    libtcod.console_set_char_foreground(self.window, nx, ny, fcolor)
                                 continue
                             col = libtcod.color_lerp(color,libtcod.black,cperc)
                             col2 = libtcod.color_lerp(fcolor,libtcod.black,cperc)
@@ -1015,7 +1015,7 @@ def GButton(window,x,y,ID,dokey,offx,offy):
     for ox in range(x + offx, x + offx + button[2]):
         for oy in range(y + offy, y + offy + button[3]):
             hoverdict['%s,%s' % (ox,oy)] = True
-            
+
     if not ButtonLock:
         hoveropt = False
         if hoverdict.get('%s,%s' % (handle_mouse('cx'),handle_mouse('cy') - 1)):
@@ -1036,7 +1036,7 @@ def GButton(window,x,y,ID,dokey,offx,offy):
 
         if hoveropt and handle_mouse('lbutton_pressed') and not killkeycheck:
             key.c = ord(dokey)
-            
+
         elif (not hoveropt) and switched:
             lock.acquire()
             ButtonLock = True
@@ -1076,7 +1076,7 @@ def MGButton(window,x,y,ID,dokey,offx,offy):
     for ox in range(x + offx, x + offx + button[2]):
         for oy in range(y + offy, y + offy + button[3]):
             hoverdict['%s,%s' % (ox,oy)] = True
-            
+
     if not ButtonLock:
         hoveropt = False
         if hoverdict.get('%s,%s' % (handle_mouse('cx'),handle_mouse('cy') - 1)):
@@ -1097,7 +1097,7 @@ def MGButton(window,x,y,ID,dokey,offx,offy):
 
         if hoveropt and handle_mouse('lbutton_pressed') and not killkeycheck:
             key.c = ord(dokey)
-            
+
         elif (not hoveropt) and switched:
             lock.acquire()
             ButtonLock = True
@@ -1237,7 +1237,7 @@ class Menu(threading.Thread):
                     roptionlist.append(moptionlist[option])
             else:
                 roptionlist.append(moptionlist[option])
-            
+
         libtcod.console_set_default_foreground(self.window, self.tcolor)
         for option in range(len(moptionlist)):
             opcells = []
@@ -1355,7 +1355,7 @@ class Menu(threading.Thread):
                 button.drawButton()
 
         lock.release()
-            
+
         oplayery = playery
         mplayery = playery + (self.moffset * 25)
         self.oy -= (ymod / 2)
@@ -1364,7 +1364,7 @@ class Menu(threading.Thread):
 
         if MenuSetting != 'WAIndivNation' and relswitch:
             relswitch = False
-            
+
         if (key.vk == libtcod.KEY_ESCAPE or handle_mouse('rbutton_pressed')):
             for method in self.BMethodList:
                 method()
@@ -1373,7 +1373,7 @@ class Menu(threading.Thread):
                 MenuList[0].moffset = bplayery[MenuSetting][2]
             except (KeyError, IndexError):
                 playery,oplayery = 1,1
-                
+
         elif ((key.vk == libtcod.KEY_ENTER and not key.lalt) or (hoveropt and handle_mouse('lbutton_pressed'))) and not ParseSwitch:
             bplayery[MenuSetting] = [playery,oplayery,self.moffset]
             playery = 1
@@ -1399,7 +1399,7 @@ class Menu(threading.Thread):
                         method[1](method[2])
                     except:
                         method[1]()
-                    
+
         if self.dialogue:
             if not self.dialogue.killonclick:
                 self.dialogue.cancel()
@@ -1447,7 +1447,7 @@ class RelMap(threading.Thread):
                     libtcod.console_set_default_background(self.window, libtcod.black)
                     libtcod.console_print_ex(self.window,self.xloc + ((xmax + xmin) / 2),self.yloc + ((ymax + ymin) / 2),libtcod.BKGND_SET, libtcod.CENTER, wcivdict[item[1]].upper())
                     libtcod.console_set_default_foreground(self.window, self.civreldict[item[1]][1])
-                    libtcod.console_print_ex(self.window,self.xloc + ((xmax + xmin) / 2),self.yloc + ((ymax + ymin) / 2) + 1,libtcod.BKGND_SET, libtcod.CENTER,'(' + self.civreldict[item[1]][0].upper() + ')') 
+                    libtcod.console_print_ex(self.window,self.xloc + ((xmax + xmin) / 2),self.yloc + ((ymax + ymin) / 2) + 1,libtcod.BKGND_SET, libtcod.CENTER,'(' + self.civreldict[item[1]][0].upper() + ')')
 
         if self not in ButtonList:
             del self
@@ -1627,7 +1627,7 @@ class InvWindow(threading.Thread):
                 char = choice(vectorchars)
                 char[2] = 189
                 self.sepchars[y] = char
-                libtcod.console_print_ex(self.invconsole, seppos, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))        
+                libtcod.console_print_ex(self.invconsole, seppos, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
         libtcod.console_set_default_foreground(self.invconsole, bordercol2)
         for x in range(1,(self.conw - 2) - seppos):
             for y in range(1,self.conh - 1):
@@ -1823,7 +1823,7 @@ class Dialogue(threading.Thread):
             while not self.killswitch:
                 if handle_mouse('lbutton') or handle_mouse('rbutton'):
                     self.cancel()
-                
+
     def cancel(self):
         global moveclouds, MouseLock, MoveLock, PX, PY, TopWindow, MenuList, hoveropt
         MenuList = []
@@ -1887,7 +1887,7 @@ class NDialogue(threading.Thread):
         curnum = self.maxnum
         libtcod.console_print_ex(self.ndialogue, 3 + wadjust, 6, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(unchecked)))
         lock.release()
-        
+
         while not self.killswitch:
             lock.acquire()
             curstr = str(curnum)
@@ -2161,7 +2161,7 @@ class OptWindow(threading.Thread):
                     time.sleep(0.1)
                     libtcod.console_set_char_background(self.audiowindow, 22, 0, libtcod.black, libtcod.BKGND_SET)
                     break
-                
+
         XConsoles = [self.conlist]
         self.MVBar.killswitch = True
         self.SVBar.killswitch = True
@@ -2169,7 +2169,7 @@ class OptWindow(threading.Thread):
         del self.SVBar
         libtcod.console_delete(self.audiowindow)
         self.passloop = False
-        
+
     def doVideo(self):
         pass
 
@@ -2215,7 +2215,7 @@ class OptWindow(threading.Thread):
         adjustScreen()
         GameWorld.handlePCchar()
         GameWorld.handlePCview()
-        
+
 
     def saveGame(self):
         global XConsoles, killkeycheck, lock, wdict
@@ -2430,7 +2430,7 @@ class OptWindow(threading.Thread):
                     libtcod.console_set_char_background(self.savewindow, 22, 0, libtcod.black, libtcod.BKGND_SET)
                     break
             oinc = SBar.inc
-                
+
         XConsoles = [self.conlist]
         SBar.killswitch = True
         del SBar
@@ -2659,7 +2659,7 @@ class CWindow(threading.Thread):
         libtcod.console_set_default_background(self.tconsole, scrollcolor2)
         libtcod.console_print_ex(self.tconsole, 12, 28, libtcod.BKGND_SET, libtcod.LEFT, 'Save')
         DrawBox(self.tconsole, 11, 27, 5, 2, color = bordercol, cornercolor = libtcod.desaturated_red, btype = 'thin')
-        
+
         libtcod.console_set_default_foreground(self.tconsole, hcolor2)
         libtcod.console_set_default_background(self.tconsole, scrollcolor2)
         libtcod.console_print_ex(self.tconsole, 4, 28, libtcod.BKGND_SET, libtcod.LEFT, 'Load')
@@ -2714,10 +2714,10 @@ class CWindow(threading.Thread):
             for y in range(7,10):
                 libtcod.console_set_char_background(self.tconsole, x, y, libtcod.black, libtcod.BKGND_SET)
 
-        libtcod.console_print_ex(self.tconsole, 2, 8, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(lschar)))       
+        libtcod.console_print_ex(self.tconsole, 2, 8, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(lschar)))
         libtcod.console_print_ex(self.tconsole, 17, 8, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(rschar)))
         libtcod.console_set_default_foreground(self.tconsole, hcolor2)
-        libtcod.console_print_ex(self.tconsole, 10, 10, libtcod.BKGND_NONE, libtcod.CENTER, 'Material')        
+        libtcod.console_print_ex(self.tconsole, 10, 10, libtcod.BKGND_NONE, libtcod.CENTER, 'Material')
 
         libtcod.console_set_default_foreground(self.tconsole, bordercol)
         libtcod.console_print_ex(self.tconsole, 5, 21, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(checked)))
@@ -2746,7 +2746,7 @@ class CWindow(threading.Thread):
         libtcod.console_print_ex(self.tconsole, 17, 12, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(rschar)))
         libtcod.console_set_char_foreground(self.tconsole, 2, 12, bordercol)
         libtcod.console_set_char_foreground(self.tconsole, 10, 12, bordercol)
-        
+
         for tile in range(3,17):
             libtcod.console_set_char_background(self.tconsole, tile, 12, libtcod.black, libtcod.BKGND_SET)
             libtcod.console_set_char_background(self.tconsole, tile, 23, libtcod.black, libtcod.BKGND_SET)
@@ -2825,7 +2825,7 @@ class CWindow(threading.Thread):
             libtcod.console_print_ex(self.tconsole, 4, 3, libtcod.BKGND_NONE, libtcod.RIGHT, self.conwstr)
             libtcod.console_print_ex(self.tconsole, 8, 3, libtcod.BKGND_NONE, libtcod.RIGHT, self.conhstr)
             libtcod.console_print_ex(self.tconsole, 11, 3, libtcod.BKGND_NONE, libtcod.RIGHT, self.zstr)
-            
+
             # X
             for num in range(3):
                 # Top Row
@@ -2926,7 +2926,7 @@ class CWindow(threading.Thread):
                 for x in range(3,17):
                     for y in range(7,10):
                         libtcod.console_set_default_background(self.tconsole, libtcod.black)
-                        libtcod.console_print_ex(self.tconsole, x, y, libtcod.BKGND_SET, libtcod.LEFT, ' ')   
+                        libtcod.console_print_ex(self.tconsole, x, y, libtcod.BKGND_SET, libtcod.LEFT, ' ')
             reqs = self.reqmats.items()
             for req in range(3):
                 try:
@@ -2936,9 +2936,9 @@ class CWindow(threading.Thread):
                     libtcod.console_print_ex(self.tconsole, 10, 7 + req, libtcod.BKGND_NONE, libtcod.CENTER, reqname.capitalize() + ': ' + reqnum)
                 except IndexError:
                     pass
-                    
+
             # Type Selection
-                    
+
             if [handle_mouse('cx'),handle_mouse('cy')] == [self.tcrx + 2,self.tcry + 12]:
                 if handle_mouse('lbutton'):
                     libtcod.console_set_char_foreground(self.tconsole, 2, 12, bordercol)
@@ -3023,7 +3023,7 @@ class CWindow(threading.Thread):
                     libtcod.console_set_char_foreground(self.tconsole, 17, 12, hcolor)
 
             # Else...
-                
+
             else:
                 libtcod.console_set_char_foreground(self.tconsole, 2, 12, bordercol)
                 libtcod.console_set_char_foreground(self.tconsole, 17, 12, bordercol)
@@ -3163,7 +3163,7 @@ class CWindow(threading.Thread):
 
             ## RGB Selector ##
             # Individual Colors
-            # Red      
+            # Red
             if handle_mouse('cx') == self.tcrx + 4 and handle_mouse('cy') == self.tcry + 16:
                 if handle_mouse('lbutton'):
                     libtcod.console_set_char_foreground(self.tconsole, 4, 16, bordercol)
@@ -3533,7 +3533,7 @@ class CWindow(threading.Thread):
                         ly,sy = self.initcoords[1],gridy
                     else:
                         ly,sy = gridy,self.initcoords[1]
-                    
+
                     for gx in range(sx,lx + 1):
                         for gy in range(sy,ly + 1):
                             nax = gx + 1 - xplus
@@ -3640,7 +3640,7 @@ class CWindow(threading.Thread):
                                         libtcod.console_set_default_foreground(self.cconsole, fg)
                                         libtcod.console_set_default_background(self.cconsole, bg)
                                         char[2] = 189
-                                        libtcod.console_print_ex(self.cconsole, nax, nay, libtcod.BKGND_SET, libtcod.LEFT, chr(DoChar(char)))                                
+                                        libtcod.console_print_ex(self.cconsole, nax, nay, libtcod.BKGND_SET, libtcod.LEFT, chr(DoChar(char)))
                                     else:
                                         char = self.getTile(gx,gy,self.z - 1)
                                         fg = libtcod.color_lerp(tile[3], libtcod.black, 0.75)
@@ -3672,7 +3672,7 @@ class CWindow(threading.Thread):
             chars = tile[2]
             buildtype = tile[0]
             key = tile[1]
-            randbuildtypes = ['floor'] 
+            randbuildtypes = ['floor']
             if buildtype in randbuildtypes:
                 if not self.otilegrid.get('%s,%s,%s' % (gx,gy,self.z)):
                     char = self.getTile(gx,gy,self.z)
@@ -4085,7 +4085,7 @@ class CWindow(threading.Thread):
                     libtcod.console_set_char_background(self.loadwindow, 22, 0, libtcod.black, libtcod.BKGND_SET)
                     break
             oinc = LBar.inc
-                
+
         XConsoles = [self.conlist,self.tconlist]
         LBar.killswitch = True
         del LBar
@@ -4146,7 +4146,7 @@ class CWindow(threading.Thread):
                         break
                     elif handle_mouse('cx') != self.pconlist[5] or handle_mouse('cy') != self.pconlist[6]:
                         TopWindow = []
-                        
+
                         mx = min(self.mconw,(SCREEN_WIDTH - 1) - handle_mouse('cx'))
                         my = min(self.mconh,(VIEW_HEIGHT + 3) - handle_mouse('cy'))
                         self.pconlist = [self.pconsole,0,0,mx,my,handle_mouse('cx') - 1,handle_mouse('cy') - 1,1.0,0.0]
@@ -4419,7 +4419,7 @@ class CWindow(threading.Thread):
         for x in range(1,self.conw - 1 - xoff):
             for y in range(1,self.conh - 1 - yoff):
                 libtcod.console_set_default_background(self.cconsole, libtcod.black)
-                libtcod.console_print_ex(self.cconsole, x, y, libtcod.BKGND_SET, libtcod.LEFT, ' ')    
+                libtcod.console_print_ex(self.cconsole, x, y, libtcod.BKGND_SET, libtcod.LEFT, ' ')
         if redrawbox:
             DrawBox(self.cconsole, 0, 0, self.conw - 1, self.conh - 1, 1, bordercol, bordercolh2)
         for x in range(self.conw - 2 - xoff):
@@ -4463,7 +4463,7 @@ class CWindow(threading.Thread):
                             char[2] = 189
                             libtcod.console_set_default_foreground(self.cconsole, fg)
                             libtcod.console_set_default_background(self.cconsole, bg)
-                            libtcod.console_print_ex(self.cconsole, x + 1, y + 1, libtcod.BKGND_SET, libtcod.LEFT, chr(DoChar(char)))  
+                            libtcod.console_print_ex(self.cconsole, x + 1, y + 1, libtcod.BKGND_SET, libtcod.LEFT, chr(DoChar(char)))
                         else:
                             if not self.otilegrid.get('%s,%s,%s' % (x,y,self.z - 1)):
                                 char = self.getTile(x,y,self.z - 1)
@@ -4483,7 +4483,7 @@ class CWindow(threading.Thread):
                                 libtcod.console_set_default_background(self.cconsole, bg)
                                 libtcod.console_print_ex(self.cconsole, x + 1, y + 1, libtcod.BKGND_SET, libtcod.LEFT, chr(DoChar(char)))
                             else:
-                                libtcod.console_print_ex(self.cconsole, x + 1, y + 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))                        
+                                libtcod.console_print_ex(self.cconsole, x + 1, y + 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
 
 
     def reSize(self):
@@ -4510,7 +4510,7 @@ class CWindow(threading.Thread):
             self.tcry = 2 + (VIEW_HEIGHT / 2) - 18
             self.sh = self.mconh - (self.conh - 2)
             self.sw = self.mconw - (self.conw - 2)
-            
+
             if self.mconw + 2 > VIEW_WIDTH - 20:
                 self.WBar = WScrollBar(self.cconsole, 1, self.conh - 2, self.conw - 3, self.rx + 1, \
                                       self.ry + self.conh - 2, arrowcolor = bordercolh2, \
@@ -4967,7 +4967,7 @@ def renderButtons():
                 GButton(button[0],button[1],button[2],button[3],button[4],button[5],button[6])
             for button in MGButtonList:
                 MGButton(button[0],button[1],button[2],button[3],button[4],button[5],button[6])
-    
+
 def renderMenus():
     global MenuList,NoMenus
     if len(MenuList) > 0:
@@ -5060,7 +5060,7 @@ def DrawScroll(window,ox,oy,width,height,style = 0):
         libtcod.console_print_ex(window, ox, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(l)))
     for y in range(oy + 1, oy + height):
         libtcod.console_print_ex(window, ox + width, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(r)))
-    
+
     libtcod.console_print_ex(window, ox, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(ul)))
     libtcod.console_print_ex(window, ox + width, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(ur)))
     libtcod.console_print_ex(window, ox, oy + height, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bl)))
@@ -5141,7 +5141,7 @@ def DrawBox(window, ox, oy, width, height, cornerstyle = 0, color = None, \
         libtcod.console_print_ex(window, ox + width, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
 
     libtcod.console_set_default_foreground(window, cornercolor)
-    
+
     if cornerstyle == 0:
         libtcod.console_print_ex(window, ox, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(choice(vectorchars))))
         libtcod.console_print_ex(window, ox + width, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(choice(vectorchars))))
@@ -5164,7 +5164,7 @@ def DoMenu(window, ox, oy, optionlist, hcolor = libtcod.azure, ocolor = libtcod.
         moptionlist = optionlist[0 + (25 * moffset):(moffset + 1) * 25]
     else:
         moptionlist = optionlist
-        
+
     libtcod.console_set_default_foreground(window, tcolor)
     for option in range(len(moptionlist)):
         opcells = []
@@ -5239,7 +5239,7 @@ def DoMenu(window, ox, oy, optionlist, hcolor = libtcod.azure, ocolor = libtcod.
         moffset += 1
     if (handle_mouse('lbutton_pressed') or key.vk == libtcod.KEY_ENTER) and moptionlist[playery - 1] == '<< Previous <<':
         moffset -= 1
-        
+
     oplayery = playery
 
 def solidScale(image, newx, newy, territory = 0):
@@ -5260,7 +5260,7 @@ def solidScale(image, newx, newy, territory = 0):
             except KeyError:
                 pass
     scaleimage = libtcod.image_from_console(imageconsole)
-    
+
     return [scaleimage,xscale,yscale,terrcivdict]
 
 def textWrap(text, conwidth = VIEW_WIDTH):
@@ -5336,7 +5336,7 @@ def handle_keys():
                     for tile in groupbutton:
                         if (handle_mouse('cx'),handle_mouse('cy')) == (tile[0] + GUIxloc,tile[1] + GUIyloc):
                             if handle_mouse('lbutton_pressed'):
-                                GameWorld.doGUIMenu('group')                    
+                                GameWorld.doGUIMenu('group')
                     taskbutton = GUITiles['task']
                     for tile in taskbutton:
                         if (handle_mouse('cx'),handle_mouse('cy')) == (tile[0] + GUIxloc,tile[1] + GUIyloc):
@@ -5368,7 +5368,7 @@ def handle_keys():
                             lock.acquire()
                             char = [button_add[0] + x,button_add[1],255]
                             libtcod.console_print_ex(GUILayer,GUITiles['add'][0][0] + x,GUITiles['add'][0][1],libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
-                            lock.release()                        
+                            lock.release()
                     subbutton = GUITiles['sub']
                     subhover = False
                     for tile in subbutton:
@@ -5407,7 +5407,7 @@ def handle_keys():
                     button2 = GUITiles['button2']
                     for tile in button2:
                         if (handle_mouse('cx'),handle_mouse('cy')) == (tile[0] + GUIxloc,tile[1] + GUIyloc):
-                            b2hover = True                    
+                            b2hover = True
                     b3hover = False
                     button3 = GUITiles['button3']
                     for tile in button3:
@@ -5576,7 +5576,7 @@ def handle_keys():
                         XConsoles.remove(GUICon)
                     if GUIBlurbCon in XConsoles:
                         XConsoles.remove(GUIBlurbCon)
-                        
+
             # World Start Site Selection
             if handle_mouse('lbutton') and (handle_mouse('cx') in range(SCREEN_WIDTH - VIEW_WIDTH - 2,SCREEN_WIDTH - 2) and \
                                   handle_mouse('cy') in range(2,VIEW_HEIGHT + 2)) and not dogui:
@@ -5630,7 +5630,7 @@ def handle_keys():
                     pathclass.start()
                 else:
                     pathlock = False
-                
+
         if handle_mouse('dx') + handle_mouse('dy') != 0:
             movetime = time.time()
 
@@ -5851,7 +5851,7 @@ def handle_keys():
                                 doScreenSetup()
                                 NewWorldHistory = WorldHistory()
                                 NewWorldHistory.start()
-                                
+
             elif key.c == ord('i') or (key.vk == libtcod.KEY_ESCAPE and GameWorld.invopen):
                 if DOSCREEN == 2 and GameWorld.setupdone:
                     if GameWorld.optopen:
@@ -5928,7 +5928,7 @@ def handle_keys():
                                 namebutton = ButtonBox(wswindow, 5, ((SCREEN_HEIGHT - 2) / 2) + 6, 'Name Gen.', 'n')
                                 scalebutton = ButtonBox(wswindow, 5, ((SCREEN_HEIGHT - 2) / 2) + 10, 'Scale Map', 's')
                                 scaleswitch = False
-                    
+
         if DOSCREEN == 2:
             if GameWorld.rswitch == True:
                 limitx,limity = RMAP_WIDTH,RMAP_HEIGHT
@@ -5985,7 +5985,7 @@ def doScreenSetup():
         for y in range(2):
             char = [x,44 + y,255]
             libtcod.console_print_ex(0,48 + ((SCREEN_WIDTH - 102) / 2) + x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
-    
+
     libtcod.console_print_ex(0, 19, 0, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapn)))
     libtcod.console_print_ex(0, 19, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
     libtcod.console_print_ex(0, 19, VIEW_HEIGHT + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(border3waye)))
@@ -6100,7 +6100,7 @@ def doIntroSetup():
         mody = 1.0
 
     mod = (modx + mody) / 2.0
-    
+
     CurText = FadeText(title, (SCREEN_WIDTH / 2), 2, align='center', fadefrom=libtcod.black, fadeto=libtcod.white, \
                        con=GraphicsLayer).start()
 
@@ -6221,11 +6221,11 @@ def doWorldAtlasSetup():
     libtcod.console_set_default_background(wswindow, bgcolor)
     libtcod.console_rect(wswindow,0,0,SCREEN_WIDTH - VIEW_WIDTH - 3,SCREEN_HEIGHT - 2,False,libtcod.BKGND_SET)
     libtcod.console_set_default_foreground(wswindow, libtcod.white)
-    
+
     libtcod.console_set_default_foreground(0, libtcod.white)
     libtcod.console_print_ex(0, 56 + ((SCREEN_WIDTH - 102) / 2), 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
-    libtcod.console_set_default_foreground(0, libtcod.white)   
-    
+    libtcod.console_set_default_foreground(0, libtcod.white)
+
     libtcod.console_set_default_foreground(0, libtcod.white)
     libtcod.console_print_ex(0, 63 + ((SCREEN_WIDTH - 102) / 2), 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapw)))
     libtcod.console_set_default_foreground(0, libtcod.white)
@@ -6642,7 +6642,7 @@ def DrawGlaciers(window,width = MAP_WIDTH,height = MAP_HEIGHT, xoffset = 0, yoff
                 libtcod.console_set_default_background(window, gcol)
                 libtcod.console_print_ex(window, x + xloc, y + yloc, libtcod.BKGND_ALPHA(coef), libtcod.LEFT, chr(DoChar(gchar)))
                 libtcod.console_set_char_foreground(window, x + xloc, y + yloc, libtcod.color_lerp(gcol,libtcod.Color(135,167,174),0.5))
-                    
+
 
 
 
@@ -6774,7 +6774,7 @@ def DrawWorld(window, width = MAP_WIDTH, height = MAP_HEIGHT, xoffset = 0, yoffs
         DrawTexture(window, width, height, \
                     xoffset, yoffset, xloc, yloc, \
                     poslist)
-        
+
     if forests:
         DrawForests(window, width, height, \
                     xoffset, yoffset, xloc, yloc, \
@@ -6933,9 +6933,9 @@ class World(threading.Thread):
                 libtcod.heightmap_set_value(worldmap, x, y, height)
 
         # Smooth the world.
-        libtcod.heightmap_kernel_transform(worldmap, 8, [0,-1,-1,-1,0,1,1,1], [1,1,0,-1,-1,-1,0,1], [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5], int(minmax[0]), int(minmax[1])) 
-        libtcod.heightmap_kernel_transform(worldmap, 8, [0,-1,-1,-1,0,1,1,1], [1,1,0,-1,-1,-1,0,1], [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5], int(minmax[0]), int(minmax[1])) 
-      
+        libtcod.heightmap_kernel_transform(worldmap, 8, [0,-1,-1,-1,0,1,1,1], [1,1,0,-1,-1,-1,0,1], [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5], int(minmax[0]), int(minmax[1]))
+        libtcod.heightmap_kernel_transform(worldmap, 8, [0,-1,-1,-1,0,1,1,1], [1,1,0,-1,-1,-1,0,1], [0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5], int(minmax[0]), int(minmax[1]))
+
         keyidx = [0, 13, 17, 24, 28, 34, 49, 50, 59, 95, 200]
         keycols = [libtcod.Color(28,16,5), libtcod.Color(44,33,14), libtcod.Color(72,69,42), \
                    libtcod.Color(126,134,61), libtcod.Color(92,121,54), libtcod.Color(27,92,18), \
@@ -6952,14 +6952,14 @@ class World(threading.Thread):
         CurText = FadeText(textWrap(wgtext)[0], VIEW_WIDTH / 2, 4, con=wiwindow, speed=50, align='center').start()
         PFName = MakeName(PLang)
         wgtext = choice(['But the mysterious catastrophe now known as the \'%s\' ended the reign of the %s forever.' % (PFName, PName), \
-                                'However, the %s empire fell during the great cataclysm now referred to only as the \'%s\'.' % (PName, PFName)])          
+                                'However, the %s empire fell during the great cataclysm now referred to only as the \'%s\'.' % (PName, PFName)])
         CurText = FadeText(textWrap(wgtext)[0], VIEW_WIDTH / 2, 6, con=wiwindow, speed=50, align='center').start()
 
         # Generate forests.
 
         forestmap = libtcod.heightmap_new(MAP_WIDTH,MAP_HEIGHT)
         libtcod.heightmap_add_voronoi(forestmap, randrange(100,300), 4, [0.2,0.4,0.5,0.6])
-        libtcod.heightmap_rain_erosion(forestmap, MAP_WIDTH * 142 * rainfall, 0.05, 0.5)   
+        libtcod.heightmap_rain_erosion(forestmap, MAP_WIDTH * 142 * rainfall, 0.05, 0.5)
         fminmax = list(libtcod.heightmap_get_minmax(forestmap))
 
         glaciermap = libtcod.heightmap_new(MAP_WIDTH,MAP_HEIGHT)
@@ -6986,7 +6986,7 @@ class World(threading.Thread):
         libtcod.heightmap_add_voronoi(desertmap, randrange(100,300), 4, [0.2,0.4,0.5,0.6])
         libtcod.heightmap_add_fbm(desertmap, dnoise, 1.0, 1.0, 0.5, 0.5, 22, 0.4, 0.8)
         libtcod.heightmap_lerp_hm(desertmap, worldmap, desertmap, 0.1)
-        #libtcod.heightmap_rain_erosion(desertmap, MAP_WIDTH * 142 * rainfall, 0.0, 0.02)   
+        #libtcod.heightmap_rain_erosion(desertmap, MAP_WIDTH * 142 * rainfall, 0.0, 0.02)
         dminmax = list(libtcod.heightmap_get_minmax(desertmap))
         dcolmap = libtcod.color_gen_map(dkeycols, dkeyidx)
 
@@ -6994,14 +6994,14 @@ class World(threading.Thread):
 
         swkeyidx = [0, 500]
         swkeycols = [libtcod.Color(48,63,28), libtcod.Color(114,118,52)]
-        
+
         swampmap = libtcod.heightmap_new(MAP_WIDTH,MAP_HEIGHT)
         swnoise = libtcod.noise_new(3)
         libtcod.heightmap_add_voronoi(swampmap, randrange(100,300), 4, [0.2,0.4,0.5,0.6])
         libtcod.heightmap_add_voronoi(swampmap, randrange(100,300), 4, [0.2,0.4,0.5,0.6])
         libtcod.heightmap_add_fbm(swampmap, swnoise, 1.0, 1.0, 0.5, 0.5, 22, 0.4, 0.8)
         libtcod.heightmap_lerp_hm(swampmap, worldmap, swampmap, 0.1)
-        libtcod.heightmap_rain_erosion(swampmap, MAP_WIDTH * 142 * rainfall, 0.02, 0.08)   
+        libtcod.heightmap_rain_erosion(swampmap, MAP_WIDTH * 142 * rainfall, 0.02, 0.08)
         swminmax = list(libtcod.heightmap_get_minmax(swampmap))
         swcolmap = libtcod.color_gen_map(swkeycols, swkeyidx)
 
@@ -7056,7 +7056,7 @@ class World(threading.Thread):
         count = 0
         for pos in wheightlist:
             x = count / MAP_HEIGHT
-            y = count % MAP_HEIGHT 
+            y = count % MAP_HEIGHT
             wheightdict['%s,%s' % (x,y)] = pos
             col = colmap[-(pos)]
             col = col + libtcod.Color(randrange(0,5),randrange(0,5),randrange(0,5))
@@ -7080,7 +7080,7 @@ class World(threading.Thread):
             tsyvar += randrange(-1,2) * 0.6
             tivar[x] = int(tsyvar)
 
-        # Add beaches.        
+        # Add beaches.
 
         for y in range(MAP_HEIGHT):
             for x in range(MAP_WIDTH):
@@ -7195,7 +7195,7 @@ class World(threading.Thread):
                             dadjust = libtcod.color_lerp(dcol,libtcod.white,0.5)
                             libtcod.console_set_char_foreground(wgwindow, x, y, dadjust)
                             wtexturedict['%s,%s' % (x,y)] = [char,dadjust]
-                        
+
 
         wgtext = 'Adding swamps...'
         CurText = FadeText(wgtext, 1, 12, con=wswindow, speed=25).start()
@@ -7254,7 +7254,7 @@ class World(threading.Thread):
 
 
         fseed = randrange(39,43)
-        fdict = {0:'cf', 1:'df', 2:'bf', 3:'ef', 4:'mf', 5:'cf', 6:'mf', 7:'cf'}  
+        fdict = {0:'cf', 1:'df', 2:'bf', 3:'ef', 4:'mf', 5:'cf', 6:'mf', 7:'cf'}
         fpdict = {'cf': [6,5,255], 'bf': [0,5,255], 'ef': [13,5,255], 'mf': [5,5,255], 'df': [4,5,255], 'tf': [8,5,255]}
         for y in range(MAP_HEIGHT):
             for x in range(MAP_WIDTH):
@@ -7356,8 +7356,8 @@ class World(threading.Thread):
                         if ftype:
                             libtcod.console_set_default_foreground(wgwindow, libtcod.white)
                             libtcod.console_print_ex(wgwindow, x, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(fpdict[ftype])))
-                            
-        
+
+
         for y in range(MAP_HEIGHT):
             for x in range(MAP_WIDTH):
                 # Draw snowcaps.
@@ -7392,7 +7392,7 @@ class World(threading.Thread):
             except KeyError:
                 gyvar += randrange(-2,3) * 0.6
                 gyvar = min(gyvar,12)
-                
+
             gvar[x] = int(gyvar)
 
         wgcoldict = {}
@@ -7436,7 +7436,7 @@ class World(threading.Thread):
                         libtcod.console_print_ex(wgwindow, x, y, libtcod.BKGND_ALPHA(coef), libtcod.LEFT, chr(DoChar(char)))
                         wtexturedict['%s,%s' % (x,y)] = [char,col]
                         libtcod.console_set_default_background(wgwindow, gcol)
-                        
+
         wgtext = 'Adding scrub...'
         CurText = FadeText(wgtext, 1, 23, con=wswindow, speed=25).start()
 
@@ -7510,7 +7510,7 @@ class World(threading.Thread):
         mod = (modx + mody) / 2.0
 
         rivernum = int(rivernum * mod)
-        
+
         startnum = rivernum
         libtcod.console_print_ex(wswindow, 9, 29, libtcod.BKGND_NONE, libtcod.CENTER, '(%s/%s)' % (startnum - rivernum,startnum))
         sourcelist = []
@@ -7627,7 +7627,7 @@ class World(threading.Thread):
 
                 if killriv:
                     break
-                            
+
 
                 breakloop = False
                 for river in riverlist:
@@ -7643,8 +7643,8 @@ class World(threading.Thread):
 
             if not breakloop and not wheightdict['%s,%s' % (curriv[-1][0],curriv[-1][1])] < 152:
                 continue
-            
-            rivname = MakeName(PLang)     
+
+            rivname = MakeName(PLang)
             riverlist.append(curriv)
             oldtime = curtime
             curtime = time.time()
@@ -7672,7 +7672,7 @@ class World(threading.Thread):
 
         rdictlist = []
         for river in wriverdict.items():
-            rdictlist.append([list(river)[0],list(river)[1]])  
+            rdictlist.append([list(river)[0],list(river)[1]])
 
         for river in rdictlist:
             tribendlist = []
@@ -7773,7 +7773,7 @@ class World(threading.Thread):
         for y in range(MAP_HEIGHT):
             for x in range(MAP_WIDTH):
                 # Draw winterized mountains.
-                if wheightdict['%s,%s' % (x,y)] > wmlev - 1 and (float(y) / MAP_HEIGHT * 100) < ivar[x]:              
+                if wheightdict['%s,%s' % (x,y)] > wmlev - 1 and (float(y) / MAP_HEIGHT * 100) < ivar[x]:
                     mcol = libtcod.Color(187,229,241)
                     mfcol = libtcod.Color(47,124,148)
                     malpha = choice([0.9,0.8,0.85])
@@ -7831,9 +7831,9 @@ class World(threading.Thread):
                             continue
                     caveok.append([x,y])
 
-        
+
         cavenum = 150
-        
+
         if MAP_WIDTH != 500:
             modx = float(MAP_WIDTH) / float(500)
         else:
@@ -7846,7 +7846,7 @@ class World(threading.Thread):
         mod = (modx + mody) / 2.0
 
         cavenum = int(cavenum * mod)
-        
+
         wcavedict = {}
         cavelist = []
         while cavenum > 0 and len(caveok) > 0:
@@ -7906,7 +7906,7 @@ class World(threading.Thread):
                 libtcod.console_set_char_background(testconsole, x, y, heightcol, libtcod.BKGND_SET)
 
         while True:
-            try:        
+            try:
                 heightpic = libtcod.image_from_console(testconsole)
                 libtcod.image_save(heightpic,'.\\image\\gfx\\hmap.png')
                 break
@@ -7965,7 +7965,7 @@ class WorldNaming(threading.Thread):
 
         wheightlist = []
         wpeakdict = {}
-        
+
         for pos in wheightdict.items():
             wheightlist.append(list(pos))
 
@@ -8112,7 +8112,7 @@ class WorldNaming(threading.Thread):
         CurText = FadeText(wgtext, 1, 10, con=wswindow, speed=25).start()
 
         # Generate desert names.
-        
+
         grid = 0
         xgrid = 10
         ygrid = 10
@@ -8200,7 +8200,7 @@ class WorldNaming(threading.Thread):
         CurText = FadeText(wgtext, 1, 12, con=wswindow, speed=25).start()
 
         # Generate arctic desert names.
-        
+
         grid = 0
         xgrid = 10
         ygrid = 10
@@ -8277,7 +8277,7 @@ class WorldNaming(threading.Thread):
         CurText = FadeText(wgtext, 1, 14, con=wswindow, speed=25).start()
 
         # Generate swamp names.
-        
+
         grid = 0
         xgrid = 10
         ygrid = 10
@@ -8356,7 +8356,7 @@ class WorldNaming(threading.Thread):
         CurText = FadeText(wgtext, 1, 16, con=wswindow, speed=25).start()
 
         # Generate plains & names.
-        
+
         grid = 0
         xgrid = 10
         ygrid = 10
@@ -8438,7 +8438,7 @@ class WorldNaming(threading.Thread):
         CurText = FadeText(wgtext, 1, 18, con=wswindow, speed=25).start()
 
         # Name glaciers.
-        
+
         grid = 0
         xgrid = 10
         ygrid = 10
@@ -8564,7 +8564,7 @@ class WorldNaming(threading.Thread):
                     shoredict.pop('%s,%s' % (pos[0],pos[1]))
                 except KeyError:
                     pass
-                
+
             lakelist.append(curbody)
 
         # Name lakes.
@@ -8573,20 +8573,20 @@ class WorldNaming(threading.Thread):
         libtcod.console_set_default_background(wgwindow, libtcod.dark_azure)
         libtcod.console_set_default_foreground(wgwindow, libtcod.white)
         lakelist.sort(LenCmp)
-        
+
         oceantiles = lakelist.pop(0)
         for tile in oceantiles:
             if wheightdict['%s,%s' % (tile[0],tile[1])] < wwlev:
                 wfeaturedict['%s,%s' % (tile[0],tile[1])] += ['o']
 
         for lake in lakelist:
-            
+
             for tile in lake:
                 if wheightdict['%s,%s' % (tile[0],tile[1])] < 152:
                     wfeaturedict['%s,%s' % (tile[0],tile[1])] += ['l']
                 if wheightdict['%s,%s' % (tile[0],tile[1])] == 152:
                     wfeaturedict['%s,%s' % (tile[0],tile[1])] += ['ls']
-                    
+
             islake = True
             lake.sort(ListCmp)
             westcheck = [lake[-1][0] - 1,lake[-1][1]]
@@ -8616,7 +8616,7 @@ class WorldNaming(threading.Thread):
 
             if len(lake) < 5:
                 islake = False
-            
+
             if islake:
                 lakename = MakeName(PLang)
                 if len(lake) > 1800:
@@ -8715,7 +8715,7 @@ class WorldNaming(threading.Thread):
 
             if len(island) < 5:
                 isisle = False
-            
+
             if isisle:
                 islename = MakeName(PLang)
                 if len(island) > 20000:
@@ -8730,13 +8730,13 @@ class WorldNaming(threading.Thread):
 
         wgtext = 'Naming oceans...'
         CurText = FadeText(wgtext, 1, 33, con=wswindow, speed=25).start()
-               
+
         # Name oceans/seas.
 
         woceandict = {}
         libtcod.console_set_default_background(wgwindow, libtcod.dark_blue)
         libtcod.console_set_default_foreground(wgwindow, libtcod.white)
-        
+
         nocean = []
         socean = []
         eocean = []
@@ -8801,7 +8801,7 @@ class WorldNaming(threading.Thread):
         libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 9, libtcod.BKGND_NONE, libtcod.CENTER, 'Naming complete!')
 
         libtcod.console_set_default_foreground(wswindow, libtcod.white)
-        libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 7, libtcod.BKGND_NONE, libtcod.CENTER, 'To move on to\ncreature gen,\ntype \'c\'.\n\nOtherwise,\npress \'g\' or\nclick the button\nto generate a\nnew map.')        
+        libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 7, libtcod.BKGND_NONE, libtcod.CENTER, 'To move on to\ncreature gen,\ntype \'c\'.\n\nOtherwise,\npress \'g\' or\nclick the button\nto generate a\nnew map.')
 
         libtcod.console_set_default_background(wgwindow, libtcod.black)
         genbutton = ButtonBox(wswindow, 6, ((SCREEN_HEIGHT - 2) / 2) + 4, 'New Map', 'g')
@@ -9113,7 +9113,7 @@ class WorldCreatures(threading.Thread):
         handdict['bulky'] = ['*','*',['narrow','flexible'],[('STR',3),('END',-2),('AGI',-1)],['bulky','massive','hefty'],5]
         handdict['stumpy'] = ['*','*',['flexible','grade_off'],[('DEF',10),('STR',6),('AGI',-10),('SPD',-6)],['stumpy','stocky','stout'],5]
         handdict['flexible'] = ['*','*',['bulky','stumpy'],[('AGI',4),('ATK',2),('DEF',-2),('END',-4)],['flexible','limber','bendable'],0]
-        handdict['padded'] = ['*','*',[],[('DEF',3),('END',2),('ATK',-2),('AGI',-3)],['padded','calloused','thickly-padded'],2]        
+        handdict['padded'] = ['*','*',[],[('DEF',3),('END',2),('ATK',-2),('AGI',-3)],['padded','calloused','thickly-padded'],2]
         handdict['large'] = ['*','*',['small'],[('AP',3),('AGI',-2)],['large','enormous','giant','huge'],5]
         handdict['small'] = ['*','*',['large'],[('AGI',3),('AP',-2)],['small','tiny','miniature','petite'],-5]
 
@@ -9348,7 +9348,7 @@ class WorldCreatures(threading.Thread):
         tentdict['sucker-covered'] = ['*','*',['grade_off'],[('AGI',8),('SPD',-4)],['sucker-covered'],1]
         tentdict['tendril-covered'] = ['*','*',['grade_off','rare'],[('AGI',6),('SPD',-3)],['tendril-covered'],1]
         tentdict['clawed'] = ['*',['Terrestrial','Subterranean','Amphibian'],['grade_off','very_rare'],[('ATK',10),('AGI',-2)],['clawed','spurred'],1]
-        tentdict['taloned'] = ['*',['Aerial'],['grade_off'],[('ATK',10),('AGI',-2)],['taloned','very_rare'],1]        
+        tentdict['taloned'] = ['*',['Aerial'],['grade_off'],[('ATK',10),('AGI',-2)],['taloned','very_rare'],1]
         tentdict['large'] = ['*','*',['small','short','thin'],[('STR',3),('AGI',-2)],['large','enormous','giant','huge'],5]
         tentdict['small'] = ['*','*',['large','long','bulky'],[('AGI',3),('STR',-2)],['small','tiny','miniature','petite'],-5]
         tentdict['prehensile'] = ['*','*',['ultra_rare','grade_off'],[('AP',10)],['prehensile'],0]
@@ -9420,7 +9420,7 @@ class WorldCreatures(threading.Thread):
         wingdict['pointed'] = ['*','*',[],[('END',5),('AGI',2),('SPD',-2),('DEF',-5)],['pointed','acute','cuspate'],0]
         wingdict['flat'] = ['*','*',[],[('END',4),('STR',2),('DEF',-2),('SPD',-4)],['flat','planar','level','smooth'],-2]
         wingdict['slotted'] = ['*','*',[],[('STR',3),('END',2),('ATK',-2),('SPD',-3)],['grooved','slotted','ridged','striated'],-2]
-        wingdict['back-swept'] = ['*','*',['grade_off'],[('AP',15),('SPD',5),('ATK',5),('DEF',-5),('END',-5),('STR',-5)],['back-swept'],0]        
+        wingdict['back-swept'] = ['*','*',['grade_off'],[('AP',15),('SPD',5),('ATK',5),('DEF',-5),('END',-5),('STR',-5)],['back-swept'],0]
 
         bodydict = {}
 
@@ -9577,7 +9577,7 @@ class WorldCreatures(threading.Thread):
 
             biomes = wchoice([(1,.9),(2,.06),(3,.03),(4,.01)])
             biomelist = []
-            
+
             for biome in range(biomes):
                 try:
                     biomelist.append(choice(filter(lambda x: x not in biomelist,filter(lambda x: x[0] == tempzone,biomedict[sphere])[0][1])))
@@ -9675,7 +9675,7 @@ class WorldCreatures(threading.Thread):
                 creature['hips'] = 1
             else:
                 creature['body'] = 1
-                
+
             description = []
             para1 = []
             para2 = []
@@ -9771,7 +9771,7 @@ class WorldCreatures(threading.Thread):
                                       '%s %s chooses to %s %s.' % (dchoice(ctitles,1),dchoice(t('rarelywords')),dchoice(t('terrguardwords')),p.a(dchoice(t('territorywords')))), \
                                       'It is only %s that %s chooses to %s %s.' % (dchoice(t('rarelywords')),dchoice(ctitles),dchoice(t('terrguardwords')), \
                                                                                    p.a(dchoice(t('territorywords'))))])
-            
+
             elif territoriality in [6,7]:
                 line = choice(['%s, %s prefers to %s %s.' % (dchoice(t('oftenwords'),1),dchoice(ctitles),dchoice(t('terrguardwords')),p.a(dchoice(t('territorywords')))), \
                                       '%s %s chooses to %s %s.' % (dchoice(ctitles,1),dchoice(t('oftenwords')),dchoice(t('terrguardwords')),p.a(dchoice(t('territorywords')))), \
@@ -10068,12 +10068,12 @@ class WorldCreatures(threading.Thread):
                         teeth = wchoice([(randrange(2,51,2),.9),(randrange(100,3001,2),.1)])
                         creature['teeth'] = teeth
                         creature['tongue'] = 1
-                        
+
                     # Horns
                     horns = wchoice([(0,.9),(1,.045),(2,.045),(randrange(3,101),.01)])
                     if horns > 0:
                         creature['horns'] = horns
-                        
+
                     # Ears
                     ears = wchoice([(0,.0025),(2,.995),(randrange(4,21,2),.0025)])
                     if ears > 0:
@@ -10098,7 +10098,7 @@ class WorldCreatures(threading.Thread):
                     tentacles = wchoice([(0,.98),(2,.019),(randrange(4,13,2),.001)])
                     if tentacles > 0:
                         creature['tentacles'] = tentacles
-                
+
                 # Legs
 
                 if bodytype != 'non-segmented':
@@ -10173,7 +10173,7 @@ class WorldCreatures(threading.Thread):
                         creature['type-cover'] = 'feathers'
                         cover = 'feathers'
                         creature['feathers'] = 1
-                    
+
                 # Body Covering
                 if not 'type-cover' in creature.keys():
                     if bodytype == 'segmented':
@@ -10345,7 +10345,7 @@ class WorldCreatures(threading.Thread):
                         creature['type-cover'] = 'feathers'
                         cover = 'feathers'
                         creature['feathers'] = 1
-                    
+
                 # Body Covering
                 if not 'type-cover' in creature.keys():
                     if bodytype == 'segmented':
@@ -10446,7 +10446,7 @@ class WorldCreatures(threading.Thread):
                              t('white') + t('yellow')
                     eyecolor = choice(colors)
                     chosentraits = self.ptraits(creature,'eyes')
-                    
+
                     if (randrange(1,6) == 1 and eyecolor not in t('black')) or 'reflective' in chosentraits:
                         if 'reflective' in chosentraits:
                             eyemod = choice(t('neon'))
@@ -10481,13 +10481,13 @@ class WorldCreatures(threading.Thread):
                             eyeline = choice(['%s eye is %s.' % (dchoice(ctitles,1,1),eyecolor), \
                                                      'It is %s.' % (eyecolor)])
                     # End Color Modification
-                            
+
                     if creature['heads'] == 1 and creature['eyes'] > 1:
                         line = choice(['%s has %s %s eyes.' % (dchoice(ctitles,1),p.number_to_words(creature['eyes']), \
                                                                           p.join(chosentraits)), \
                                               '%s %s eyes are %s.' % (dchoice(ctitles,1,1),p.number_to_words(creature['eyes']), \
                                                                           p.join(chosentraits))])
-                        
+
                     elif creature['heads'] > 1 and creature['eyes'] > 1:
                         line = choice(['%s has %s %s eyes per head.' % (dchoice(ctitles,1),p.number_to_words(creature['eyes']), \
                                                                                    p.join(chosentraits)), \
@@ -10497,7 +10497,7 @@ class WorldCreatures(threading.Thread):
                     elif creature['heads'] == 1 and creature['eyes'] == 1:
                         line = choice(['%s has a single %s eye.' % (dchoice(ctitles,1),p.join(chosentraits)), \
                                               '%s singular eye is %s.' % (dchoice(ctitles,1,1),p.join(chosentraits))])
-                        
+
                     else:
                         line = choice(['%s has a single %s eye per head.' % (dchoice(ctitles,1),p.join(chosentraits)), \
                                               'Each of %s heads has a single %s eye.' % (dchoice(ctitles,0,1),p.join(chosentraits))])
@@ -10668,7 +10668,7 @@ class WorldCreatures(threading.Thread):
                         line = choice(['%s has a single %s horn.' % (dchoice(ctitles,1),p.join(chosentraits)), \
                                               '%s singular horn is %s.' % (dchoice(ctitles,1,1),p.join(chosentraits))])
                         para1.append(line)
-                        
+
                     elif creature['heads'] > 1 and creature['horns'] == 1:
                         line = choice(['%s has a single %s horn per head.' % (dchoice(ctitles,1),p.join(chosentraits)), \
                                               'Each of %s heads has a single %s horn.' % (dchoice(ctitles,0,1),p.join(chosentraits))])
@@ -10705,7 +10705,7 @@ class WorldCreatures(threading.Thread):
             # Segmented Body Notes
             if bodytype == 'segmented':
                 if creature.get('thorax'):
-                    
+
                     line = choice(['%s body is %s three %s %s.' % (dchoice(ctitles,1,1),dchoice(t('dividewords')),dchoice(t('mainwords')),dchoice(t('segwordplur'))), \
                                           '%s has an insect-like, %s body structure.' % (dchoice(ctitles,1,1),dchoice(t('segadj'))), \
                                           '%s has three %s body %s.' % (dchoice(ctitles,1),dchoice(t('mainwords')),dchoice(t('segwordplur')))])
@@ -10991,7 +10991,7 @@ class WorldCreatures(threading.Thread):
                 else:
                     line = choice(['%s tail is %s.' % (dchoice(ctitles,1,1),p.join(chosentraits)), \
                                           '%s has a %s tail.' % (dchoice(ctitles,1),p.join(chosentraits))])
-                
+
                 para2.append(line)
 
             # Body Covering
@@ -11030,7 +11030,7 @@ class WorldCreatures(threading.Thread):
                                                   t('patched'))
 
                 skincolorlist = [('black',.02),('gray',.02),('tan',.95),('white',.01)]
-                
+
                 chosentraits = self.ptraits(creature,cover)
                 if cover == 'exoskeleton':
                     line = choice(['%s has %s %s.' % (dchoice(ctitles,1),p.a(p.join(chosentraits)),cover), \
@@ -11170,7 +11170,7 @@ class WorldCreatures(threading.Thread):
                                                    'It is %s.' % (color)])
 
                 chosentraits2 = self.ptraits(creature,'skin')
-                    
+
                 line = choice(['%s has %s skin.' % (dchoice(ctitles,1),p.join(chosentraits2)),
                                              '%s skin is %s.' % (dchoice(ctitles,1,1),p.join(chosentraits2))])
                 line += ' ' + skincolorline
@@ -11223,7 +11223,7 @@ class WorldCreatures(threading.Thread):
                                 mods[mod[0]] += mod[1]
 
                 creature['mods'] = mods
-                
+
                 creature['description'] = ' '.join(para1) + '\n\n' + ' '.join(para2) + '\n\n' + ' '.join(para3)
                 if sizecat > 4:
                     creaturechar = creaturename[0].upper()
@@ -11283,7 +11283,7 @@ class WorldCreatures(threading.Thread):
                 startposlist = filter(lambda pos: wheightdict['%s,%s' % (pos[0],pos[1])] < 152,startposlist)
             else:
                 startposlist = filter(lambda pos: wheightdict['%s,%s' % (pos[0],pos[1])] > 151,startposlist)
-            
+
             try:
                 startpos = choice(startposlist)
             except IndexError:
@@ -11303,7 +11303,7 @@ class WorldCreatures(threading.Thread):
         cpopdict = {}
 
         # Initial Population
-                
+
         for creature in wcreaturedict.values():
             name = creature['name']
             if creature['extinct']:
@@ -11386,7 +11386,7 @@ class WorldCreatures(threading.Thread):
 
         genbutton = ButtonBox(wswindow, 6, ((SCREEN_HEIGHT - 2) / 2) + 4, 'New Map', 'g')
         namebutton = ButtonBox(wswindow, 4, ((SCREEN_HEIGHT - 2) / 2) + 8, 'History Gen', 'h')
-        
+
         del self
 
 ####################################
@@ -11407,7 +11407,7 @@ class WorldHistory(threading.Thread):
                wtexturedict, wbiomedict, MouseLock, wgcoldict, wmountaindict
 
         WorldGoing = True
-        
+
         DrawWorld(wgwindow, cities = False)
 
         libtcod.console_set_default_foreground(wswindow, libtcod.white)
@@ -11430,14 +11430,14 @@ class WorldHistory(threading.Thread):
         civleft = civnum
         libtcod.console_set_default_foreground(wswindow, libtcod.white)
         time.sleep(2)
-        
+
         while civleft > 0:
             time.sleep(.1)
             civleft -= 1
             libtcod.console_print_ex(wswindow, 9, 7, libtcod.BKGND_NONE, libtcod.CENTER, '(%s/%s)' % (civnum - civleft,civnum))
 
             # Civ Initialization
-            
+
             language = MakeLang()
             name = MakeName(language)
             wcivdict[name] = language
@@ -11467,13 +11467,13 @@ class WorldHistory(threading.Thread):
             wcivdict[name + '-magic'] = 10 - wcivdict[name + '-technology'] + randrange(0,4)
             wcivdict[name + '-commerce'] = randrange(1,11) + randrange(0,4)
             wcivdict[name + '-spirituality'] = 10 - wcivdict[name + '-commerce'] + randrange(0,4)
-            
+
             a = randrange(50,256)
             b = randrange(50,256)
             c = randrange(50,256)
             wcivdict[name + '-civcol'] = libtcod.Color(a,b,c)
             wcivdict[name + '-civcol2'] = libtcod.Color(c / 2,b / 2,a / 2)
-            
+
         wgtext = 'Placing civs...'
         CurText = FadeText(wgtext, 1, 9, con=wswindow, speed=25).start()
 
@@ -11535,7 +11535,7 @@ class WorldHistory(threading.Thread):
 
         while year <= stopyear:
             libtcod.console_print_ex(wswindow, 9, 17, libtcod.BKGND_NONE, libtcod.CENTER, 'Year %s' % year)
-            
+
             for civ in curcivs:
                 civname = wcivdict[civ]
                 for pos in waitingdict1[civname]:
@@ -11544,7 +11544,7 @@ class WorldHistory(threading.Thread):
                         curposdict[civname].append(pos)
                     else:
                         waitingdict2['%s,%s' % (pos[0],pos[1])] -= 1
-                        
+
                 for pos in curposdict[civname]:
                     if wheightdict['%s,%s' % (pos[0],pos[1])] > 151:
                         wterritorydict['%s,%s' % (pos[0],pos[1])] = civ
@@ -11617,7 +11617,7 @@ class WorldHistory(threading.Thread):
         NoKeys = False
 
         savedict = {}
-        
+
         savedict['PLang'] = PLang
         savedict['PName'] = PName
         savedict['worldname'] = worldname
@@ -11666,7 +11666,7 @@ class WorldHistory(threading.Thread):
         libtcod.console_print_ex(wswindow, 9, 21, libtcod.BKGND_NONE, libtcod.CENTER, 'History gen\nfinished!')
 
         libtcod.console_set_default_foreground(wswindow, libtcod.yellow)
-        libtcod.console_print_ex(wswindow, 9, 24, libtcod.BKGND_NONE, libtcod.CENTER, 'Saving world -\nplease wait...')    
+        libtcod.console_print_ex(wswindow, 9, 24, libtcod.BKGND_NONE, libtcod.CENTER, 'Saving world -\nplease wait...')
 
         NoKeys = True
         time.sleep(1.0)
@@ -11678,7 +11678,7 @@ class WorldHistory(threading.Thread):
         NoKeys = False
 
         libtcod.console_set_default_foreground(wswindow, libtcod.yellow)
-        libtcod.console_print_ex(wswindow, 9, 27, libtcod.BKGND_NONE, libtcod.CENTER, 'Done!')     
+        libtcod.console_print_ex(wswindow, 9, 27, libtcod.BKGND_NONE, libtcod.CENTER, 'Done!')
 
         libtcod.console_set_default_foreground(wswindow, libtcod.white)
         libtcod.console_print_ex(wswindow, 9, 29, libtcod.BKGND_NONE, libtcod.CENTER, 'World generation\nis done. To\nexit, press\nescape or\nright-click.')
@@ -11719,14 +11719,14 @@ class WorldAtlas(threading.Thread):
 
     def loadWorld(self):
         global MouseLock, Cursor, BTorch, init
-        
+
         MouseLock = True
         wdictfile = open('.\\data\\world\\%s' % wlist[mplayery - 1] + '.sav','rb')
         gc.disable()
         wdict = cPickle.load(wdictfile)
         gc.disable()
         wdictfile.close()
-        LoadWorld(wdict)        
+        LoadWorld(wdict)
         DrawWorld(wgwindow, cities = False)
         self.worldpic = libtcod.image_from_console(wgwindow)
         libtcod.image_scale(self.worldpic, (VIEW_WIDTH - 10) * 2, (VIEW_HEIGHT - 20) * 2)
@@ -11738,13 +11738,13 @@ class WorldAtlas(threading.Thread):
 
         bplayery = {}
         ButtonList = []
-            
+
         libtcod.console_set_default_background(wawindow, libtcod.black)
         libtcod.console_clear(wawindow)
 
         DrawScroll(wawindow, 4, 5, VIEW_WIDTH - 10 + 1, VIEW_HEIGHT - 20 + 1)
         libtcod.image_blit_2x(self.worldpic, wawindow, 5, 6)
-        
+
         MenuList = []
         libtcod.console_clear(wswindow)
         MenuSetting = 'WAWorld'
@@ -11788,7 +11788,7 @@ class WorldAtlas(threading.Thread):
 
         civrange = range(1, wcivdict['civnum'] + 1)
         civrange.remove(natnum)
-        
+
         DrawScroll(wawindow, 9, 5, VIEW_WIDTH - 20 + 1, VIEW_HEIGHT - 30 + 1)
         DrawWorld(wawindow, VIEW_WIDTH - 20, VIEW_HEIGHT - 30, \
                   wcivdict[nation + '-startpos'][0], wcivdict[nation + '-startpos'][1], \
@@ -11867,7 +11867,7 @@ class WorldAtlas(threading.Thread):
 
     def loadRelationsMap(self):
         global MAP_WIDTH, MAP_HEIGHT, VIEW_WIDTH, VIEW_HEIGHT
-        
+
         libtcod.console_set_default_background(wawindow, libtcod.black)
         libtcod.console_clear(wawindow)
 
@@ -11877,7 +11877,7 @@ class WorldAtlas(threading.Thread):
                         libtcod.console_set_char_background(wgwindow, x, y, self.civreldict[wterritorydict['%s,%s' % (x,y)]][1], libtcod.BKGND_SET)
                     except KeyError:
                         pass
-                    
+
         relpic = libtcod.image_from_console(wgwindow)
         newrel = solidScale(relpic, VIEW_WIDTH - 20, VIEW_HEIGHT - 20, 1)
         libtcod.image_scale(relpic, (VIEW_WIDTH - 20) * 2, (VIEW_HEIGHT - 20) * 2)
@@ -11889,9 +11889,9 @@ class WorldAtlas(threading.Thread):
         libtcod.console_clear(wswindow)
         MenuSetting = 'WABestiaryMain'
         MenuList = []
-        
+
         optionlist = ['All','Sorted...']
-        
+
         self.atlasmenu = Menu(wswindow, 2, 4, optionlist, title = 'Bestiary:', talign = 'center', tx = 9, ty = 2, \
                          MethodList = [('All',Atlas.loadBestiary),('Sorted...',Atlas.loadBestiarySorted)], \
                          BMethodList = [Atlas.loadWorldScreen])
@@ -11945,7 +11945,7 @@ class WorldAtlas(threading.Thread):
 
         elif option in biomelist + spherelist + sizelist:
             Atlas.loadBestiary(req = option)
-        
+
     def loadBestiary(self, req = None):
         global MenuList, MenuSetting, playery, oplayery, mplayery
 
@@ -12002,7 +12002,7 @@ class WorldAtlas(threading.Thread):
 
         DrawScroll(wawindow, 9, 9, VIEW_WIDTH - 19, VIEW_HEIGHT - 19)
         libtcod.console_set_default_foreground(wawindow, creature['charcolor'])
-        
+
         charfile = open('.\\image\\txt\\chars.txt','r')
         charlines = []
         for line in charfile:
@@ -12130,7 +12130,7 @@ class PlayWorld(threading.Thread):
         self.timestr = '11:59 PM'
         self.showclock = False
         self.paused = False
-                    
+
     # Travel Functions
 
     def floodFill(self,wobstructed = False,captureimage = False):
@@ -12234,7 +12234,7 @@ class PlayWorld(threading.Thread):
 
         FMGButtonList = map(lambda x: x[3],MGButtonList)
         if 'Inventory' not in FMGButtonList:
-            MGButtonList.append([wswindow,1,20,'Inventory','i',0,1,False,False])            
+            MGButtonList.append([wswindow,1,20,'Inventory','i',0,1,False,False])
         if 'Skills and Spells' not in FMGButtonList:
             MGButtonList.append([wswindow,1,23,'Skills and Spells','s',0,1,False,False])
         if 'Character' not in FMGButtonList:
@@ -12247,7 +12247,7 @@ class PlayWorld(threading.Thread):
             MGButtonList.append([wswindow,1,35,'Ground View','g',0,1,False,False])
         if 'Options' not in FMGButtonList:
             MGButtonList.append([wswindow,1,38,'Options','o',0,1,False,False])
-        
+
         # Draw the HUD, HP/Mana/Phase Meters, etc.
         if DoHUD:
             for x in range(15):
@@ -12472,7 +12472,7 @@ class PlayWorld(threading.Thread):
                         char = [icon_group[0] + x,icon_group[1] + y,255]
                         libtcod.console_print_ex(GUILayer,GUITiles['group'][0][0] + x,GUITiles['group'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                         lock.release()
-                        
+
     # Message Display Functions
 
     def addMesg(self,message,col = libtcod.white):
@@ -12754,7 +12754,7 @@ class PlayWorld(threading.Thread):
         mapnoise = libtcod.noise_new(randrange(3,5))
         libtcod.heightmap_add_fbm(rmap, mapnoise, 1.5, 1.5, 1.2, 1.2, 40, 0.5, 0.5)
         minmax = list(libtcod.heightmap_get_minmax(rmap))
-        return (rmap,minmax)        
+        return (rmap,minmax)
 
     def PlainMap(self):
         rmap = libtcod.heightmap_new(RMAP_WIDTH,RMAP_HEIGHT)
@@ -12784,13 +12784,13 @@ class PlayWorld(threading.Thread):
         pass
 
     # Map Generation - Minor Algorithms
-        
+
     def rdictSetup(self):
 
         # Some various lists to help with my faulty memory.
 
         # Main terrain types:
-        ## 'Deciduous Forest','Shrubland','Desert','Heathland','Broadleaf Forest', 
+        ## 'Deciduous Forest','Shrubland','Desert','Heathland','Broadleaf Forest',
         ## 'Mixed Forest','Coniferous Forest','Evergreen Forest','Swamp', 'Plain', 'Highland','Mountain',
         ## 'Marshland','Tundra','Glacier','Tropical Forest','Savannah','Ocean','Lake'
 
@@ -12828,9 +12828,9 @@ class PlayWorld(threading.Thread):
         ### largecedar1, largeneedle1, largepine1
         ## Tropical:
         ### smallpalm1, smallpalm2, smallpalm3, largepalm1, largepalm2
-        
+
         # Desert
-        
+
         curdict = {}
         curdict['keyidx'] = [0,100,200]
         curdict['keycols'] = [libtcod.Color(216,186,89), libtcod.Color(216,193,116), libtcod.Color(223,205,144)]
@@ -13470,7 +13470,7 @@ class PlayWorld(threading.Thread):
                                libtcod.Color(117,147,97)]
         curdict['dkeyidx'] = [0, 12, 28, 500]
         curdict['dkeycols'] = [libtcod.Color(245,249,192), libtcod.Color(253,209,159), libtcod.Color(196,177,98), libtcod.Color(241,199,149)]
-        
+
         curdict['wlev'] = 12
         curdict['mlev'] = 188
         curdict['mshade'] = [True,180,180,180]
@@ -13585,7 +13585,7 @@ class PlayWorld(threading.Thread):
             self.rinit = True
             hpcswitch = True
             MouseLock,MoveLock = False,False
-            
+
     def cmpTiles(self,t1,t2):
         if isinstance(self.rheightmap['%s,%s' % (t1[0],t1[1])],int) and isinstance(self.rheightmap['%s,%s' % (t2[0],t2[1])],str):
             return True
@@ -13595,7 +13595,7 @@ class PlayWorld(threading.Thread):
             return True
         else:
             return False
-        
+
     def digRiver(self):
         global PCX,PCY
         ntiles,stiles,etiles,wtiles = [],[],[],[]
@@ -13708,7 +13708,7 @@ class PlayWorld(threading.Thread):
                                 self.rheightmap['%s,%s' % (tile[0] + num,tile[1] + num2)] = newheight
                                 if type(newheight) == str:
                                     self.wobstructed[self.curz]['%s,%s' % (tile[0] + num,tile[1] + num2)] = 'water'
-            
+
             numsplits = randrange(2,7)
             # And now create paths for each small source.
             for split in range(numsplits):
@@ -13721,7 +13721,7 @@ class PlayWorld(threading.Thread):
                     if splitpath.path == False:
                         splitpath.pathgoing = False
                 while dist > len(mainpath.path) or (not splitpath.path):
-                    splitend = (randrange(MAP_WIDTH),randrange(MAP_HEIGHT))          
+                    splitend = (randrange(MAP_WIDTH),randrange(MAP_HEIGHT))
                     dist = sqrt(pow(splitend[0] - mainend[0],2) + pow(splitend[1] - mainend[1],2))
                     splitpath = Pathfinder(rivobdict,self.flood,splitend[0],splitend[1],mainend[0],mainend[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
                     splitpath.start()
@@ -13775,8 +13775,8 @@ class PlayWorld(threading.Thread):
                                     self.rheightmap['%s,%s' % (tile[0] + num,tile[1] + num2)] = newheight
                                     if type(newheight) == str:
                                         self.wobstructed[self.curz]['%s,%s' % (tile[0] + num,tile[1] + num2)] = 'water'
-                
-        else:            
+
+        else:
             # Otherwise, if this is just a segment of the river...
             if len(rivdirs) == 2:
                 dir1 = edgetiles[rivdirs[0]]
@@ -13975,7 +13975,7 @@ class PlayWorld(threading.Thread):
                     libtcod.console_set_default_foreground(wrwindow,libtcod.white)
                     libtcod.console_print_ex(wrwindow,tile[0],tile[1],libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
         self.rtiledict = rtiledict
-        
+
     # def __init__(self,wobstructed,areas,x,y,x2,y2,actor = 'PC',domove = True,notify = True)
 
     def doShoreLine(self):
@@ -14017,11 +14017,11 @@ class PlayWorld(threading.Thread):
                 if x in range(RMAP_WIDTH / 4) and y in range(RMAP_HEIGHT / 4):
                     shobdictnw['%s,%s' % (x,y)] = 'blocked'
                 if x in range((RMAP_WIDTH / 4) * 3,RMAP_WIDTH) and y in range(RMAP_HEIGHT / 4):
-                    shobdictne['%s,%s' % (x,y)] = 'blocked'                    
+                    shobdictne['%s,%s' % (x,y)] = 'blocked'
                 if x in range(RMAP_WIDTH / 4) and y in range((RMAP_HEIGHT / 4) * 3,RMAP_HEIGHT):
-                    shobdictsw['%s,%s' % (x,y)] = 'blocked'     
+                    shobdictsw['%s,%s' % (x,y)] = 'blocked'
                 if x in range((RMAP_WIDTH / 4) * 3,RMAP_WIDTH) and y in range((RMAP_HEIGHT / 4) * 3,RMAP_HEIGHT):
-                    shobdictse['%s,%s' % (x,y)] = 'blocked'     
+                    shobdictse['%s,%s' % (x,y)] = 'blocked'
         # Now merge it with the actual dictionary of obstructions so we don't end up with something goofy happening.
 
         shobdict = dict(shobdict.items() + self.wobstructed.items())
@@ -14056,9 +14056,9 @@ class PlayWorld(threading.Thread):
             wtile = choice(edgetiles['w'][0:(len(edgetiles['w']) / 4)])
             while mshobdict.get('%s,%s' % (etile[0],etile[1])) or mshobdict.get('%s,%s' % (wtile[0],wtile[1])):
                 etile = choice(edgetiles['e'][0:(len(edgetiles['e']) / 4)])
-                wtile = choice(edgetiles['w'][0:(len(edgetiles['w']) / 4)])                
+                wtile = choice(edgetiles['w'][0:(len(edgetiles['w']) / 4)])
             path = Pathfinder(mshobdict,self.flood,etile[0],etile[1],wtile[0],wtile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
-            path.start()            
+            path.start()
             while path.pathgoing:
                 time.sleep(0.1)
                 if path.path == False:
@@ -14110,9 +14110,9 @@ class PlayWorld(threading.Thread):
             wtile = choice(edgetiles['w'][(len(edgetiles['w']) / 4) * 3:])
             while mshobdict.get('%s,%s' % (etile[0],etile[1])) or mshobdict.get('%s,%s' % (wtile[0],wtile[1])):
                 etile = choice(edgetiles['e'][(len(edgetiles['e']) / 4) * 3:])
-                wtile = choice(edgetiles['w'][(len(edgetiles['w']) / 4) * 3:]) 
+                wtile = choice(edgetiles['w'][(len(edgetiles['w']) / 4) * 3:])
             path = Pathfinder(mshobdict,self.flood,etile[0],etile[1],wtile[0],wtile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
-            path.start()            
+            path.start()
             while path.pathgoing:
                 time.sleep(0.1)
                 if path.path == False:
@@ -14166,7 +14166,7 @@ class PlayWorld(threading.Thread):
                 ntile = choice(edgetiles['n'][0:(len(edgetiles['n']) / 4)])
                 stile = choice(edgetiles['s'][0:(len(edgetiles['s']) / 4)])
             path = Pathfinder(mshobdict,self.flood,ntile[0],ntile[1],stile[0],stile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
-            path.start()            
+            path.start()
             while path.pathgoing:
                 time.sleep(0.1)
                 if path.path == False:
@@ -14220,7 +14220,7 @@ class PlayWorld(threading.Thread):
                 ntile = choice(edgetiles['n'][(len(edgetiles['n']) / 4) * 3:])
                 stile = choice(edgetiles['s'][(len(edgetiles['s']) / 4) * 3:])
             path = Pathfinder(mshobdict,self.flood,ntile[0],ntile[1],stile[0],stile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
-            path.start()            
+            path.start()
             while path.pathgoing:
                 time.sleep(0.1)
                 if path.path == False:
@@ -14498,14 +14498,14 @@ class PlayWorld(threading.Thread):
                     self.wobstructed[self.curz]['%s,%s' % (tile[0],tile[1])] = 'water'
                     self.oltiledict['%s,%s' % (tile[0],tile[1])] = True
                 self.shoretiles['%s,%s,' % (pathtile[0],pathtile[1])] = True
-                
+
     def doTexture(self,rmap):
         hlist = self.rdict['%s-%s' % (self.maintype,self.tempzone)]['textperc']
         slist = self.rdict['%s-%s' % (self.maintype,self.tempzone)]['textshade']
         self.tallgrassdict = {}
         rtextdict = {}
         self.dirtdict = {}
-        
+
         # Texturize mountains/rock outcroppings.
 
 
@@ -14562,7 +14562,7 @@ class PlayWorld(threading.Thread):
                         self.shadowdict['%s,%s' % (x,y)] = shadow
 
         # Texturize water.
-        
+
         for y in range(RMAP_HEIGHT):
             for x in range(RMAP_WIDTH):
                 if isinstance(self.rheightmap['%s,%s' % (x,y)],str):
@@ -14676,7 +14676,7 @@ class PlayWorld(threading.Thread):
                     else:
                         libtcod.console_print_ex(wrwindow, x, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
                     rtextdict['%s,%s' % (x,y)] = [char,fcol]
-                    
+
         # Create bare patches of dirt.
 
         if self.rdict['%s-%s' % (self.maintype,self.tempzone)].get('dirtperc'):
@@ -14750,7 +14750,7 @@ class PlayWorld(threading.Thread):
                         libtcod.console_print_ex(wrwindow,x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                         rtextdict['%s,%s' % (x,y)] = [char,col]
                     else:
-                        self.dirtdict['%s,%s' % (x + num,y + num2)] = True 
+                        self.dirtdict['%s,%s' % (x + num,y + num2)] = True
                         char = choice(beachchars + shorechars + dirtchars)
                         bcol = libtcod.color_lerp(self.rterraindict['%s,%s' % (x,y)], col, alphperc)
                         col = libtcod.white
@@ -14758,11 +14758,11 @@ class PlayWorld(threading.Thread):
                         self.rterraindict['%s,%s' % (x,y)] = bcol
                         libtcod.console_set_default_foreground(wrwindow,col)
                         libtcod.console_print_ex(wrwindow,x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
-                        rtextdict['%s,%s' % (x,y)] = [char,col]                        
+                        rtextdict['%s,%s' % (x,y)] = [char,col]
                 else:
                     bcol = libtcod.color_lerp(self.rterraindict['%s,%s' % (x,y)], col, alphperc)
                     libtcod.console_set_char_background(wrwindow, x, y, bcol, libtcod.BKGND_SET)
-                    self.rterraindict['%s,%s' % (x,y)] = bcol            
+                    self.rterraindict['%s,%s' % (x,y)] = bcol
 
         self.beachtiles = {}
         n = randrange(-18,-6)
@@ -14798,7 +14798,7 @@ class PlayWorld(threading.Thread):
                             libtcod.console_print_ex(wrwindow,x + num,y + num2,libtcod.BKGND_ALPHA(alphperc),libtcod.LEFT,chr(DoChar(char)))
                             rtextdict['%s,%s' % (x + num,y + num2)] = [char,col]
 ##                                self.rterraindict['%s,%s' % (x + num,y + num2)] = bcol
-                            self.dirtdict['%s,%s' % (x + num,y + num2)] = True                            
+                            self.dirtdict['%s,%s' % (x + num,y + num2)] = True
                     except KeyError:
                         pass
 
@@ -14837,7 +14837,7 @@ class PlayWorld(threading.Thread):
                                     blocked = True
                                 if self.dirtdict.get('%s,%s' % (x + cx,y + cy)):
                                     blocked = True
-                                    
+
                         if blocked:
                             continue
                         copselist = []
@@ -14852,14 +14852,14 @@ class PlayWorld(threading.Thread):
                                                            (copse[1] + cy) * finfomod) == libtcod.Color(125,255,255):
                                     continue
                                 if libtcod.image_get_pixel(fontinfo,(copse[0] + cx) * finfomod, \
-                                                           (copse[1] + cy) * finfomod) == libtcod.Color(200,0,200):                    
+                                                           (copse[1] + cy) * finfomod) == libtcod.Color(200,0,200):
                                     self.wobstructed[self.curz]['%s,%s' % (x + cx,y + cy)] = 'copse'
                                     tchar = choice(trunkchars)
                                     rlist = []
                                     if randrange(2) == 1:
                                         rlist.append('n')
                                     if randrange(2) == 1:
-                                        rlist.append('e')                                
+                                        rlist.append('e')
                                     if randrange(2) == 1:
                                         rlist.append('w')
                                     if randrange(2) == 1:
@@ -14888,7 +14888,7 @@ class PlayWorld(threading.Thread):
                                     self.treedict['%s,%s' % (tree[0],tree[1])] += [[x + cx,y + cy,tcol,leafcol]]
                                 char = [copse[0] + cx,copse[1] + cy,255]
                                 self.translayer[self.curz]['%s,%s' % (x + cx,y + cy)] = [tcol,leafcol,char,treetype]
-                                self.ldict['%s,%s' % (x + cx,y + cy)] = (x,y)                                
+                                self.ldict['%s,%s' % (x + cx,y + cy)] = (x,y)
                                 libtcod.console_set_default_foreground(wrwindow, leafcol)
                                 libtcod.console_print_ex(wrwindow, x + cx, y + cy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
 
@@ -14982,7 +14982,7 @@ class PlayWorld(threading.Thread):
             self.treecenter = self.dirttreecenter
         char = [self.treecenter[0] + self.num,self.treecenter[1] + self.num2,255]
         leafcol = libtcod.white
-        return [char,leafcol,self.tcol]                          
+        return [char,leafcol,self.tcol]
 
     def doTrees(self):
         hperc = self.rdict['%s-%s' % (self.maintype,self.tempzone)]['treeperc']
@@ -14991,7 +14991,7 @@ class PlayWorld(threading.Thread):
         rainfall = 4
         treemap = libtcod.heightmap_new(RMAP_WIDTH,RMAP_HEIGHT)
         libtcod.heightmap_add_voronoi(treemap, randrange(100,300), 4, [0.2,0.4,0.5,0.6])
-        libtcod.heightmap_rain_erosion(treemap, RMAP_WIDTH * 142 * rainfall, 0.05, 0.5)   
+        libtcod.heightmap_rain_erosion(treemap, RMAP_WIDTH * 142 * rainfall, 0.05, 0.5)
         tminmax = list(libtcod.heightmap_get_minmax(treemap))
         taltrange = tminmax[1] - tminmax[0]
 
@@ -15086,7 +15086,7 @@ class PlayWorld(threading.Thread):
                                         else:
                                             self.doleaves = False
                                         if treetype == 'Tropical':
-                                            self.doleaves = False                                                
+                                            self.doleaves = False
                                         dotree = getattr(self,'do' + treetype)(subtype)
                                         if dotree:
                                             char,leafcol,tcol = dotree[0],dotree[1],dotree[2]
@@ -15110,7 +15110,7 @@ class PlayWorld(threading.Thread):
                     except KeyError:
                         continue
                     if (hperc[1] < self.rheightmap['%s,%s' % (x + num,y + num2)] < hperc[2]) and \
-                       isinstance(self.rheightmap['%s,%s' % (x + num,y + num2)],int):                    
+                       isinstance(self.rheightmap['%s,%s' % (x + num,y + num2)],int):
                         maxdist = 21 * 1.0
                         curdist = sqrt(pow(num,2) + pow(num2,2)) * 1.0
                         chance = int(((curdist / maxdist) * 100) * 0.5)
@@ -15408,7 +15408,7 @@ class PlayWorld(threading.Thread):
                                         pass
                                 shchar = [shrub[2] + sx,shrub[3] + sy,255]
                                 shdict['%s,%s' % (x + sx,y + sy)] = [shcol,shchar,shrubtype]
-                                
+
                                 if not libtcod.image_get_pixel(fontinfo,shchar[0] * finfomod,shchar[1] * finfomod) == libtcod.Color(200,0,200):
                                     if 'cactus' in shrubtype:
                                         self.wobstructed[self.curz]['%s,%s' % (x + sx,y + sy)] = 'cactus'
@@ -15485,7 +15485,7 @@ class PlayWorld(threading.Thread):
 
     def doLogs(self):
 
-        self.logdict = {}        
+        self.logdict = {}
         logfreq = self.rdict['%s-%s' % (self.maintype,self.tempzone)]['logfreq']
         if logfreq > 0:
             logtypes = self.rdict['%s-%s' % (self.maintype,self.tempzone)]['logtypes']
@@ -15585,7 +15585,7 @@ class PlayWorld(threading.Thread):
                     char = [x,1433 + y,255]
                     coords = [(VIEW_WIDTH / 2) - 16,(VIEW_HEIGHT / 2) - 10]
                     libtcod.console_set_default_foreground(LoadScreen,libtcod.white)
-                    libtcod.console_print_ex(LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))            
+                    libtcod.console_print_ex(LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
         elif stage == 'misc':
             for x in range(32):
                 for y in range(19):
@@ -15599,7 +15599,7 @@ class PlayWorld(threading.Thread):
                     char = [x,1471 + y,255]
                     coords = [(VIEW_WIDTH / 2) - 16,(VIEW_HEIGHT / 2) - 10]
                     libtcod.console_set_default_foreground(LoadScreen,libtcod.white)
-                    libtcod.console_print_ex(LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))     
+                    libtcod.console_print_ex(LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
         elif stage == 'vectors':
             for x in range(32):
                 for y in range(19):
@@ -15644,7 +15644,7 @@ class PlayWorld(threading.Thread):
             self.itemdict[z] = {}
         self.curz = 0
         self.rtypes = rtypes
-        
+
         self.subtypes = []
         self.maintypes = []
         print rtypes
@@ -15670,7 +15670,7 @@ class PlayWorld(threading.Thread):
             coltype = None
             wcoltype = None
             dcoltype = None
-            for key in list(union):       
+            for key in list(union):
                 while not self.rdict['%s-%s' % ('Fusion',self.tempzone)].get(key):
                     highkey = -500
                     if key in ['keyidx','keycols','mlev'] and not coltype:
@@ -15678,7 +15678,7 @@ class PlayWorld(threading.Thread):
                     elif key in ['wkeyidx','wkeycols'] and not wcoltype:
                         wcoltype = choice(self.maintypes)
                     elif key in ['dkeyidx','dkeycols'] and not dcoltype:
-                        dcoltype = choice(self.maintypes)   
+                        dcoltype = choice(self.maintypes)
                     if key in ['keyidx','keycols','mlev']:
                         self.rdict['%s-%s' % ('Fusion',self.tempzone)][key] = self.rdict['%s-%s' % (coltype,self.tempzone)][key]
                         continue
@@ -15798,13 +15798,13 @@ class PlayWorld(threading.Thread):
             self.doShoreLine()
             time.sleep(1.0)
 
-        if 'r' in wfeaturedict['%s,%s' % (self.curregion[0],self.curregion[1])]:       
+        if 'r' in wfeaturedict['%s,%s' % (self.curregion[0],self.curregion[1])]:
             self.doLoadScreen('river')
             self.digRiver()
             time.sleep(1.0)
         else:
             self.rtiledict = {}
-                    
+
         self.flood[self.curz] = self.floodFill(self.wobstructed,captureimage = False)
         self.recalcRoutes()
 
@@ -15923,7 +15923,7 @@ class PlayWorld(threading.Thread):
         except NameError:
             pass
         LWindow = Dialogue([('Yes',self.doLeave),('No',doNothing)],title = 'Leave region?',resume = True)
-        LWindow.start()        
+        LWindow.start()
 
     def doLeave(self):
         global DoLoadScreen
@@ -15989,7 +15989,7 @@ class PlayWorld(threading.Thread):
 
     def displayCity(self,city = None):
         global PX,PY, TextList, Clouds
-        
+
         TextList = []
         for Button in ButtonList:
             if Button.text == 'Begin Adventuring Here':
@@ -16005,7 +16005,7 @@ class PlayWorld(threading.Thread):
                 for tiley in range(-2,1):
                     x = globals()['w%sdict' % (sitetype)][city][0][0] - (len(city) / 2) + tilex
                     y = globals()['w%sdict' % (sitetype)][city][0][1] - 1 + tiley
-                    
+
             libtcod.console_clear(wiwindow)
             #libtcod.console_print_ex(wiwindow, VIEW_WIDTH / 2, 2, libtcod.BKGND_NONE, libtcod.CENTER, 'The %s of %s' % (sitetype.capitalize(),city))
             for x in range(VIEW_WIDTH):
@@ -16030,7 +16030,7 @@ class PlayWorld(threading.Thread):
             self.startregion = [globals()['w%sdict' % (sitetype)][city][0][0],globals()['w%sdict' % (sitetype)][city][0][1]]
             self.curregion = self.startregion
             self.startcity = city
-        
+
     # Game Start Functions
 
     def siteMenu(self):
@@ -16044,7 +16044,7 @@ class PlayWorld(threading.Thread):
                 ButtonList.remove(Button)
             else:
                 Button.drawButton()
-                
+
         MenuSetting = 'PWStartLoc'
         StartLocMenu = Menu(wswindow, 2, 4, optionlist, title = 'Starting Sites:', talign = 'center', tx = 9, ty = 2, \
                             MethodList = [('Cities',self.loadCities),('Villages',self.loadVillages)], BMethodList = [doIntroSetup], \
@@ -16327,7 +16327,7 @@ class PlayWorld(threading.Thread):
                     self.ItemDialogue.start()
                 else:
                     item = self.itemdict[self.curz]['%s,%s' % (PCX,PCY)].values()[0][0]
-                    self.getItem(item)         
+                    self.getItem(item)
             else:
                 self.addMesg('There\'s nothing there to pick up.', col = libtcod.yellow)
         else:
@@ -16438,7 +16438,7 @@ class PlayWorld(threading.Thread):
                 self.runtime = False
             else:
                 Constructions.close()
-                self.cmopen = False        
+                self.cmopen = False
                 self.paused = self.opaused
                 self.runtime = self.oruntime
                 del self.opaused
@@ -16507,7 +16507,7 @@ class PlayWorld(threading.Thread):
                 for num2 in range(-1,2):
                     if [num,num2] != [0,0]:
                         tlist.append([num,num2])
-            tlist.sort(key=lambda tile: sqrt((pow(PCX - (x + tile[0]),2) + pow(PCY - (y + tile[1]),2)))) 
+            tlist.sort(key=lambda tile: sqrt((pow(PCX - (x + tile[0]),2) + pow(PCY - (y + tile[1]),2))))
             for tile in tlist:
                 pathdone = False
                 if [PCX,PCY] == [x + tile[0],y + tile[1]]:
@@ -16590,7 +16590,7 @@ class PlayWorld(threading.Thread):
                     self.flood[self.curz][curarea]['%s,%s' % (x,y)] = True
                     self.treedict.pop('%s,%s' % (x,y))
                     break
-                
+
         else:
             self.addMesg('You don\'t have anything to chop that down with.', col = libtcod.yellow)
         MoveLock = False
@@ -16617,7 +16617,7 @@ class PlayWorld(threading.Thread):
                 for num2 in range(-1,2):
                     if [num,num2] != [0,0]:
                         tlist.append([num,num2])
-            tlist.sort(key=lambda tile: sqrt((pow(PCX - (x + tile[0]),2) + pow(PCY - (y + tile[1]),2)))) 
+            tlist.sort(key=lambda tile: sqrt((pow(PCX - (x + tile[0]),2) + pow(PCY - (y + tile[1]),2))))
             for tile in tlist:
                 pathdone = False
                 if [PCX,PCY] == [x + tile[0],y + tile[1]]:
@@ -16699,7 +16699,7 @@ class PlayWorld(threading.Thread):
             for num2 in range(-1,2):
                 if [num,num2] != [0,0]:
                     tlist.append([num,num2])
-        tlist.sort(key=lambda tile: sqrt((pow(PCX - (x + tile[0]),2) + pow(PCY - (y + tile[1]),2)))) 
+        tlist.sort(key=lambda tile: sqrt((pow(PCX - (x + tile[0]),2) + pow(PCY - (y + tile[1]),2))))
         for tile in tlist:
             pathdone = False
             if [PCX,PCY] == [x + tile[0],y + tile[1]]:
@@ -16727,7 +16727,7 @@ class PlayWorld(threading.Thread):
                 break
         self.handlePCview()
         MoveLock = False
-        self.windowlock = False        
+        self.windowlock = False
 
     def openSet(self,x,y):
         doorareas = []
@@ -16758,7 +16758,7 @@ class PlayWorld(threading.Thread):
             for num2 in range(-1,2):
                 if [num,num2] != [0,0]:
                     tlist.append([num,num2])
-        tlist.sort(key=lambda tile: sqrt((pow(PCX - (x + tile[0]),2) + pow(PCY - (y + tile[1]),2)))) 
+        tlist.sort(key=lambda tile: sqrt((pow(PCX - (x + tile[0]),2) + pow(PCY - (y + tile[1]),2))))
         for tile in tlist:
             pathdone = False
             if [PCX,PCY] == [x + tile[0],y + tile[1]]:
@@ -16923,7 +16923,7 @@ class PlayWorld(threading.Thread):
                 self.ochar = [libtcod.console_get_char(self.window,PCX,PCY),libtcod.console_get_char_foreground(self.window,PCX,PCY)]
                 Clouds.ofcolordict['%s,%s' % (PCX,PCY)] = libtcod.console_get_char_foreground(wpwindow,PCX,PCY)
                 self.handlePCchar()
-                self.winit = False           
+                self.winit = False
             if (OPCX,OPCY) != (PCX,PCY):
                 if self.rswitch:
                     wobstructed = self.wobstructed[self.curz]
@@ -17136,7 +17136,7 @@ class PlayWorld(threading.Thread):
                                 bcol = libtcod.color_lerp(bcol,libtcod.white,shadperc)
                             libtcod.console_set_default_foreground(self.window, fcol)
                             libtcod.console_set_default_background(self.window, bcol)
-                            libtcod.console_print_ex(self.window, lx, ly, libtcod.BKGND_SET, libtcod.LEFT, chr(DoChar(char)))                        
+                            libtcod.console_print_ex(self.window, lx, ly, libtcod.BKGND_SET, libtcod.LEFT, chr(DoChar(char)))
                     elif self.translayer[self.curz].get('%s,%s' % (PCX + num,PCY + num2)) and not self.groundview:
                         if (not (self.wobstructed[self.curz].get('%s,%s' % (PCX + num,PCY + num2)) == 'water' and \
                            self.tempzone == 'Arctic') and not self.ldict.get('%s,%s' % (PCX + num,PCY + num2))) or copsecheck:
@@ -17413,7 +17413,7 @@ class PlayWorld(threading.Thread):
                                         bg = ftile[4]
                                         char[2] = 255
                                     except IndexError:
-                                        char = [0,0,255]                       
+                                        char = [0,0,255]
                             if self.itemdict[self.curz].get('%s,%s' % (PCX + num,PCY + num2)):
                                 items = self.itemdict[self.curz]['%s,%s' % (PCX + num,PCY + num2)].values()
                                 items.sort(key=lambda value: value[1],reverse = True)
@@ -17807,7 +17807,7 @@ class PlayWorld(threading.Thread):
                         bcol = libtcod.color_lerp(bcol,libtcod.white,shadperc)
                     libtcod.console_set_default_foreground(self.window, fcol)
                     libtcod.console_set_default_background(self.window, bcol)
-                    libtcod.console_print_ex(self.window, lx, ly, libtcod.BKGND_SET, libtcod.LEFT, chr(DoChar(char)))                        
+                    libtcod.console_print_ex(self.window, lx, ly, libtcod.BKGND_SET, libtcod.LEFT, chr(DoChar(char)))
             elif self.docopses[key][0] == 'out' and self.docopses[key][1] == 'in':
                 self.docopses[key] = ['done','out']
                 for leaf in leaflist:
@@ -17891,7 +17891,7 @@ class PlayWorld(threading.Thread):
                             except KeyError:
                                 pass
                     except KeyError:
-                        pass                  
+                        pass
         lock.release()
 
     # In-Game Visual Functionality
@@ -18027,13 +18027,13 @@ class PlayWorld(threading.Thread):
             time.sleep(1.0)
 
             audio.playMusic('music\\wav\\Cult-summer.wav',-1)
-            
+
             libtcod.console_set_default_background(wrwindow, libtcod.black)
             libtcod.console_clear(wiwindow)
             libtcod.console_clear(wswindow)
             time.sleep(0.1)
             libtcod.console_clear(wpwindow)
-            
+
             self.loadWorld()
             Clouds = WCloudNoise(wpwindow)
             Clouds.start()
@@ -18115,7 +18115,7 @@ class PlayWorld(threading.Thread):
                 self.citygrid['%s,%s' % (wcitydict[city][0][0],wcitydict[city][0][1])] = city
             for village in wvillagedict.keys():
                 self.citygrid['%s,%s' % (wvillagedict[village][0][0],wvillagedict[village][0][1])] = village
-            
+
             self.rdictSetup()
             self.siteMenu()
             borderbutton = ButtonBox(wswindow, 5, 44, '+ Borders', '+')
@@ -18221,7 +18221,7 @@ class PlayWorld(threading.Thread):
 class Pathfinder(threading.Thread):
 
     # This class handles pathfinding algorithms.
-    
+
     def __init__(self,wobstructed,areas,x,y,x2,y2,actor = 'PC',domove = True,notify = True,skipareas = False,canswim = False):
         threading.Thread.__init__(self)
         self.wobstructed = wobstructed
@@ -18271,7 +18271,7 @@ class Pathfinder(threading.Thread):
         else:
             limitx,limity = MAP_WIDTH,MAP_HEIGHT
 
-    
+
         endarea = None
         for area in GameWorld.flood[GameWorld.curz]:
             try:
@@ -18279,7 +18279,7 @@ class Pathfinder(threading.Thread):
                 endarea = area
             except KeyError:
                 pass
-                
+
         linked = False
         try:
             if type(endarea) == int:
@@ -18287,7 +18287,7 @@ class Pathfinder(threading.Thread):
                     linked = True
         except KeyError:
             pass
-                
+
         if not self.skipareas:
             if self.wobstructed.get('%s,%s' % (end[0],end[1])) or not (self.areas[curarea].get('%s,%s' % (end[0],end[1])) or linked):
                 endfine = False
@@ -18315,7 +18315,7 @@ class Pathfinder(threading.Thread):
                         GameWorld.addMesg('You can\'t reach that place.', col = libtcod.yellow)
                     self.pathgoing = False
                     self.path = False
-            
+
         if self.path:
             self.pathgoing = True
             while self.pathgoing:
@@ -18328,7 +18328,7 @@ class Pathfinder(threading.Thread):
                 movetile = heap[1]
                 heap.pop(len(heap))
                 heappos = 1
-                
+
                 while True:
                     if len(heap) >= (heappos * 2) + 1:
                         if heap[heappos * 2][0] > heap[(heappos * 2) + 1][0]:
@@ -18354,7 +18354,7 @@ class Pathfinder(threading.Thread):
                             break
                     else:
                         break
-                
+
                 for num in range(-1,2):
                     for num2 in range(-1,2):
                         newtile = [curtile[0] - num,curtile[1] - num2]
@@ -18388,7 +18388,7 @@ class Pathfinder(threading.Thread):
                                 if g > gdict['%s,%s' % (newtile[0],newtile[1])]:
                                     continue
                                 else:
-                                    oldswitch = True                     
+                                    oldswitch = True
                             gdict['%s,%s' % (newtile[0],newtile[1])] = g
                             h = (abs(newtile[0] - end[0]) + abs(newtile[1] - end[1])) * 10
                             f = g + h
@@ -18407,7 +18407,7 @@ class Pathfinder(threading.Thread):
                                     break
                             opendict['%s,%s' % (newtile[0],newtile[1])] = True
                             pdict['%s,%s' % (newtile[0],newtile[1])] = curtile
-                            
+
                 if curtile == end:
                     path = [end]
                     try:
@@ -18473,7 +18473,7 @@ def doWorldGen():
 
 def doWorldAtlas():
     global VIEW_HEIGHT, VIEW_WIDTH, SCREEN_HEIGHT
-    
+
     while KeyLock:
         libtcod.console_wait_for_keypress(True)
     libtcod.console_blit(wawindow,0,0,VIEW_WIDTH,VIEW_HEIGHT,0,20,2,1.0,1.0)
@@ -18542,7 +18542,7 @@ if __name__ == '__main__':
     finfomod = libtcod.image_get_size(fontimage)
     finfomod = finfomod[0] / 32
     fontinfo = libtcod.image_load('fonts\\fontinfo%s.png' % finfomod)
-    
+
     libtcod.sys_set_fps(LIMIT_FPS)
 
     # GUI Layer Location
@@ -18611,7 +18611,7 @@ if __name__ == '__main__':
         GUITiles['add'].append((17 + x,4))
         GUITiles['subh'].append((10 + x,0))
         GUITiles['addh'].append((20 + x,0))
-    
+
     # Initial GUI Setup
     GUIMenu = {}
     GUIMenu['menu'] = 'battle'
@@ -18635,7 +18635,7 @@ if __name__ == '__main__':
     for x in range(3):
         for y in range(3):
             char = [icon_battleh[0] + x,icon_battleh[1] + y,255]
-            libtcod.console_print_ex(GUILayer,GUITiles['battle'][0][0] + x,GUITiles['battle'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))       
+            libtcod.console_print_ex(GUILayer,GUITiles['battle'][0][0] + x,GUITiles['battle'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
     libtcod.console_set_default_foreground(GUILayer,libtcod.black)
     libtcod.console_set_default_background(GUILayer,scrollcolor2)
     libtcod.console_print_ex(GUILayer,15,4,libtcod.BKGND_SET,libtcod.LEFT,'%02d' % GUIMenu['page'])
@@ -18651,7 +18651,7 @@ if __name__ == '__main__':
     action_forage = [(9,2006),'task','Forage','Forage for berries and fruits.']
     action_till = [(12,2006),'task','Till','Till the ground for farming.']
     action_deconstruct = [(15,2006),'task','Deconstruct','Destroy a construction.']
-    
+
     GUIMenu['task'][1] = [action_dig,action_mine,action_fell,action_forage,action_till,action_deconstruct]
     GUIMenu['task'][2] = [None,None,None,None,None,None]
     GUIMenu['task'][3] = [None,None,None,None,None,None]
@@ -18688,7 +18688,7 @@ if __name__ == '__main__':
     GUIMenu['group'][4] = [None,None,None,None,None,None]
     GUIMenu['group'][5] = [None,None,None,None,None,None]
     GUIMenu['group'][6] = [None,None,None,None,None,None]
-    
+
     # Initial time setup.
     libtcod.console_set_default_background(TimeLayer,scrollcolor2)
     libtcod.console_clear(TimeLayer)
@@ -18797,7 +18797,7 @@ if __name__ == '__main__':
     leafchar3 = [19,7,255]
     leafchar4 = [20,7,255]
     leafchars = [leafchar1,leafchar2,leafchar3,leafchar4]
-    
+
     lshrubul = [0,7,255]
     lshrubur = [1,7,255]
     lshrubll = [2,7,255]
@@ -18815,7 +18815,7 @@ if __name__ == '__main__':
     bordercorner = [28,2,255]
 
     border3waye = [26,4,255]
-    
+
     bordercapn = [26,3,255]
     bordercape = [27,3,255]
     bordercaps = [28,3,255]
@@ -19043,7 +19043,7 @@ if __name__ == '__main__':
     rootcharwd = [26,122,255]
     rootchared = [25,123,255]
     rootcharsd = [26,123,255]
-    
+
     ballchar = [23,6,255]
 
     waterchars = [water1,water2,water3,water4]
@@ -19086,7 +19086,7 @@ if __name__ == '__main__':
     libtcod.sys_set_fps(25)
 
     q = Queue.Queue()
-    
+
     while not libtcod.console_is_window_closed():
         if not (KeyLock or NoKeys):
             ev = libtcod.sys_check_for_event(libtcod.EVENT_ANY,key,mouse)

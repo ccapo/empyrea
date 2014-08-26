@@ -10,7 +10,7 @@ def MakeLang(langfile = None,MINLEN = 3,MAXLEN = 9,caphy = True):
     langdict['caphy'] = caphy
 
     namedir = '.\\data\\name'
-    if not langfile:        
+    if not langfile:
         langdir = os.listdir(namedir)
         langdir.remove('verboten.txt')
         filedir = namedir + '\\' + random.choice(langdir)
@@ -61,7 +61,7 @@ def MakeName(langdict):
 
     conlist = ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']
     vowlist = ['a','e','i','o','u','y']
-    
+
     while True:
         startpair = random.choice(langdict['startpairs']).capitalize()
         name = startpair
@@ -108,5 +108,5 @@ def MakeName(langdict):
 
         if len(name) > langdict['MINLEN']:
             break
-                
+
     return name

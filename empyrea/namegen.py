@@ -9,13 +9,13 @@ def MakeLang(langfile = None,MINLEN = 3,MAXLEN = 9,caphy = True):
 
     langdict['caphy'] = caphy
 
-    namedir = '.\\data\\name'
+    namedir = './data/name'
     if not langfile:
         langdir = os.listdir(namedir)
         langdir.remove('verboten.txt')
-        filedir = namedir + '\\' + random.choice(langdir)
+        filedir = namedir + '/' + random.choice(langdir)
     else:
-        filedir = namedir + '\\' + langfile + '.txt'
+        filedir = namedir + '/' + langfile + '.txt'
 
     langfile = open(filedir, 'r')
     namelist = map(lambda x: x.strip('\n'), langfile.readlines())

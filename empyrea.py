@@ -2252,9 +2252,9 @@ class OptWindow(threading.Thread):
         lasttime = time.time() - 0.3
         SBar = ScrollBar(self.savewindow, 20, 11, 16, srx + 20, sry + 11, arrowcolor = scrollcolor2, \
                          bgcolor = libtcod.darker_azure, hcolor = globals()['hcolor'])
-        if not os.path.exists('.\\data\\world\\%s' % GameWorld.world):
-            os.makedirs('.\\data\\world\\%s' % GameWorld.world)
-        slist = os.listdir('.\\data\\world\\%s' % GameWorld.world)
+        if not os.path.exists('./data/world/%s' % GameWorld.world):
+            os.makedirs('./data/world/%s' % GameWorld.world)
+        slist = os.listdir('./data/world/%s' % GameWorld.world)
         slist = filter(lambda x: x[-4:] == '.svp', slist)
         for save in range(len(slist)):
             slist[save] = slist[save][:-4]
@@ -2284,8 +2284,8 @@ class OptWindow(threading.Thread):
                 savestr = savestr.strip(' ')
                 GameWorld.saves[savestr] = savefile
                 GameWorld.addMesg('Saving...')
-                os.remove('.\\data\\world\\%s\\%s.svp' % (GameWorld.world,savestr))
-                sfile = open('.\\data\\world\\%s\\%s.svp' % (GameWorld.world,savestr),'wb')
+                os.remove('./data/world/%s/%s.svp' % (GameWorld.world,savestr))
+                sfile = open('./data/world/%s/%s.svp' % (GameWorld.world,savestr),'wb')
                 gc.disable()
                 cPickle.dump(savefile, sfile, -1)
                 gc.enable()
@@ -2293,7 +2293,7 @@ class OptWindow(threading.Thread):
                 GameWorld.addMesg('Save point \'%s\' overwritten successfully.' % savestr)
                 break
             elif self.delete:
-                os.remove('.\\data\\world\\%s\\%s.svp' % (GameWorld.world,savestr))
+                os.remove('./data/world/%s/%s.svp' % (GameWorld.world,savestr))
                 GameWorld.addMesg('Save point  \'%s\' deleted.' % savelist[selectnum])
                 break
             newkey = key.c
@@ -2376,7 +2376,7 @@ class OptWindow(threading.Thread):
                                 continue
                             savestr = savestr.strip(' ')
                             GameWorld.addMesg('Saving...')
-                            sfile = open('.\\data\\world\\%s\\%s.svp' % (GameWorld.world,savestr),'wb')
+                            sfile = open('./data/world/%s/%s.svp' % (GameWorld.world,savestr),'wb')
                             gc.disable()
                             cPickle.dump(savefile, sfile, -1)
                             gc.enable()
@@ -2468,9 +2468,9 @@ class OptWindow(threading.Thread):
         XConsoles = [self.lconlist]
         self.LBar = ScrollBar(self.loadwindow, 20, 7, 20, srx + 20, sry + 7, arrowcolor = scrollcolor2,
                          bgcolor = libtcod.darker_azure, hcolor = globals()['hcolor'])
-        if not os.path.exists('.\\data\\world\\%s' % GameWorld.world):
-            os.makedirs('.\\data\\world\\%s' % GameWorld.world)
-        slist = os.listdir('.\\data\\world\\%s' % GameWorld.world)
+        if not os.path.exists('./data/world/%s' % GameWorld.world):
+            os.makedirs('./data/world/%s' % GameWorld.world)
+        slist = os.listdir('./data/world/%s' % GameWorld.world)
         slist = filter(lambda x: x[-4:] == '.svp', slist)
         for save in range(len(slist)):
             slist[save] = slist[save][:-4]
@@ -3772,7 +3772,7 @@ class CWindow(threading.Thread):
         lasttime = time.time() - 0.3
         self.SBar = ScrollBar(self.savewindow, 20, 11, 16, srx + 20, sry + 11, arrowcolor = bordercolh2,
                          bgcolor = bgcolor2, hcolor = globals()['hcolor'])
-        blist = os.listdir('.\\data\\blueprint')
+        blist = os.listdir('./data/blueprint')
         blist = filter(lambda x: x[-4:] == '.blp', blist)
         self.SBar.max = max(len(blist) - 16,0)
         oldkey = 0
@@ -3798,7 +3798,7 @@ class CWindow(threading.Thread):
                 continue
             elif self.overwrite:
                 savestr = savestr.strip(' ')
-                bpfile = open('.\\data\\blueprint\\%s.blp' % savestr, 'wb')
+                bpfile = open('./data/blueprint/%s.blp' % savestr, 'wb')
                 gc.disable()
                 cPickle.dump(blueprint, bpfile, -1)
                 gc.enable()
@@ -3806,7 +3806,7 @@ class CWindow(threading.Thread):
                 GameWorld.addMesg('Blueprint  \'%s\' overwritten successfully.' % savestr)
                 break
             elif self.delete:
-                os.remove('.\\data\\blueprint\\%s.blp' % bluelist[selectnum])
+                os.remove('./data/blueprint/%s.blp' % bluelist[selectnum])
                 GameWorld.addMesg('Blueprint  \'%s\' deleted.' % bluelist[selectnum])
                 break
             newkey = key.c
@@ -3888,7 +3888,7 @@ class CWindow(threading.Thread):
                             if skip:
                                 continue
                             savestr = savestr.strip(' ')
-                            bpfile = open('.\\data\\blueprint\\%s.blp' % savestr, 'wb')
+                            bpfile = open('./data/blueprint/%s.blp' % savestr, 'wb')
                             GameWorld.addMesg('Blueprint \'%s\' saved successfully.' % savestr)
                             gc.disable()
                             cPickle.dump(blueprint, bpfile, -1)
@@ -3979,7 +3979,7 @@ class CWindow(threading.Thread):
         XConsoles = [self.lconlist]
         LBar = ScrollBar(self.loadwindow, 20, 7, 20, srx + 20, sry + 7, arrowcolor = bordercolh2, \
                          bgcolor = bgcolor2, hcolor = globals()['hcolor'])
-        blist = os.listdir('.\\data\\blueprint')
+        blist = os.listdir('./data/blueprint')
         blist = filter(lambda x: x[-4:] == '.blp', blist)
         LBar.max = max(len(blist) - 20,0)
         redo = False
@@ -4003,7 +4003,7 @@ class CWindow(threading.Thread):
                 time.sleep(0.1)
                 continue
             elif self.delete:
-                os.remove('.\\data\\blueprint\\%s.blp' % bluelist[selectnum])
+                os.remove('./data/blueprint/%s.blp' % bluelist[selectnum])
                 GameWorld.addMesg('Blueprint  \'%s\' deleted.' % bluelist[selectnum])
                 break
             if LBar.inc != oinc or redo:
@@ -4029,7 +4029,7 @@ class CWindow(threading.Thread):
                     load = True
                 elif handle_mouse('lbutton_pressed') and load:
                     time.sleep(0.1)
-                    bluepath = open('.\\data\\blueprint\\%s' % bluelist[selectnum] + '.blp','rb')
+                    bluepath = open('./data/blueprint/%s' % bluelist[selectnum] + '.blp','rb')
                     gc.disable()
                     loadblue = cPickle.load(bluepath)
                     gc.enable()
@@ -4991,7 +4991,7 @@ def renderText():
                                 while sound == lastsound:
                                     sound = (randrange(1,5))
                                 lastsound = sound
-                                doorname = 'sounds\\wav\\ding%s' % sound + '.wav'
+                                doorname = 'sounds/wav/ding%s' % sound + '.wav'
                                 audio.playSound(doorname,volume=0.5)
                             TextList[text].playsound = False
                             TextList[text].fadeto = libtcod.white
@@ -5350,7 +5350,7 @@ def handle_keys():
                     if addhover and handle_mouse('lbutton'):
                         addhover = False
                     elif addhover and handle_mouse('lbutton_pressed'):
-                        audio.playSound('sounds\\wav\\click2.wav')
+                        audio.playSound('sounds/wav/click2.wav')
                         if GUIMenu['page'] < 6:
                             GUIMenu['page'] += 1
                         else:
@@ -5377,7 +5377,7 @@ def handle_keys():
                     if subhover and handle_mouse('lbutton'):
                         subhover = False
                     elif subhover and handle_mouse('lbutton_pressed'):
-                        audio.playSound('sounds\\wav\\click2.wav')
+                        audio.playSound('sounds/wav/click2.wav')
                         if GUIMenu['page'] > 1:
                             GUIMenu['page'] -= 1
                         else:
@@ -5391,7 +5391,7 @@ def handle_keys():
                             libtcod.console_print_ex(GUILayer,GUITiles['sub'][0][0] + x,GUITiles['sub'][0][1],libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                             lock.release()
                         if handle_mouse('lbutton_pressed'):
-                            audio.playSound('sounds\\wav\\click2.wav')
+                            audio.playSound('sounds/wav/click2.wav')
                     else:
                         for x in range(2):
                             lock.acquire()
@@ -5828,7 +5828,7 @@ def handle_keys():
                         CreatureDone = False
                         NamingDone = False
                         DoScaleLayer = False
-                        audio.playMusic('music\\wav\\Cult-worldbuilder.wav')
+                        audio.playMusic('music/wav/Cult-worldbuilder.wav')
                         libtcod.console_set_default_background(wgwindow, libtcod.black)
                         libtcod.console_clear(wgwindow)
                         doScreenSetup()
@@ -6050,7 +6050,7 @@ def doIntroSetup():
         libtcod.console_delete(wgwindow)
     except:
         pass
-    audio.playMusic('music\\wav\\Cult-title.wav',-1)
+    audio.playMusic('music/wav/Cult-title.wav',-1)
 
     title = []
     for line in range(1927,1941):
@@ -6254,7 +6254,7 @@ def doWorldAtlasSetup():
         borderh = borderhchars[x % 3]
         libtcod.console_print_ex(0, x + (SCREEN_WIDTH - VIEW_WIDTH) - 3, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderh)))
 
-    wlist = os.listdir('.\\data\\world')
+    wlist = os.listdir('./data/world')
     wlist = filter(lambda x: x[-4:] == '.sav', wlist)
     printline = 0
     if len(wlist) > 0:
@@ -6282,7 +6282,7 @@ def doWorldStartSetup():
                 char = choice(starchars)
                 libtcod.console_print_ex(0,x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
 
-    wlist = os.listdir('.\\data\\world')
+    wlist = os.listdir('./data/world')
     wlist = filter(lambda x: x[-4:] == '.sav', wlist)
     printline = 0
     for x in range(6):
@@ -7888,12 +7888,12 @@ class World(threading.Thread):
             try:
                 if init['WORLDGEN PICS'] == 'YES':
                     wgpic = libtcod.image_from_console(wgwindow)
-                    libtcod.image_save(wgpic,'.\\image\\gfx\\worldgen.png')
+                    libtcod.image_save(wgpic,'./image/gfx/worldgen.png')
                 break
             except WindowsError:
                 pass
 
-        libtcod.console_set_custom_font('fonts\\heightmap.bmp', libtcod.FONT_LAYOUT_TCOD | libtcod.FONT_TYPE_GREYSCALE, fontx, fonty)
+        libtcod.console_set_custom_font('fonts/heightmap.bmp', libtcod.FONT_LAYOUT_TCOD | libtcod.FONT_TYPE_GREYSCALE, fontx, fonty)
 
         testconsole = libtcod.console_new(MAP_WIDTH,MAP_HEIGHT)
         for x in range(MAP_WIDTH):
@@ -7908,7 +7908,7 @@ class World(threading.Thread):
         while True:
             try:
                 heightpic = libtcod.image_from_console(testconsole)
-                libtcod.image_save(heightpic,'.\\image\\gfx\\hmap.png')
+                libtcod.image_save(heightpic,'./image/gfx/hmap.png')
                 break
             except WindowsError:
                 pass
@@ -8788,7 +8788,7 @@ class WorldNaming(threading.Thread):
             try:
                 if init['WORLDGEN PICS'] == 'YES':
                     wgnpic = libtcod.image_from_console(wgwindow)
-                    libtcod.image_save(wgnpic,'.\\image\\gfx\\worldgenpn.png')
+                    libtcod.image_save(wgnpic,'./image/gfx/worldgenpn.png')
                 break
             except WindowsError:
                 pass
@@ -11609,7 +11609,7 @@ class WorldHistory(threading.Thread):
             try:
                 if init['WORLDGEN PICS'] == 'YES':
                     wgcpic = libtcod.image_from_console(wgwindow)
-                    libtcod.image_save(wgcpic,'.\\image\\gfx\\worldgenpc.png')
+                    libtcod.image_save(wgcpic,'./image/gfx/worldgenpc.png')
                 break
             except WindowsError:
                 pass
@@ -11670,7 +11670,7 @@ class WorldHistory(threading.Thread):
 
         NoKeys = True
         time.sleep(1.0)
-        worldfile = open('.\\data\\world\\%s.sav' % worldname, 'wb')
+        worldfile = open('./data/world/%s.sav' % worldname, 'wb')
         gc.disable()
         cPickle.dump(savedict, worldfile, -1)
         gc.enable()
@@ -11703,7 +11703,7 @@ class WorldAtlas(threading.Thread):
         MenuList = []
         MenuSetting = 'WAMain'
 
-        wlist = os.listdir('.\\data\\world')
+        wlist = os.listdir('./data/world')
         wlist = filter(lambda x: x[-4:] == '.sav', wlist)
         printline = 0
         if len(wlist) > 0:
@@ -11721,7 +11721,7 @@ class WorldAtlas(threading.Thread):
         global MouseLock, Cursor, BTorch, init
 
         MouseLock = True
-        wdictfile = open('.\\data\\world\\%s' % wlist[mplayery - 1] + '.sav','rb')
+        wdictfile = open('./data/world/%s' % wlist[mplayery - 1] + '.sav','rb')
         gc.disable()
         wdict = cPickle.load(wdictfile)
         gc.disable()
@@ -12003,7 +12003,7 @@ class WorldAtlas(threading.Thread):
         DrawScroll(wawindow, 9, 9, VIEW_WIDTH - 19, VIEW_HEIGHT - 19)
         libtcod.console_set_default_foreground(wawindow, creature['charcolor'])
 
-        charfile = open('.\\image\\txt\\chars.txt','r')
+        charfile = open('./image/txt/chars.txt','r')
         charlines = []
         for line in charfile:
             charlines.append(line.strip('\n'))
@@ -12323,7 +12323,7 @@ class PlayWorld(threading.Thread):
                     char = [icon_pause[0] + x,icon_pause[1] + y,255]
                     libtcod.console_print_ex(GUILayer,GUITiles['unpause'][0][0] + x,GUITiles['unpause'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                     lock.release()
-            audio.playSound('sounds\\wav\\lb.wav')
+            audio.playSound('sounds/wav/lb.wav')
             self.runtime = False
             Clouds.hover = True
             pathlock = True
@@ -12336,7 +12336,7 @@ class PlayWorld(threading.Thread):
                     char = [icon_unpause[0] + x,icon_unpause[1] + y,255]
                     libtcod.console_print_ex(GUILayer,GUITiles['unpause'][0][0] + x,GUITiles['unpause'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                     lock.release()
-            audio.playSound('sounds\\wav\\lbh.wav')
+            audio.playSound('sounds/wav/lbh.wav')
             self.runtime = True
             Clouds.hover = False
             pathlock = False
@@ -12410,7 +12410,7 @@ class PlayWorld(threading.Thread):
         if menu == GUIMenu['menu']:
             pass
         else:
-            audio.playSound('sounds\\wav\\click.wav')
+            audio.playSound('sounds/wav/click.wav')
             GUIMenu['menu'] = menu
             libtcod.console_set_default_foreground(GUILayer,libtcod.white)
             if menu == 'task':
@@ -15979,7 +15979,7 @@ class PlayWorld(threading.Thread):
     def loadWorld(self):
         global MenuSetting, MenuList, wdict
         MenuList = []
-        wdictfile = open('.\\data\\world\\%s' % self.world + '.sav','rb')
+        wdictfile = open('./data/world/%s' % self.world + '.sav','rb')
         gc.disable()
         wdict = cPickle.load(wdictfile)
         gc.enable()
@@ -16114,7 +16114,7 @@ class PlayWorld(threading.Thread):
         MLogBar.start()
         self.window = wrwindow
         self.pswitch = True
-        audio.playMusic('music\\wav\\Cult-spring.wav',-1)
+        audio.playMusic('music/wav/Cult-spring.wav',-1)
         self.addMesg('Generating map, one moment...',col = libtcod.light_orange)
         rtypes = wbiomedict['%s,%s' % (self.curregion[0],self.curregion[1])]
         libtcod.console_set_default_background(LoadScreen,libtcod.magenta)
@@ -16153,7 +16153,7 @@ class PlayWorld(threading.Thread):
 
     def LoadStruct(self,raw):
         sdict = {}
-        structfile = open('data\\struct\\%s.txt' % raw, 'r')
+        structfile = open('data/struct/%s.txt' % raw, 'r')
         struct = structfile.readlines()
         structfile.close()
         for line in struct:
@@ -16173,7 +16173,7 @@ class PlayWorld(threading.Thread):
 
     def LoadCon(self,raw):
         cdict = {}
-        confile = open('data\\build\\%s.txt' % raw, 'r')
+        confile = open('data/build/%s.txt' % raw, 'r')
         con = confile.readlines()
         confile.close()
         for line in con:
@@ -16198,7 +16198,7 @@ class PlayWorld(threading.Thread):
         coordcats = ['GRASS','TALLGRASS','LEAF','DIRT','WATER']
         intcats = ['VARIATIONS','WIDTH','HEIGHT','XLOC','YLOC']
         terdict = {}
-        terfile = open('data\\terrain\\%s\\%s.txt' % (folder,raw), 'r')
+        terfile = open('data/terrain/%s/%s.txt' % (folder,raw), 'r')
         ter = terfile.readlines()
         terfile.close()
         for line in ter:
@@ -16524,7 +16524,7 @@ class PlayWorld(threading.Thread):
                         GameWorld.addMesg('You can\'t reach that place.', col = libtcod.yellow)
                 if pathdone:
                     ttime = 0.0
-                    treesound = audio.playSound('sounds\\ogg\\chop.ogg')
+                    treesound = audio.playSound('sounds/ogg/chop.ogg')
                     self.addMesg('You begin chopping down the tree with your %s.' % tool)
                     Progress = ProgressBar('Felling',5)
                     Progress.start()
@@ -16574,7 +16574,7 @@ class PlayWorld(threading.Thread):
                         except KeyError:
                             pass
                     self.handlePCchar()
-                    audio.playSound('sounds\\ogg\\treefall.ogg')
+                    audio.playSound('sounds/ogg/treefall.ogg')
                     self.addMesg('You chop down the tree.')
                     log = ['log','component','wood',1]
                     for section in range(treerad):
@@ -16634,7 +16634,7 @@ class PlayWorld(threading.Thread):
                         GameWorld.addMesg('You can\'t reach that place.', col = libtcod.yellow)
                 if pathdone:
                     ttime = 0.0
-                    picksound = audio.playSound('sounds\\ogg\\pick.ogg')
+                    picksound = audio.playSound('sounds/ogg/pick.ogg')
                     self.addMesg('You begin mining the rock.')
                     Progress = ProgressBar('Mining',7)
                     Progress.start()
@@ -16718,9 +16718,9 @@ class PlayWorld(threading.Thread):
                 self.openSet(x,y)
                 self.recalcRoutes()
                 if self.zgrid[self.curz]['%s,%s' % (x,y)][1] == 'Stone Door':
-                    doorsound = audio.playSound('sounds\\wav\\stonedooropen.wav')
+                    doorsound = audio.playSound('sounds/wav/stonedooropen.wav')
                 else:
-                    doorsound = audio.playSound('sounds\\wav\\dooropen.wav')
+                    doorsound = audio.playSound('sounds/wav/dooropen.wav')
                 self.zgrid[self.curz]['%s,%s' % (x,y)][5] = 'open'
                 self.wobstructed[self.curz].pop('%s,%s' % (x,y))
                 self.addMesg('You open the door.')
@@ -16796,9 +16796,9 @@ class PlayWorld(threading.Thread):
                 self.flood[self.curz][doorareas[0]].pop('%s,%s' % (x,y))
                 self.recalcRoutes()
                 if self.zgrid[self.curz]['%s,%s' % (x,y)][1] == 'Stone Door':
-                    doorsound = audio.playSound('sounds\\wav\\stonedoorclose.wav')
+                    doorsound = audio.playSound('sounds/wav/stonedoorclose.wav')
                 else:
-                    doorsound = audio.playSound('sounds\\wav\\doorclose.wav')
+                    doorsound = audio.playSound('sounds/wav/doorclose.wav')
                 tile = self.zgrid[self.curz]['%s,%s' % (x,y)]
                 char = tile[2]
                 fg = tile[3]
@@ -16839,7 +16839,7 @@ class PlayWorld(threading.Thread):
             else:
                 GameWorld.addMesg('You can\'t reach that place.', col = libtcod.yellow)
         if pathdone:
-            stairsound = audio.playSound('sounds\\ogg\\stairstep.ogg',3000)
+            stairsound = audio.playSound('sounds/ogg/stairstep.ogg',3000)
             self.changeZ(1)
             if not self.flood.get(self.curz):
                 self.flood[self.curz] = self.floodFill(self.wobstructed)
@@ -16869,7 +16869,7 @@ class PlayWorld(threading.Thread):
             else:
                 GameWorld.addMesg('You can\'t reach that place.', col = libtcod.yellow)
         if pathdone:
-            audio.playSound('sounds\\ogg\\stairstep.ogg',3000)
+            audio.playSound('sounds/ogg/stairstep.ogg',3000)
             self.changeZ(-1)
             if not self.flood.get(self.curz):
                 self.flood[self.curz] = self.floodFill(self.wobstructed)
@@ -18026,7 +18026,7 @@ class PlayWorld(threading.Thread):
             libtcod.console_print_ex(wpwindow,VIEW_WIDTH / 2,VIEW_HEIGHT / 2,libtcod.BKGND_NONE,libtcod.CENTER,'Loading...')
             time.sleep(1.0)
 
-            audio.playMusic('music\\wav\\Cult-summer.wav',-1)
+            audio.playMusic('music/wav/Cult-summer.wav',-1)
 
             libtcod.console_set_default_background(wrwindow, libtcod.black)
             libtcod.console_clear(wiwindow)
@@ -18531,17 +18531,17 @@ def doMainGame():
 if __name__ == '__main__':
     libtcod.mouse_show_cursor(True)
 
-    fontimage = libtcod.image_load('fonts\\' + init['FONT'])
+    fontimage = libtcod.image_load('fonts/' + init['FONT'])
 
     if init['FONT TYPE'] == 'GREYSCALE':
-        libtcod.console_set_custom_font('fonts\\' + init['FONT'],libtcod.FONT_LAYOUT_TCOD | libtcod.FONT_TYPE_GREYSCALE,fontx,fonty)
+        libtcod.console_set_custom_font('fonts/' + init['FONT'],libtcod.FONT_LAYOUT_TCOD | libtcod.FONT_TYPE_GREYSCALE,fontx,fonty)
     else:
-        libtcod.console_set_custom_font('fonts\\' + init['FONT'],libtcod.FONT_LAYOUT_TCOD,fontx,fonty)
+        libtcod.console_set_custom_font('fonts/' + init['FONT'],libtcod.FONT_LAYOUT_TCOD,fontx,fonty)
     libtcod.console_init_root(SCREEN_WIDTH,SCREEN_HEIGHT,'Empyrea ' + __version__,False)
 
     finfomod = libtcod.image_get_size(fontimage)
     finfomod = finfomod[0] / 32
-    fontinfo = libtcod.image_load('fonts\\fontinfo%s.png' % finfomod)
+    fontinfo = libtcod.image_load('fonts/fontinfo%s.png' % finfomod)
 
     libtcod.sys_set_fps(LIMIT_FPS)
 

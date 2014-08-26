@@ -5828,7 +5828,7 @@ def handle_keys():
                         CreatureDone = False
                         NamingDone = False
                         DoScaleLayer = False
-                        audio.playMusic('music/wav/Cult-worldbuilder.wav')
+                        audio.playMusic('music/ogg/Cult-worldbuilder.ogg')
                         libtcod.console_set_default_background(wgwindow, libtcod.black)
                         libtcod.console_clear(wgwindow)
                         doScreenSetup()
@@ -6050,7 +6050,7 @@ def doIntroSetup():
         libtcod.console_delete(wgwindow)
     except:
         pass
-    audio.playMusic('music/wav/Cult-title.wav',-1)
+    audio.playMusic('music/ogg/Cult-title.ogg',-1)
 
     title = []
     for line in range(1927,1941):
@@ -16114,7 +16114,7 @@ class PlayWorld(threading.Thread):
         MLogBar.start()
         self.window = wrwindow
         self.pswitch = True
-        audio.playMusic('music/wav/Cult-spring.wav',-1)
+        audio.playMusic('music/ogg/Cult-spring.ogg',-1)
         self.addMesg('Generating map, one moment...',col = libtcod.light_orange)
         rtypes = wbiomedict['%s,%s' % (self.curregion[0],self.curregion[1])]
         libtcod.console_set_default_background(LoadScreen,libtcod.magenta)
@@ -18026,7 +18026,7 @@ class PlayWorld(threading.Thread):
             libtcod.console_print_ex(wpwindow,VIEW_WIDTH / 2,VIEW_HEIGHT / 2,libtcod.BKGND_NONE,libtcod.CENTER,'Loading...')
             time.sleep(1.0)
 
-            audio.playMusic('music/wav/Cult-summer.wav',-1)
+            audio.playMusic('music/ogg/Cult-summer.ogg',-1)
 
             libtcod.console_set_default_background(wrwindow, libtcod.black)
             libtcod.console_clear(wiwindow)

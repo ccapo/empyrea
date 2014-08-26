@@ -7,9 +7,7 @@ import time
 import pygame
 import math
 from math import sqrt
-import random
-from random import randrange
-from random import choice
+from random import choice, randrange, shuffle
 import threading
 import multiprocessing
 import cPickle
@@ -668,7 +666,7 @@ class IntroGraphics(threading.Thread):
                 dist = int(sqrt((pow((self.candle1[0] - x) - self.candle1[0],2) + pow((self.candle1[1] - y) - self.candle1[1],2))))
                 if dist < self.candlerad:
                     dperc = 1.0 - ((dist * 1.0) / (self.candlerad * 1.0))
-                    dpercmod = random.randrange(-8,8) * 0.01
+                    dpercmod = randrange(-8,8) * 0.01
                     dperc = max(min(dperc + dpercmod,0.95),0.0)
                     fcol = libtcod.color_lerp(libtcod.white,self.color,dperc)
                     bcol = libtcod.color_lerp(libtcod.Color(2,0,0),self.color,dperc)
@@ -679,7 +677,7 @@ class IntroGraphics(threading.Thread):
                 dist = int(sqrt((pow((self.candle2[0] - x) - self.candle2[0],2) + pow((self.candle2[1] - y) - self.candle2[1],2))))
                 if dist < self.candlerad:
                     dperc = 1.0 - ((dist * 1.0) / (self.candlerad * 1.0))
-                    dpercmod = random.randrange(-8,8) * 0.01
+                    dpercmod = randrange(-8,8) * 0.01
                     dperc = max(min(dperc + dpercmod,0.95),0.0)
                     fcol = libtcod.color_lerp(libtcod.white,self.color,dperc)
                     bcol = libtcod.color_lerp(libtcod.Color(2,0,0),self.color,dperc)
@@ -1744,7 +1742,7 @@ class InvWindow(threading.Thread):
         except AttributeError:
             self.sepchars = {}
             for y in range(1,self.conh - 1):
-                char = random.choice(vectorchars)
+                char = choice(vectorchars)
                 char[2] = 189
                 self.sepchars[y] = char
                 libtcod.console_print_ex(self.invconsole, seppos, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))        
@@ -5250,43 +5248,43 @@ def DrawBox(window, ox, oy, width, height, cornerstyle = 0, color = None, \
 
     if title:
         for x in range(ox + 1, ox + (width / 2) - (len(title) / 2) - 2 + to):
-            char = random.choice(vectorchars)
+            char = choice(vectorchars)
             libtcod.console_print_ex(window, x, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
         for x in range(ox + (width / 2) + (len(title) / 2) + 3 + to,ox + width):
-            char = random.choice(vectorchars)
+            char = choice(vectorchars)
             libtcod.console_print_ex(window, x, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
         libtcod.console_set_default_foreground(window, cornercolor)
-        libtcod.console_print_ex(window, ox + (width / 2) - (len(title) / 2) - 2 + to, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(random.choice(vectorchars))))
-        libtcod.console_print_ex(window, ox + (width / 2) + (len(title) / 2) + 2 + to, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(random.choice(vectorchars))))
+        libtcod.console_print_ex(window, ox + (width / 2) - (len(title) / 2) - 2 + to, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(choice(vectorchars))))
+        libtcod.console_print_ex(window, ox + (width / 2) + (len(title) / 2) + 2 + to, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(choice(vectorchars))))
         libtcod.console_set_default_foreground(window, tcolor)
         libtcod.console_print_ex(window, ox + (width / 2) - (len(title) / 2) + to, oy, libtcod.BKGND_NONE, libtcod.LEFT, title)
         libtcod.console_set_default_foreground(window, color)
     else:
         for x in range(ox + 1,ox + width):
-            char = random.choice(vectorchars)
+            char = choice(vectorchars)
             libtcod.console_print_ex(window, x, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
     for x in range(ox + 1,ox + width):
-        char = random.choice(vectorchars)
+        char = choice(vectorchars)
         libtcod.console_print_ex(window, x, oy + height, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
     for y in range(oy + 1, oy + height):
-        char = random.choice(vectorchars)
+        char = choice(vectorchars)
         libtcod.console_print_ex(window, ox, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
     for y in range(oy + 1, oy + height):
-        char = random.choice(vectorchars)
+        char = choice(vectorchars)
         libtcod.console_print_ex(window, ox + width, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
 
     libtcod.console_set_default_foreground(window, cornercolor)
     
     if cornerstyle == 0:
-        libtcod.console_print_ex(window, ox, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(random.choice(vectorchars))))
-        libtcod.console_print_ex(window, ox + width, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(random.choice(vectorchars))))
-        libtcod.console_print_ex(window, ox, oy + height, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(random.choice(vectorchars))))
-        libtcod.console_print_ex(window, ox + width, oy + height, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(random.choice(vectorchars))))
+        libtcod.console_print_ex(window, ox, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(choice(vectorchars))))
+        libtcod.console_print_ex(window, ox + width, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(choice(vectorchars))))
+        libtcod.console_print_ex(window, ox, oy + height, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(choice(vectorchars))))
+        libtcod.console_print_ex(window, ox + width, oy + height, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(choice(vectorchars))))
     else:
-        libtcod.console_print_ex(window, ox, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(random.choice(vectorchars))))
-        libtcod.console_print_ex(window, ox + width, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(random.choice(vectorchars))))
-        libtcod.console_print_ex(window, ox, oy + height, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(random.choice(vectorchars))))
-        libtcod.console_print_ex(window, ox + width, oy + height, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(random.choice(vectorchars))))
+        libtcod.console_print_ex(window, ox, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(choice(vectorchars))))
+        libtcod.console_print_ex(window, ox + width, oy, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(choice(vectorchars))))
+        libtcod.console_print_ex(window, ox, oy + height, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(choice(vectorchars))))
+        libtcod.console_print_ex(window, ox + width, oy + height, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(choice(vectorchars))))
     NoGraphics, NoButtons, NoMenus, NoUpdate = False,False,False,False
 
 def DoMenu(window, ox, oy, optionlist, hcolor = libtcod.azure, ocolor = libtcod.darkest_azure, \
@@ -7615,7 +7613,7 @@ class World(threading.Thread):
                             for num in range(-2,3):
                                 for num2 in range(-2,3):
                                     try:
-                                        if wheightdict['%s,%s' % (x + num,y + num2)] < wwlev and random.randrange(2) == 1:
+                                        if wheightdict['%s,%s' % (x + num,y + num2)] < wwlev and randrange(2) == 1:
                                             shrubtype = 'ml'
                                     except KeyError:
                                         pass
@@ -7907,7 +7905,7 @@ class World(threading.Thread):
                             try:
                                 if 'r' in wfeaturedict['%s,%s' % (x + num,y + num2)]:
                                     flist = wfeaturedict['%s,%s' % (x,y)]
-                                    if random.randrange(2) == 1:
+                                    if randrange(2) == 1:
                                         try:
                                             flist.remove('sl')
                                         except ValueError:
@@ -9794,7 +9792,7 @@ class WorldCreatures(threading.Thread):
             num3 = randrange(4,11)
 
             numlist = [num1,num2,num3]
-            random.shuffle(numlist)
+            shuffle(numlist)
 
             creature['STR'] = numlist[0] + skew
             creature['END'] = numlist[1] + skew
@@ -9805,7 +9803,7 @@ class WorldCreatures(threading.Thread):
             num3 = randrange(4,11)
 
             numlist = [num1,num2,num3]
-            random.shuffle(numlist)
+            shuffle(numlist)
 
             creature['WIL'] = numlist[0] - skew
             creature['INT'] = numlist[1] - skew
@@ -14229,11 +14227,11 @@ class PlayWorld(threading.Thread):
             wdirs.append('se')
         if 'n' in wdirs:
             mshobdict = dict(shobdict.items() + shobdicte.items() + shobdictw.items())
-            etile = random.choice(edgetiles['e'][0:(len(edgetiles['e']) / 4)])
-            wtile = random.choice(edgetiles['w'][0:(len(edgetiles['w']) / 4)])
+            etile = choice(edgetiles['e'][0:(len(edgetiles['e']) / 4)])
+            wtile = choice(edgetiles['w'][0:(len(edgetiles['w']) / 4)])
             while mshobdict.get('%s,%s' % (etile[0],etile[1])) or mshobdict.get('%s,%s' % (wtile[0],wtile[1])):
-                etile = random.choice(edgetiles['e'][0:(len(edgetiles['e']) / 4)])
-                wtile = random.choice(edgetiles['w'][0:(len(edgetiles['w']) / 4)])                
+                etile = choice(edgetiles['e'][0:(len(edgetiles['e']) / 4)])
+                wtile = choice(edgetiles['w'][0:(len(edgetiles['w']) / 4)])                
             path = Pathfinder(mshobdict,self.flood,etile[0],etile[1],wtile[0],wtile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
             path.start()            
             while path.pathgoing:
@@ -14241,8 +14239,8 @@ class PlayWorld(threading.Thread):
                 if path.path == False:
                     path.pathgoing = False
             while path.path == False:
-                etile = random.choice(edgetiles['e'][0:(len(edgetiles['e']) / 4)])
-                wtile = random.choice(edgetiles['w'][0:(len(edgetiles['w']) / 4)])
+                etile = choice(edgetiles['e'][0:(len(edgetiles['e']) / 4)])
+                wtile = choice(edgetiles['w'][0:(len(edgetiles['w']) / 4)])
                 path = Pathfinder(mshobdict,self.flood,etile[0],etile[1],wtile[0],wtile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
                 path.start()
                 while path.pathgoing:
@@ -14283,11 +14281,11 @@ class PlayWorld(threading.Thread):
                 self.shoretiles['%s,%s,' % (pathtile[0],pathtile[1])] = True
         if 's' in wdirs:
             mshobdict = dict(shobdict.items() + shobdicte.items() + shobdictw.items())
-            etile = random.choice(edgetiles['e'][(len(edgetiles['e']) / 4) * 3:])
-            wtile = random.choice(edgetiles['w'][(len(edgetiles['w']) / 4) * 3:])
+            etile = choice(edgetiles['e'][(len(edgetiles['e']) / 4) * 3:])
+            wtile = choice(edgetiles['w'][(len(edgetiles['w']) / 4) * 3:])
             while mshobdict.get('%s,%s' % (etile[0],etile[1])) or mshobdict.get('%s,%s' % (wtile[0],wtile[1])):
-                etile = random.choice(edgetiles['e'][(len(edgetiles['e']) / 4) * 3:])
-                wtile = random.choice(edgetiles['w'][(len(edgetiles['w']) / 4) * 3:]) 
+                etile = choice(edgetiles['e'][(len(edgetiles['e']) / 4) * 3:])
+                wtile = choice(edgetiles['w'][(len(edgetiles['w']) / 4) * 3:]) 
             path = Pathfinder(mshobdict,self.flood,etile[0],etile[1],wtile[0],wtile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
             path.start()            
             while path.pathgoing:
@@ -14295,8 +14293,8 @@ class PlayWorld(threading.Thread):
                 if path.path == False:
                     path.pathgoing = False
             while path.path == False:
-                etile = random.choice(edgetiles['e'][(len(edgetiles['e']) / 4) * 3:])
-                wtile = random.choice(edgetiles['w'][(len(edgetiles['w']) / 4) * 3:])
+                etile = choice(edgetiles['e'][(len(edgetiles['e']) / 4) * 3:])
+                wtile = choice(edgetiles['w'][(len(edgetiles['w']) / 4) * 3:])
                 path = Pathfinder(mshobdict,self.flood,etile[0],etile[1],wtile[0],wtile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
                 path.start()
                 while path.pathgoing:
@@ -14337,11 +14335,11 @@ class PlayWorld(threading.Thread):
                 self.shoretiles['%s,%s,' % (pathtile[0],pathtile[1])] = True
         if 'w' in wdirs:
             mshobdict = dict(shobdict.items() + shobdictn.items() + shobdicts.items())
-            ntile = random.choice(edgetiles['n'][0:(len(edgetiles['n']) / 4)])
-            stile = random.choice(edgetiles['s'][0:(len(edgetiles['s']) / 4)])
+            ntile = choice(edgetiles['n'][0:(len(edgetiles['n']) / 4)])
+            stile = choice(edgetiles['s'][0:(len(edgetiles['s']) / 4)])
             while mshobdict.get('%s,%s' % (ntile[0],ntile[1])) or mshobdict.get('%s,%s' % (stile[0],stile[1])):
-                ntile = random.choice(edgetiles['n'][0:(len(edgetiles['n']) / 4)])
-                stile = random.choice(edgetiles['s'][0:(len(edgetiles['s']) / 4)])
+                ntile = choice(edgetiles['n'][0:(len(edgetiles['n']) / 4)])
+                stile = choice(edgetiles['s'][0:(len(edgetiles['s']) / 4)])
             path = Pathfinder(mshobdict,self.flood,ntile[0],ntile[1],stile[0],stile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
             path.start()            
             while path.pathgoing:
@@ -14349,8 +14347,8 @@ class PlayWorld(threading.Thread):
                 if path.path == False:
                     path.pathgoing = False
             while path.path == False:
-                ntile = random.choice(edgetiles['n'][0:(len(edgetiles['n']) / 4)])
-                stile = random.choice(edgetiles['s'][0:(len(edgetiles['s']) / 4)])
+                ntile = choice(edgetiles['n'][0:(len(edgetiles['n']) / 4)])
+                stile = choice(edgetiles['s'][0:(len(edgetiles['s']) / 4)])
                 path = Pathfinder(mshobdict,self.flood,ntile[0],ntile[1],stile[0],stile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
                 path.start()
                 while path.pathgoing:
@@ -14391,11 +14389,11 @@ class PlayWorld(threading.Thread):
                 self.shoretiles['%s,%s,' % (pathtile[0],pathtile[1])] = True
         if 'e' in wdirs:
             mshobdict = dict(shobdict.items() + shobdictn.items() + shobdicts.items())
-            ntile = random.choice(edgetiles['n'][(len(edgetiles['n']) / 4) * 3:])
-            stile = random.choice(edgetiles['s'][(len(edgetiles['s']) / 4) * 3:])
+            ntile = choice(edgetiles['n'][(len(edgetiles['n']) / 4) * 3:])
+            stile = choice(edgetiles['s'][(len(edgetiles['s']) / 4) * 3:])
             while mshobdict.get('%s,%s' % (ntile[0],ntile[1])) or mshobdict.get('%s,%s' % (stile[0],stile[1])):
-                ntile = random.choice(edgetiles['n'][(len(edgetiles['n']) / 4) * 3:])
-                stile = random.choice(edgetiles['s'][(len(edgetiles['s']) / 4) * 3:])
+                ntile = choice(edgetiles['n'][(len(edgetiles['n']) / 4) * 3:])
+                stile = choice(edgetiles['s'][(len(edgetiles['s']) / 4) * 3:])
             path = Pathfinder(mshobdict,self.flood,ntile[0],ntile[1],stile[0],stile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
             path.start()            
             while path.pathgoing:
@@ -14403,8 +14401,8 @@ class PlayWorld(threading.Thread):
                 if path.path == False:
                     path.pathgoing = False
             while path.path == False:
-                ntile = random.choice(edgetiles['n'][(len(edgetiles['n']) / 4) * 3:])
-                stile = random.choice(edgetiles['s'][(len(edgetiles['s']) / 4) * 3:])
+                ntile = choice(edgetiles['n'][(len(edgetiles['n']) / 4) * 3:])
+                stile = choice(edgetiles['s'][(len(edgetiles['s']) / 4) * 3:])
                 path = Pathfinder(mshobdict,self.flood,ntile[0],ntile[1],stile[0],stile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
                 path.start()
                 while path.pathgoing:
@@ -14446,11 +14444,11 @@ class PlayWorld(threading.Thread):
         if ('nw' in wdirs and 'n' in wdirs and 'w' in wdirs) or \
            ('nw' in wdirs and not ('n' in wdirs or 'w' in wdirs)):
             mshobdict = dict(shobdict.items() + shobdictnw.items())
-            ntile = random.choice(edgetiles['n'][0:(len(edgetiles['n']) / 2)])
-            wtile = random.choice(edgetiles['w'][0:(len(edgetiles['w']) / 2)])
+            ntile = choice(edgetiles['n'][0:(len(edgetiles['n']) / 2)])
+            wtile = choice(edgetiles['w'][0:(len(edgetiles['w']) / 2)])
             while mshobdict.get('%s,%s' % (ntile[0],ntile[1])) or mshobdict.get('%s,%s' % (wtile[0],wtile[1])):
-                ntile = random.choice(edgetiles['n'][0:(len(edgetiles['n']) / 2)])
-                wtile = random.choice(edgetiles['w'][0:(len(edgetiles['w']) / 2)])
+                ntile = choice(edgetiles['n'][0:(len(edgetiles['n']) / 2)])
+                wtile = choice(edgetiles['w'][0:(len(edgetiles['w']) / 2)])
             path = Pathfinder(mshobdict,self.flood,ntile[0],ntile[1],wtile[0],wtile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
             path.start()
             while path.pathgoing:
@@ -14458,8 +14456,8 @@ class PlayWorld(threading.Thread):
                 if path.path == False:
                     path.pathgoing = False
             while path.path == False:
-                ntile = random.choice(edgetiles['n'][0:(len(edgetiles['n']) / 2)])
-                wtile = random.choice(edgetiles['w'][0:(len(edgetiles['w']) / 2)])
+                ntile = choice(edgetiles['n'][0:(len(edgetiles['n']) / 2)])
+                wtile = choice(edgetiles['w'][0:(len(edgetiles['w']) / 2)])
                 path = Pathfinder(mshobdict,self.flood,ntile[0],ntile[1],wtile[0],wtile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
                 path.start()
                 while path.pathgoing:
@@ -14504,11 +14502,11 @@ class PlayWorld(threading.Thread):
         if ('ne' in wdirs and 'n' in wdirs and 'e' in wdirs) or \
            ('ne' in wdirs and not ('n' in wdirs or 'e' in wdirs)):
             mshobdict = dict(shobdict.items() + shobdictne.items())
-            ntile = random.choice(edgetiles['n'][0:(len(edgetiles['n']) / 2)])
-            etile = random.choice(edgetiles['e'][(len(edgetiles['e']) / 2):])
+            ntile = choice(edgetiles['n'][0:(len(edgetiles['n']) / 2)])
+            etile = choice(edgetiles['e'][(len(edgetiles['e']) / 2):])
             while mshobdict.get('%s,%s' % (ntile[0],ntile[1])) or mshobdict.get('%s,%s' % (etile[0],etile[1])):
-                ntile = random.choice(edgetiles['n'][0:(len(edgetiles['n']) / 2)])
-                etile = random.choice(edgetiles['e'][(len(edgetiles['e']) / 2):])
+                ntile = choice(edgetiles['n'][0:(len(edgetiles['n']) / 2)])
+                etile = choice(edgetiles['e'][(len(edgetiles['e']) / 2):])
             path = Pathfinder(mshobdict,self.flood,ntile[0],ntile[1],etile[0],etile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
             path.start()
             while path.pathgoing:
@@ -14516,8 +14514,8 @@ class PlayWorld(threading.Thread):
                 if path.path == False:
                     path.pathgoing = False
             while path.path == False:
-                ntile = random.choice(edgetiles['n'][0:(len(edgetiles['n']) / 2)])
-                etile = random.choice(edgetiles['e'][(len(edgetiles['e']) / 2):])
+                ntile = choice(edgetiles['n'][0:(len(edgetiles['n']) / 2)])
+                etile = choice(edgetiles['e'][(len(edgetiles['e']) / 2):])
                 path = Pathfinder(mshobdict,self.flood,ntile[0],ntile[1],etile[0],etile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
                 path.start()
                 while path.pathgoing:
@@ -14562,11 +14560,11 @@ class PlayWorld(threading.Thread):
         if ('sw' in wdirs and 's' in wdirs and 'w' in wdirs) or \
            ('sw' in wdirs and not ('s' in wdirs or 'w' in wdirs)):
             mshobdict = dict(shobdict.items() + shobdictsw.items())
-            stile = random.choice(edgetiles['s'][0:(len(edgetiles['s']) / 2)])
-            wtile = random.choice(edgetiles['w'][(len(edgetiles['w']) / 2):])
+            stile = choice(edgetiles['s'][0:(len(edgetiles['s']) / 2)])
+            wtile = choice(edgetiles['w'][(len(edgetiles['w']) / 2):])
             while mshobdict.get('%s,%s' % (stile[0],stile[1])) or mshobdict.get('%s,%s' % (wtile[0],wtile[1])):
-                stile = random.choice(edgetiles['s'][0:(len(edgetiles['s']) / 2)])
-                wtile = random.choice(edgetiles['w'][(len(edgetiles['w']) / 2):])
+                stile = choice(edgetiles['s'][0:(len(edgetiles['s']) / 2)])
+                wtile = choice(edgetiles['w'][(len(edgetiles['w']) / 2):])
             path = Pathfinder(mshobdict,self.flood,stile[0],stile[1],wtile[0],wtile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
             path.start()
             while path.pathgoing:
@@ -14574,8 +14572,8 @@ class PlayWorld(threading.Thread):
                 if path.path == False:
                     path.pathgoing = False
             while path.path == False:
-                stile = random.choice(edgetiles['s'][0:(len(edgetiles['s']) / 2)])
-                wtile = random.choice(edgetiles['w'][(len(edgetiles['w']) / 2):])
+                stile = choice(edgetiles['s'][0:(len(edgetiles['s']) / 2)])
+                wtile = choice(edgetiles['w'][(len(edgetiles['w']) / 2):])
                 path = Pathfinder(mshobdict,self.flood,stile[0],stile[1],wtile[0],wtile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
                 path.start()
                 while path.pathgoing:
@@ -14620,11 +14618,11 @@ class PlayWorld(threading.Thread):
         if ('se' in wdirs and 's' in wdirs and 'e' in wdirs) or \
            ('se' in wdirs and not ('s' in wdirs or 'e' in wdirs)):
             mshobdict = dict(shobdict.items() + shobdictse.items())
-            stile = random.choice(edgetiles['s'][(len(edgetiles['s']) / 2):])
-            etile = random.choice(edgetiles['e'][(len(edgetiles['e']) / 2):])
+            stile = choice(edgetiles['s'][(len(edgetiles['s']) / 2):])
+            etile = choice(edgetiles['e'][(len(edgetiles['e']) / 2):])
             while mshobdict.get('%s,%s' % (stile[0],stile[1])) or mshobdict.get('%s,%s' % (etile[0],etile[1])):
-                stile = random.choice(edgetiles['s'][(len(edgetiles['s']) / 2):])
-                etile = random.choice(edgetiles['e'][(len(edgetiles['e']) / 2):])
+                stile = choice(edgetiles['s'][(len(edgetiles['s']) / 2):])
+                etile = choice(edgetiles['e'][(len(edgetiles['e']) / 2):])
             path = Pathfinder(mshobdict,self.flood,stile[0],stile[1],etile[0],etile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
             path.start()
             while path.pathgoing:
@@ -14632,8 +14630,8 @@ class PlayWorld(threading.Thread):
                 if path.path == False:
                     path.pathgoing = False
             while path.path == False:
-                stile = random.choice(edgetiles['s'][(len(edgetiles['s']) / 2):])
-                etile = random.choice(edgetiles['e'][(len(edgetiles['e']) / 2):])
+                stile = choice(edgetiles['s'][(len(edgetiles['s']) / 2):])
+                etile = choice(edgetiles['e'][(len(edgetiles['e']) / 2):])
                 path = Pathfinder(mshobdict,self.flood,stile[0],stile[1],etile[0],etile[1],actor = 'River',domove = False,notify = False,skipareas = True,canswim = True)
                 path.start()
                 while path.pathgoing:
@@ -14942,13 +14940,13 @@ class PlayWorld(threading.Thread):
                     self.rterraindict['%s,%s' % (x,y)] = bcol            
 
         self.beachtiles = {}
-        n = random.randrange(-18,-6)
-        n2 = random.randrange(7,19)
+        n = randrange(-18,-6)
+        n2 = randrange(7,19)
         for key in self.shoretiles.keys():
             x = int(key.split(',')[0])
             y = int(key.split(',')[1])
-            n = min(max(n + (random.randrange(-5,6) * 0.1),-25),-6)
-            n2 = min(max(n2 + (random.randrange(-5,6) * 0.1),6),25)
+            n = min(max(n + (randrange(-5,6) * 0.1),-25),-6)
+            n2 = min(max(n2 + (randrange(-5,6) * 0.1),6),25)
             for num in range(int(n),int(n2)):
                 for num2 in range(int(n),int(n2)):
                     try:
@@ -14967,9 +14965,9 @@ class PlayWorld(threading.Thread):
                                 pass
                             self.beachtiles['%s,%s' % (x + num,y + num2)] = alphperc
                             if alphperc > 0.4:
-                                char = random.choice(shorechars + beachchars)
+                                char = choice(shorechars + beachchars)
                             else:
-                                char = random.choice(dirtchars + tallgrasschars)
+                                char = choice(dirtchars + tallgrasschars)
                             libtcod.console_set_default_foreground(wrwindow,fcol)
                             libtcod.console_set_default_background(wrwindow,col)
                             libtcod.console_print_ex(wrwindow,x + num,y + num2,libtcod.BKGND_ALPHA(alphperc),libtcod.LEFT,chr(DoChar(char)))

@@ -4840,7 +4840,7 @@ class WScrollBar(threading.Thread):
                 libtcod.console_print_ex(self.window, self.x + 1 + tile, self.y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar([0,0,self.charnum])))
             if handle_mouse('lbutton') and handle_mouse('cx') == self.rbpos:
                 libtcod.console_set_default_foreground(self.window, self.hcolor)
-            libtcod.console_set_default_foreground(self.window,libtcod.arrowcolor)
+            libtcod.console_set_default_foreground(self.window, self.arrowcolor)
             char = ballchar
             char[2] = self.charnum
             libtcod.console_print_ex(self.window, self.bpos, self.y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
@@ -5619,11 +5619,7 @@ def handle_keys():
                         pathclass.killswitch = True
                     except NameError:
                         pass
-                    try:
-                        circle.killswitch = True
-                        circle.clearCircle()
-                    except NameError:
-                        pass
+
                     marker = PathMarker(GameWorld.window,handle_mouse('cx'),handle_mouse('cy'))
                     marker.start()
                     mxpos = PX + handle_mouse('cx') - (SCREEN_WIDTH - VIEW_WIDTH - 2)
@@ -5670,7 +5666,7 @@ def handle_keys():
                             adjustScreen()
                             GameWorld.handlePC()
                             if GameWorld.rswitch:
-                                if PCX in [0,RMAP_WIDTH - 1] or PCY in [0,RMAP_HEIGHT - 1] and not killmenu:
+                                if PCX in [0,RMAP_WIDTH - 1] or PCY in [0,RMAP_HEIGHT - 1]:
                                     GameWorld.leaveRegion()
                 else:
                     playerx = playerx + movekeys[key.vk][0]
@@ -6819,7 +6815,7 @@ def DrawWorld(window, width = MAP_WIDTH, height = MAP_HEIGHT, xoffset = 0, yoffs
 class World(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
-        
+
     def run(self):
         global SCREEN_HEIGHT, VIEW_HEIGHT, SCREEN_WIDTH, VIEW_WIDTH, wiwindow, \
                wgwindow, wswindow, worldmap, wheightdict, wfeaturedict, wgpic, \

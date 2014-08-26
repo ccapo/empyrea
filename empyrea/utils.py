@@ -31,29 +31,6 @@ def wchoice(lst):
     return choice(randlist)
 
 
-def dchoice(choicelist,capitalize = 0,possessive = 0):
-    global paraswitch, ctitles, curchoice
-    if not possessive:
-        poss = ''
-    else:
-        if not paraswitch or not choicelist == ctitles:
-            poss = '\'s'
-        else:
-            poss = 's'
-    if not paraswitch or not choicelist == ctitles:
-        dchoice = choice(choicelist)
-        curchoice = dchoice
-        if capitalize:
-            return dchoice[0].upper() + dchoice[1:] + poss
-        else:
-            return dchoice + poss
-    else:
-        if capitalize:
-            return 'It' + poss
-        else:
-            return 'it' + poss
-
-
 def DictCmp(x, y):
     if x[1] > y[1]:
         return -1

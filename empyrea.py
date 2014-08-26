@@ -3,7 +3,7 @@ import sys
 import libtcodpy as libtcod
 import time
 from math import sqrt
-from random import randrange, shuffle
+from random import choice, randrange, shuffle
 import threading
 import cPickle
 import fnmatch
@@ -37,7 +37,7 @@ __version__ = '0.3 Alpha Tech Demo by ' + __author__
 # Coder's Guide                    #
 ####################################
 ##     I. Misc. Functions
-##       - f. HeightSort, f. getRivChar, f. queryTile, f. DoChar
+##       - f.dchoice, f. HeightSort, f. getRivChar, f. queryTile, f. DoChar
 ##    II. Graphical/Menu Classes
 ##       - c. IntroGraphics, c. CloudNoise, c. WCloudNoise, c. FadeText,
 ##         c. ButtonBox, c. Menu, c. RelMap c. LeaveWindow, c. ScrollBar,
@@ -226,6 +226,28 @@ bannerdict['Type 1'] = [21,12]
 ####################################
 # I. Misc. Functions               #
 ####################################
+
+def dchoice(choicelist,capitalize = 0,possessive = 0):
+    global paraswitch, ctitles, curchoice
+    if not possessive:
+        poss = ''
+    else:
+        if not paraswitch or not choicelist == ctitles:
+            poss = '\'s'
+        else:
+            poss = 's'
+    if not paraswitch or not choicelist == ctitles:
+        dchoice = choice(choicelist)
+        curchoice = dchoice
+        if capitalize:
+            return dchoice[0].upper() + dchoice[1:] + poss
+        else:
+            return dchoice + poss
+    else:
+        if capitalize:
+            return 'It' + poss
+        else:
+            return 'it' + poss
 
 def HeightSort(x, y):
     if wheightdict['%s,%s' % (x[0],x[1])] > wheightdict['%s,%s' % (y[0],y[1])]:

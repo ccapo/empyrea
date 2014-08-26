@@ -12000,7 +12000,7 @@ class WorldAtlas(threading.Thread):
         libtcod.console_set_default_background(wawindow, libtcod.black)
         libtcod.console_clear(wawindow)
 
-        DrawScroll(wawindow, 9, 9, VIEW_WIDTH - 19, VIEW_HEIGHT - 19)
+        DrawScroll(wawindow, 9, 3, VIEW_WIDTH - 19, VIEW_HEIGHT - 3)
         libtcod.console_set_default_foreground(wawindow, creature['charcolor'])
 
         charfile = open('./image/txt/chars.txt','r')
@@ -12021,17 +12021,17 @@ class WorldAtlas(threading.Thread):
                 if len(line) > lline:
                     lline = len(line)
 
-        y = 11
+        y = 5
         for line in mcharlines:
             libtcod.console_print_ex(wawindow, 10 + ((VIEW_WIDTH - 19) / 2) - (lline / 2), y, libtcod.BKGND_NONE, libtcod.LEFT, line)
             y += 1
 
-        libtcod.console_set_default_foreground(wawindow, libtcod.white)
+        libtcod.console_set_default_foreground(wawindow, libtcod.dark_gray)
         libtcod.console_set_color_control(libtcod.COLCTRL_1,creature['charcolor'],libtcod.black)
-        libtcod.console_print_ex(wawindow, 9 + ((VIEW_WIDTH - 19) / 2), 12 + len(mcharlines), libtcod.BKGND_NONE, libtcod.CENTER, \
+        libtcod.console_print_ex(wawindow, 9 + ((VIEW_WIDTH - 19) / 2), 6 + len(mcharlines), libtcod.BKGND_NONE, libtcod.CENTER, \
                                      'The %c%s%c' % (libtcod.COLCTRL_1,creature['name'].capitalize(),libtcod.COLCTRL_STOP))
-        libtcod.console_print_rect_ex(wawindow, 9 + ((VIEW_WIDTH - 19) / 2), 14 + len(mcharlines), (VIEW_WIDTH - 32), (VIEW_HEIGHT - 32), \
-                                          libtcod.BKGND_NONE, libtcod.CENTER, creature['description'])
+        libtcod.console_print_rect_ex(wawindow, 11, 8 + len(mcharlines), (VIEW_WIDTH - 22), (VIEW_HEIGHT - 13), \
+                                          libtcod.BKGND_NONE, libtcod.LEFT, creature['description'])
 
         optionlist = ['Description','Information','Combat Stats','Legends']
         self.atlasmenu = Menu(wswindow, 2, 4, optionlist, title = creature['name'] + ':', talign = 'center', tx = 9, ty = 2, \

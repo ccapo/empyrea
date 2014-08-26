@@ -1,22 +1,17 @@
 from namegen import *
-from ctypes import *
 import os
 import sys
 import libtcodpy as libtcod
 import time
 import pygame
-import math
 from math import sqrt
 from random import choice, randrange, shuffle
 import threading
-import multiprocessing
 import cPickle
 import fnmatch
 import inflect
 import copy
-import sqlite3
 import gc
-import cProfile
 import Queue
 
 os.putenv("SDL_VIDEO_CENTERED", "1")

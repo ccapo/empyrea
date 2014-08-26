@@ -1,4 +1,3 @@
-from namegen import *
 import os
 import sys
 import libtcodpy as libtcod
@@ -9,10 +8,12 @@ from random import choice, randrange, shuffle
 import threading
 import cPickle
 import fnmatch
-import inflect
 import copy
 import gc
 import Queue
+
+from empyrea.namegen import MakeLang, MakeName
+import empyrea.inflect as inflect
 
 os.putenv("SDL_VIDEO_CENTERED", "1")
 sys.setrecursionlimit(50000)

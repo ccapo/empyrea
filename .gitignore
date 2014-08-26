@@ -1,0 +1,14 @@
+# Dynamically generated rubbish
+*.pyc
+*.log
+
+# Stuff modified during world generation
+data/world/*
+!data/world/Thaaka.sav
+!data/world/Vijamonen.sav
+image/gfx/*
+!image/gfx/README.TXT
+
+# Eclipse/PyDev project files
+.project
+.pydevproject

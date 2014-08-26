@@ -2,9 +2,8 @@ import os
 import sys
 import libtcodpy as libtcod
 import time
-import pygame
 from math import sqrt
-from random import choice, randrange, shuffle
+from random import randrange, shuffle
 import threading
 import cPickle
 import fnmatch
@@ -12,30 +11,17 @@ import copy
 import gc
 import Queue
 
+import empyrea.audio
 from empyrea.namegen import MakeLang, MakeName
 import empyrea.inflect as inflect
+from empyrea.utils import *
 
 os.putenv("SDL_VIDEO_CENTERED", "1")
 sys.setrecursionlimit(50000)
 
-def LoadInit():
-    initdict = {}
-    initfile = open('init.txt', 'r')
-    init = initfile.readlines()
-    initfile.close()
-    for line in init:
-        line = line.strip('\n')
-        if line.startswith('===') or line.startswith('*'):
-            continue
-        if not line.strip(' '):
-            continue
-        else:
-            sname = line.split(': ')[0]
-            setting = line.split(': ')[1]
-            initdict[sname] = setting
-    return initdict
 
-init = LoadInit()
+init = LoadInit('init.txt')
+audio = empyrea.audio.audio(int(init['MUSIC VOLUME']), int(init['SFX VOLUME']))
 
 p = inflect.engine()
 __author__ = 'D.M. Hagar'
@@ -50,10 +36,7 @@ __version__ = '0.3 Alpha Tech Demo by ' + __author__
 # Coder's Guide                    #
 ####################################
 ##     I. Misc. Functions
-##       - f. wchoice, f. dchoice, f. DictCmp, f. ListCmp, f. ListCmp2, f. LenCmp,
-##         f. HeightSort, f. modifyList, f. getRivChar, f. MergeTerritory, f. queryTile,
-##         f. doNothing, f. DoChar, f. throwSwitches, f. delFile
-##     I.A Music/Sound Functions
+##       - f. HeightSort, f. getRivChar, f. queryTile, f. DoChar
 ##    II. Graphical/Menu Classes
 ##       - c. IntroGraphics, c. CloudNoise, c. WCloudNoise, c. FadeText,
 ##         c. ButtonBox, c. Menu, c. RelMap c. LeaveWindow, c. ScrollBar,
@@ -113,9 +96,6 @@ NoRefresh = False
 
 fontx = 32
 fonty = 2055
-
-MVolume = ((int(init['MUSIC VOLUME']) * 1.0) / 100)
-SVolume = ((int(init['SFX VOLUME']) * 1.0) / 100)
 
 playerx, oplayerx = 1,1
 playery, oplayery = 1,1
@@ -251,72 +231,6 @@ bannerdict['Type 1'] = [21,12]
 # I. Misc. Functions               #
 ####################################
 
-def wchoice(lst):
-    total = 0
-    for pair in lst:
-        total += pair[1]
-    if str(total) != '1.0':
-        raise ValueError
-    randlist = []
-    for pair in lst:
-        randlist += [pair[0]] * int(pair[1] * 1000)
-    return choice(randlist)
-
-def dchoice(choicelist,capitalize = 0,possessive = 0):
-    global paraswitch, ctitles, curchoice
-    if not possessive:
-        poss = ''
-    else:
-        if not paraswitch or not choicelist == ctitles:
-            poss = '\'s'
-        else:
-            poss = 's'
-    if not paraswitch or not choicelist == ctitles:
-        dchoice = choice(choicelist)
-        curchoice = dchoice
-        if capitalize:
-            return dchoice[0].upper() + dchoice[1:] + poss
-        else:
-            return dchoice + poss
-    else:
-        if capitalize:
-            return 'It' + poss
-        else:
-            return 'it' + poss
-
-def DictCmp(x, y):
-    if x[1] > y[1]:
-        return -1
-    elif x[1] == y[1]:
-        return 0
-    else:
-        return 1
-
-def ListCmp(x, y):
-    if x[0] > y[0]:
-        return -1
-    elif x[0] == y[0]:
-        return 0
-    else:
-        return 1
-
-def ListCmp2(x, y):
-    if x[1] > y[1]:
-        return -1
-    elif x[1] == y[1]:
-        return 0
-    else:
-        return 1
-
-
-def LenCmp(x, y):
-    if len(x) > len(y):
-        return -1
-    elif len(x) == len(y):
-        return 0
-    else:
-        return 1
-
 def HeightSort(x, y):
     if wheightdict['%s,%s' % (x[0],x[1])] > wheightdict['%s,%s' % (y[0],y[1])]:
         return -1
@@ -325,14 +239,6 @@ def HeightSort(x, y):
     else:
         return 1
 
-def modifyList(curpos):
-    curpos = list(curpos)
-    compos = curpos.index(',')
-    curpos.remove(',')
-    curpos = [curpos[0:compos],curpos[compos:]]
-    curpos[0] = int(''.join(map(lambda x: str(x),curpos[0])))
-    curpos[1] = int(''.join(map(lambda x: str(x),curpos[1])))
-    return curpos
 
 def getRivChar(adjdirs, tributes):
     if len(adjdirs) == 1:
@@ -411,12 +317,6 @@ def getRivChar(adjdirs, tributes):
     elif len(adjdirs) == 4:
         return [2,6,255]
 
-def MergeTerritory(seq):
-    merged = []
-    for s in seq:
-        if merged.count(s) == 0:
-            merged.append(s)
-    return merged
 
 def queryTile(x, y, checklist):
     global wheightdict, wfeaturedict, tivar
@@ -485,8 +385,6 @@ def queryTile(x, y, checklist):
 
     return condition
 
-def doNothing():
-    pass
 
 def DoChar(char,charnum = None,store = False,x = None,y = None):
     if not charnum:
@@ -500,34 +398,6 @@ def DoChar(char,charnum = None,store = False,x = None,y = None):
         GameWorld.wcdict[GameWorld.curz]['%s,%s' % (x,y)] = char
     return charnum
 
-def throwSwitches(subject,switches):
-    for switch in switches:
-        case = getattr(subject,switch)
-        setattr(subject,switch,not case)
-
-def delFile(path):
-    os.remove(path)
-    
-####################################
-# I.A Music/Sound Functions        #
-####################################
-
-def playMusic(fname,loops=0,start=0.0):
-    global MVolume
-    pygame.mixer.music.load(fname)
-    pygame.mixer.music.play(loops,start)
-    pygame.mixer.music.set_volume(MVolume)
-
-def playSound(fname,fadeout=0,volume=1.0):
-    global SVolume
-    sound = pygame.mixer.Sound(fname)
-    sound.play()
-    if fadeout:
-        sound.fadeout(fadeout)
-    sound.set_volume(min(SVolume,volume))
-    
-    
-    return sound
 
 ####################################
 # II. Graphical/Menu Classes       #
@@ -2204,9 +2074,9 @@ class OptWindow(threading.Thread):
                     libtcod.console_set_char_background(self.oconsole, tile, 15, scrollcolor, libtcod.BKGND_SET)
 
     def doAudio(self):
-        global XConsoles, WeatherLayer, TopWindow, toplayer, freeze, Clouds, GameWorld, MVolume, SVolume, \
+        global XConsoles, WeatherLayer, TopWindow, toplayer, freeze, Clouds, GameWorld, \
                Nographics, NoButtons, NoMenus
-    
+
         time.sleep(0.1)
         self.audiowindow = libtcod.console_new(24,30)
         libtcod.console_set_default_background(self.audiowindow, libtcod.darkest_azure)
@@ -2223,13 +2093,13 @@ class OptWindow(threading.Thread):
         self.MVBar = WScrollBar(self.audiowindow, 2, 7, 20, srx + 2, sry + 7, arrowcolor = scrollcolor2, \
                                 bgcolor = libtcod.darker_azure, hcolor = scrollcolor2)
         self.MVBar.max = 100
-        self.MVBar.inc = int(MVolume * 100)
+        self.MVBar.inc = int(audio.MVolume * 100)
         self.MVBar.reDraw()
 
         self.SVBar = WScrollBar(self.audiowindow, 2, 12, 20, srx + 2, sry + 12, arrowcolor = scrollcolor2, \
                                 bgcolor = libtcod.darker_azure, hcolor = scrollcolor2)
         self.SVBar.max = 100
-        self.SVBar.inc = int(SVolume * 100)
+        self.SVBar.inc = int(audio.SVolume * 100)
         self.SVBar.reDraw()
 
         self.aconlist = [self.audiowindow,0,0,24,30,srx,sry,1.0,1.0]
@@ -2255,8 +2125,7 @@ class OptWindow(threading.Thread):
                         mvstr = ' ' + mvstr
                 libtcod.console_set_default_foreground(self.audiowindow,libtcod.black)
                 libtcod.console_print_ex(self.audiowindow, 7, 9, libtcod.BKGND_NONE, libtcod.LEFT, 'Music: %s' % mvstr)
-                MVolume = (self.MVBar.inc * 1.0) / 100
-                pygame.mixer.music.set_volume(MVolume)
+                audio.setMVolume((self.MVBar.inc * 1.0) / 100)
 
             if soinc != self.SVBar.inc or first:
                 if len(svstr) < 3:
@@ -2264,7 +2133,7 @@ class OptWindow(threading.Thread):
                         svstr = ' ' + svstr
                 libtcod.console_set_default_foreground(self.audiowindow,libtcod.black)
                 libtcod.console_print_ex(self.audiowindow, 7, 14, libtcod.BKGND_NONE, libtcod.LEFT, 'Sound: %s' % svstr)
-                SVolume = (self.SVBar.inc * 1.0) / 100
+                audio.setSVolume((self.SVBar.inc * 1.0) / 100)
                 
             first = False
 
@@ -3931,7 +3800,7 @@ class CWindow(threading.Thread):
                 GameWorld.addMesg('Blueprint  \'%s\' overwritten successfully.' % savestr)
                 break
             elif self.delete:
-                delFile('.\\data\\blueprint\\%s.blp' % bluelist[selectnum])
+                os.remove('.\\data\\blueprint\\%s.blp' % bluelist[selectnum])
                 GameWorld.addMesg('Blueprint  \'%s\' deleted.' % bluelist[selectnum])
                 break
             newkey = key.c
@@ -4129,7 +3998,7 @@ class CWindow(threading.Thread):
                 time.sleep(0.1)
                 continue
             elif self.delete:
-                delFile('.\\data\\blueprint\\%s.blp' % bluelist[selectnum])
+                os.remove('.\\data\\blueprint\\%s.blp' % bluelist[selectnum])
                 GameWorld.addMesg('Blueprint  \'%s\' deleted.' % bluelist[selectnum])
                 break
             if LBar.inc != oinc or redo:
@@ -5121,7 +4990,7 @@ def renderText():
                                     sound = (randrange(1,5))
                                 lastsound = sound
                                 doorname = 'sounds\\wav\\ding%s' % sound + '.wav'
-                                doorsound = playSound(doorname,volume=0.5)
+                                doorsound = audio.playSound(doorname,volume=0.5)
                             TextList[text].playsound = False
                             TextList[text].fadeto = libtcod.white
                             TextList[text].fadevar -= 1
@@ -5479,7 +5348,7 @@ def handle_keys():
                     if addhover and handle_mouse('lbutton'):
                         addhover = False
                     elif addhover and handle_mouse('lbutton_pressed'):
-                        clicksound = playSound('sounds\\wav\\click2.wav')
+                        clicksound = audio.playSound('sounds\\wav\\click2.wav')
                         if GUIMenu['page'] < 6:
                             GUIMenu['page'] += 1
                         else:
@@ -5506,7 +5375,7 @@ def handle_keys():
                     if subhover and handle_mouse('lbutton'):
                         subhover = False
                     elif subhover and handle_mouse('lbutton_pressed'):
-                        clicksound = playSound('sounds\\wav\\click2.wav')
+                        clicksound = audio.playSound('sounds\\wav\\click2.wav')
                         if GUIMenu['page'] > 1:
                             GUIMenu['page'] -= 1
                         else:
@@ -5520,7 +5389,7 @@ def handle_keys():
                             libtcod.console_print_ex(GUILayer,GUITiles['sub'][0][0] + x,GUITiles['sub'][0][1],libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                             lock.release()
                         if handle_mouse('lbutton_pressed'):
-                            clicksound = playSound('sounds\\wav\\click2.wav')
+                            clicksound = audio.playSound('sounds\\wav\\click2.wav')
                     else:
                         for x in range(2):
                             lock.acquire()
@@ -5772,13 +5641,9 @@ def handle_keys():
                 if not libtcod.console_is_fullscreen():
                     libtcod.sys_set_renderer(libtcod.RENDERER_SDL)
                     libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-                    pygame.mixer.init()
-                    pygame.mixer.set_num_channels(32)
                 else:
                     libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
                     libtcod.sys_set_renderer(libtcod.RENDERER_SDL)
-                    pygame.mixer.init()
-                    pygame.mixer.set_num_channels(32)
 
             elif key.lctrl and key.c == ord('q'):
                 return True
@@ -5932,7 +5797,7 @@ def handle_keys():
                     else:
                         for Button in ButtonList:
                             if Button.text == 'Begin Adventuring Here':
-                                pygame.mixer.music.fadeout(4000)
+                                audio.fadeoutMusic(4000)
                                 MouseLock = True
                                 ButtonList = []
                                 MenuList = []
@@ -5965,7 +5830,7 @@ def handle_keys():
                         CreatureDone = False
                         NamingDone = False
                         DoScaleLayer = False
-                        playMusic('music\\wav\\Cult-worldbuilder.wav')
+                        audio.playMusic('music\\wav\\Cult-worldbuilder.wav')
                         libtcod.console_set_default_background(wgwindow, libtcod.black)
                         libtcod.console_clear(wgwindow)
                         doScreenSetup()
@@ -6187,7 +6052,7 @@ def doIntroSetup():
         libtcod.console_delete(wgwindow)
     except:
         pass
-    playMusic('music\\wav\\Cult-title.wav',-1)
+    audio.playMusic('music\\wav\\Cult-title.wav',-1)
 
     title = []
     for line in range(1927,1941):
@@ -6521,7 +6386,7 @@ def introWorldGen():
     DOSCREEN = 1
     wipeIntro()
     IntroBG.killswitch = True
-    pygame.mixer.music.fadeout(2000)
+    audio.fadeoutMusic(2000)
     doWorldGenSetup()
 
 
@@ -6538,7 +6403,7 @@ def introWorldStart():
     DOSCREEN = 6
     IntroBG.killswitch = True
     doWorldStartSetup()
-    pygame.mixer.music.fadeout(2000)
+    audio.fadeoutMusic(2000)
         
 def introWorldAtlas():
     global IntroBG, DOSCREEN, playery, playerx, oplayery, MenuList, Atlas, TextList
@@ -6552,7 +6417,7 @@ def introWorldAtlas():
     playery = 1
     oplayery = playery
     DOSCREEN = 4
-    pygame.mixer.music.fadeout(2000)
+    audio.fadeoutMusic(2000)
     IntroBG.killswitch = True
     Atlas = WorldAtlas()
     Atlas.start()
@@ -12487,7 +12352,7 @@ class PlayWorld(threading.Thread):
                     char = [icon_pause[0] + x,icon_pause[1] + y,255]
                     libtcod.console_print_ex(GUILayer,GUITiles['unpause'][0][0] + x,GUITiles['unpause'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                     lock.release()
-            pausesound = playSound('sounds\\wav\\lb.wav')
+            pausesound = audio.playSound('sounds\\wav\\lb.wav')
             self.runtime = False
             Clouds.hover = True
             pathlock = True
@@ -12500,7 +12365,7 @@ class PlayWorld(threading.Thread):
                     char = [icon_unpause[0] + x,icon_unpause[1] + y,255]
                     libtcod.console_print_ex(GUILayer,GUITiles['unpause'][0][0] + x,GUITiles['unpause'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                     lock.release()
-            unpausesound = playSound('sounds\\wav\\lbh.wav')
+            unpausesound = audio.playSound('sounds\\wav\\lbh.wav')
             self.runtime = True
             Clouds.hover = False
             pathlock = False
@@ -12574,7 +12439,7 @@ class PlayWorld(threading.Thread):
         if menu == GUIMenu['menu']:
             pass
         else:
-            clicksound = playSound('sounds\\wav\\click.wav')            
+            clicksound = audio.playSound('sounds\\wav\\click.wav')
             GUIMenu['menu'] = menu
             libtcod.console_set_default_foreground(GUILayer,libtcod.white)
             if menu == 'task':
@@ -16292,7 +16157,7 @@ class PlayWorld(threading.Thread):
         MLogBar.start()
         self.window = wrwindow
         self.pswitch = True
-        playMusic('music\\wav\\Cult-spring.wav',-1)
+        audio.playMusic('music\\wav\\Cult-spring.wav',-1)
         self.addMesg('Generating map, one moment...',col = libtcod.light_orange)
         rtypes = wbiomedict['%s,%s' % (self.curregion[0],self.curregion[1])]
         libtcod.console_set_default_background(LoadScreen,libtcod.magenta)
@@ -16704,7 +16569,7 @@ class PlayWorld(threading.Thread):
                         GameWorld.addMesg('You can\'t reach that place.', col = libtcod.yellow)
                 if pathdone:
                     ttime = 0.0
-                    treesound = playSound('sounds\\ogg\\chop.ogg')
+                    treesound = audio.playSound('sounds\\ogg\\chop.ogg')
                     self.addMesg('You begin chopping down the tree with your %s.' % tool)
                     Progress = ProgressBar('Felling',5)
                     Progress.start()
@@ -16754,7 +16619,7 @@ class PlayWorld(threading.Thread):
                         except KeyError:
                             pass
                     self.handlePCchar()
-                    playSound('sounds\\ogg\\treefall.ogg')
+                    audio.playSound('sounds\\ogg\\treefall.ogg')
                     self.addMesg('You chop down the tree.')
                     log = ['log','component','wood',1]
                     for section in range(treerad):
@@ -16814,7 +16679,7 @@ class PlayWorld(threading.Thread):
                         GameWorld.addMesg('You can\'t reach that place.', col = libtcod.yellow)
                 if pathdone:
                     ttime = 0.0
-                    picksound = playSound('sounds\\ogg\\pick.ogg')
+                    picksound = audio.playSound('sounds\\ogg\\pick.ogg')
                     self.addMesg('You begin mining the rock.')
                     Progress = ProgressBar('Mining',7)
                     Progress.start()
@@ -16898,9 +16763,9 @@ class PlayWorld(threading.Thread):
                 self.openSet(x,y)
                 self.recalcRoutes()
                 if self.zgrid[self.curz]['%s,%s' % (x,y)][1] == 'Stone Door':
-                    doorsound = playSound('sounds\\wav\\stonedooropen.wav')
+                    doorsound = audio.playSound('sounds\\wav\\stonedooropen.wav')
                 else:
-                    doorsound = playSound('sounds\\wav\\dooropen.wav')
+                    doorsound = audio.playSound('sounds\\wav\\dooropen.wav')
                 self.zgrid[self.curz]['%s,%s' % (x,y)][5] = 'open'
                 self.wobstructed[self.curz].pop('%s,%s' % (x,y))
                 self.addMesg('You open the door.')
@@ -16977,9 +16842,9 @@ class PlayWorld(threading.Thread):
                 self.flood[self.curz][doorareas[0]].pop('%s,%s' % (x,y))
                 self.recalcRoutes()
                 if self.zgrid[self.curz]['%s,%s' % (x,y)][1] == 'Stone Door':
-                    doorsound = playSound('sounds\\wav\\stonedoorclose.wav')
+                    doorsound = audio.playSound('sounds\\wav\\stonedoorclose.wav')
                 else:
-                    doorsound = playSound('sounds\\wav\\doorclose.wav')
+                    doorsound = audio.playSound('sounds\\wav\\doorclose.wav')
                 tile = self.zgrid[self.curz]['%s,%s' % (x,y)]
                 char = tile[2]
                 fg = tile[3]
@@ -17021,7 +16886,7 @@ class PlayWorld(threading.Thread):
             else:
                 GameWorld.addMesg('You can\'t reach that place.', col = libtcod.yellow)
         if pathdone:
-            stairsound = playSound('sounds\\ogg\\stairstep.ogg',3000)
+            stairsound = audio.playSound('sounds\\ogg\\stairstep.ogg',3000)
             self.changeZ(1)
             if not self.flood.get(self.curz):
                 self.flood[self.curz] = self.floodFill(self.wobstructed)
@@ -17052,7 +16917,7 @@ class PlayWorld(threading.Thread):
             else:
                 GameWorld.addMesg('You can\'t reach that place.', col = libtcod.yellow)
         if pathdone:
-            stairsound = playSound('sounds\\ogg\\stairstep.ogg',3000)
+            stairsound = audio.playSound('sounds\\ogg\\stairstep.ogg',3000)
             self.changeZ(-1)
             if not self.flood.get(self.curz):
                 self.flood[self.curz] = self.floodFill(self.wobstructed)
@@ -18214,7 +18079,7 @@ class PlayWorld(threading.Thread):
             libtcod.console_print_ex(wpwindow,VIEW_WIDTH / 2,VIEW_HEIGHT / 2,libtcod.BKGND_NONE,libtcod.CENTER,'Loading...')
             time.sleep(1.0)
 
-            playMusic('music\\wav\\Cult-summer.wav',-1)
+            audio.playMusic('music\\wav\\Cult-summer.wav',-1)
             
             libtcod.console_set_default_background(wrwindow, libtcod.black)
             libtcod.console_clear(wiwindow)
@@ -19412,9 +19277,6 @@ if __name__ == '__main__':
 
     if init['FULLSCREEN'] == 'yes':
         libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-
-    pygame.mixer.init()
-    pygame.mixer.set_num_channels(32)
 
     doIntroSetup()
     movetime = time.time()

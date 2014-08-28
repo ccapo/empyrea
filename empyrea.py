@@ -146,7 +146,6 @@ NoUpdate = False
 IntroHover = False
 MenuSetting = None
 WorldGoing = False
-KeyLock = False
 MouseLock = False
 WorldDone = False
 NamingDone = False
@@ -2175,7 +2174,7 @@ class OptWindow(threading.Thread):
     def createSave(self):
         if GameWorld.rswitch:
             GameWorld.packMap()
-        glist = ['moveclouds','hpcswitch','pathlock','KeyLock','MouseLock','MoveLock','ignoreclick','cannotleave','changecursor', \
+        glist = ['moveclouds','hpcswitch','pathlock','MouseLock','MoveLock','ignoreclick','cannotleave','changecursor', \
                  'killkeycheck','MenuSetting','PX','PY','PCX','PCY','OPCX','OPCY','PCcol','toplayer']
         gwlist = ['regiondict','invdict','inventory','rswitch','messagelog','lastmessage','lastmessagecount','setupdone','rinit','winit', \
                   'rdict','windowlock','groundview','invopen','cmopen','optopen','topwindow','loading','linkedareas','rtree','wobstructed', \
@@ -5767,7 +5766,7 @@ def handle_keys():
 
             elif key.c == ord(','):
                 if DOSCREEN == 2 and GameWorld.rswitch:
-                    if not MoveLock and not KeyLock:
+                    if not MoveLock:
                         GameWorld.getItem()
 
             elif key.c == ord('@'):
@@ -8906,7 +8905,7 @@ class WorldCreatures(threading.Thread):
                NoKeys, WorldGoing, CreatureDone, woceandict, wlakedict, \
                wlakedict, wtundradict, wcavedict, wriverdict, wlangdict, PLang, \
                wcreaturedict, wspiritdict, wgoddict, ButtonList, bodydict, idict, \
-               paraswitch, ctitles, curchoice, KeyLock, wtexturedict, wbiomedict
+               paraswitch, ctitles, curchoice, wtexturedict, wbiomedict
 
         WorldGoing = True
 
@@ -18446,8 +18445,6 @@ class Pathfinder(threading.Thread):
 
 def doWorldGen():
     global VIEW_HEIGHT, VIEW_WIDTH, SCREEN_HEIGHT, DoScaleLayer
-    while KeyLock:
-        libtcod.console_wait_for_keypress(True)
     libtcod.console_blit(wgwindow,0 + playerx,0 + playery,VIEW_WIDTH,VIEW_HEIGHT,0,20,2,1.0,1.0)
     libtcod.console_blit(wiwindow,0,0,VIEW_WIDTH,SCREEN_HEIGHT - VIEW_HEIGHT - 3,0,20,VIEW_HEIGHT + 3,1.0,0.5)
     libtcod.console_blit(wswindow,0,0,SCREEN_WIDTH - VIEW_WIDTH - 3,SCREEN_HEIGHT - 2,0,0,2,1.0,0.5)
@@ -18461,8 +18458,6 @@ def doWorldGen():
 def doWorldAtlas():
     global VIEW_HEIGHT, VIEW_WIDTH, SCREEN_HEIGHT
 
-    while KeyLock:
-        libtcod.console_wait_for_keypress(True)
     libtcod.console_blit(wawindow,0,0,VIEW_WIDTH,VIEW_HEIGHT,0,20,2,1.0,1.0)
     libtcod.console_blit(wswindow,0,0,SCREEN_WIDTH - VIEW_WIDTH - 3,SCREEN_HEIGHT - 2,0,0,2,1.0,0.5)
 
@@ -18473,8 +18468,6 @@ def doWorldAtlas():
 def doMainGame():
     global VIEW_HEIGHT, VIEW_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH, MAP_HEIGHT, SCREEN_HEIGHT, PY, PX, GameWorld, hpcswitch, \
            XConsoles, TopWindow, freeze, PCRlayer, PCWlayer, DoLoadScreen
-    while KeyLock:
-        libtcod.console_wait_for_keypress(True)
     if not freeze:
         if GameWorld.rswitch == True:
             limitx,limity = RMAP_WIDTH,RMAP_HEIGHT
@@ -18810,7 +18803,7 @@ if __name__ == '__main__':
     q = Queue.Queue()
 
     while not libtcod.console_is_window_closed():
-        if not (KeyLock or NoKeys):
+        if not NoKeys:
             ev = libtcod.sys_check_for_event(libtcod.EVENT_ANY,key,mouse)
         if (mouse.cx,mouse.cy) == (ocx,ocy):
             mouse.dcx,mouse.dcy = 0,0

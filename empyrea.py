@@ -11675,7 +11675,7 @@ class WorldAtlas(threading.Thread):
 
     def run(self):
         global playery, oplayery, wawindow, wswindow, DOSCREEN, wtmapdict, nation, \
-               natnum, civrange, relswitch, civreldict, hoveropt, MenuSetting
+               natnum, relswitch, civreldict, hoveropt, MenuSetting
 
         MenuList = []
         MenuSetting = 'WAMain'
@@ -11762,9 +11762,6 @@ class WorldAtlas(threading.Thread):
         self.natnum = mplayery
         nation = self.nation
         natnum = self.natnum
-
-        civrange = range(1, wcivdict['civnum'] + 1)
-        civrange.remove(natnum)
 
         DrawScroll(wawindow, 9, 5, VIEW_WIDTH - 20 + 1, VIEW_HEIGHT - 30 + 1)
         DrawWorld(wawindow, VIEW_WIDTH - 20, VIEW_HEIGHT - 30, \

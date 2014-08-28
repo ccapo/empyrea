@@ -106,7 +106,6 @@ bplayery = {}
 tpcount = 0
 intronoise = libtcod.noise_new(2)
 libtcod.noise_set_type(intronoise, libtcod.NOISE_SIMPLEX)
-intromap = libtcod.map_new(SCREEN_WIDTH, SCREEN_HEIGHT)
 wgpic = libtcod.image_new(MAP_WIDTH, MAP_HEIGHT)
 TextList = []
 LightList = []
@@ -6034,10 +6033,6 @@ def doIntroSetup():
         GameWorld.killswitch = True
     except:
         pass
-
-    for y in range(SCREEN_HEIGHT):
-        for x in range(SCREEN_WIDTH):
-            libtcod.map_set_properties(intromap, x, y, True, True)
 
     introwindow = libtcod.console_new(28,38)
 

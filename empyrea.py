@@ -166,7 +166,6 @@ moveclouds = False
 hpcswitch = False
 pathlock = False
 MoveLock = False
-changecursor = False
 killkeycheck = False
 freeze = False
 DoMessageLog = False
@@ -2171,7 +2170,7 @@ class OptWindow(threading.Thread):
     def createSave(self):
         if GameWorld.rswitch:
             GameWorld.packMap()
-        glist = ['moveclouds','hpcswitch','pathlock','MouseLock','MoveLock','changecursor', \
+        glist = ['moveclouds','hpcswitch','pathlock','MouseLock','MoveLock', \
                  'killkeycheck','MenuSetting','PX','PY','PCX','PCY','OPCX','OPCY','PCcol','toplayer']
         gwlist = ['regiondict','invdict','inventory','rswitch','messagelog','lastmessage','lastmessagecount','setupdone','rinit','winit', \
                   'rdict','windowlock','groundview','invopen','cmopen','optopen','topwindow','loading','linkedareas','rtree','wobstructed', \
@@ -5293,7 +5292,7 @@ def handle_keys():
            scaleswitch, NoKeys, MenuSetting, PX, PY, GameWorld, MenuList, \
            MouseLock, TextList, PCX, PCY, hpcswitch, pathclass, pathlock, lastmove, \
            movekeys, MoveLock, relswitch, marker, music, \
-           changecursor, Cursor, toplayer, killkeycheck, DoScaleLayer, NoButtons, NoMenus, \
+           Cursor, toplayer, killkeycheck, DoScaleLayer, NoButtons, NoMenus, \
            q, GUITiles, GUICon, XConsoles, moveclouds, GUIBlurbCon
 
     if not NoKeys:

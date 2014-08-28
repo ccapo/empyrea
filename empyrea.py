@@ -45,7 +45,7 @@ __version__ = '0.3 Alpha Tech Demo by ' + __author__
 ##         c. InvWindow, c. Dialogue, c. NDialogue, c.OptWindow, c. CWindow,
 ##         c. ProgressBar
 ##   III. Misc. Graphical Functions
-##       - f. renderButtons, f. renderMenus, f. renderText, f. renderLights, f. renderGraphics,
+##       - f. renderButtons, f. renderMenus, f. renderText, f. renderGraphics,
 ##         f. drawBox, f. doMenu, f. solidScale, f. textWrap, f. killMenus
 ##    IV. Input Functions
 ##       - f. handle_mouse, f. mouse_isvisible, f. handle_keys, f. adjustScreen
@@ -108,7 +108,6 @@ intronoise = libtcod.noise_new(2)
 libtcod.noise_set_type(intronoise, libtcod.NOISE_SIMPLEX)
 wgpic = libtcod.image_new(MAP_WIDTH, MAP_HEIGHT)
 TextList = []
-LightList = []
 GraphicsList = []
 ButtonList = []
 GButtonList = []
@@ -5015,11 +5014,6 @@ def renderText():
     else:
         pass
 
-def renderLights():
-    global LightList
-    for light in LightList:
-        light.lightDraw()
-
 def renderGraphics():
     global GraphicsList, NoGraphics
     for graphic in GraphicsList:
@@ -6022,7 +6016,7 @@ def doScreenSetup():
     lock.release()
 
 def doIntroSetup():
-    global SCREEN_WIDTH, SCREEN_HEIGHT, TextList, LightList, titlepic, MenuList, playery, DOSCREEN, Clouds, \
+    global SCREEN_WIDTH, SCREEN_HEIGHT, TextList, titlepic, MenuList, playery, DOSCREEN, Clouds, \
            introwindow, IntroBG, wgwindow, MouseLock, IntroHover
 
     IntroHover = False
@@ -6432,11 +6426,8 @@ def introSettings():
 ####################################
 
 def wipeIntro():
-    global LightList, TextList
+    global TextList
     libtcod.console_clear(toplayer)
-    for light in LightList:
-        del light
-    LightList = []
     libtcod.console_set_default_background(0, libtcod.Color(2,0,0))
     libtcod.console_clear(0)
 
@@ -18842,7 +18833,6 @@ if __name__ == '__main__':
             doMainGame()
         elif DOSCREEN == 4:
             doWorldAtlas()
-        renderLights()
         renderGraphics()
         libtcod.console_blit(GraphicsLayer,0,0,SCREEN_WIDTH,SCREEN_HEIGHT,0,0,0,1.0,0.0)
         if not NoRefresh:

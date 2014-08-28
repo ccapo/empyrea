@@ -166,7 +166,6 @@ moveclouds = False
 hpcswitch = False
 pathlock = False
 MoveLock = False
-cannotleave = False
 changecursor = False
 killkeycheck = False
 freeze = False
@@ -2172,7 +2171,7 @@ class OptWindow(threading.Thread):
     def createSave(self):
         if GameWorld.rswitch:
             GameWorld.packMap()
-        glist = ['moveclouds','hpcswitch','pathlock','MouseLock','MoveLock','cannotleave','changecursor', \
+        glist = ['moveclouds','hpcswitch','pathlock','MouseLock','MoveLock','changecursor', \
                  'killkeycheck','MenuSetting','PX','PY','PCX','PCY','OPCX','OPCY','PCcol','toplayer']
         gwlist = ['regiondict','invdict','inventory','rswitch','messagelog','lastmessage','lastmessagecount','setupdone','rinit','winit', \
                   'rdict','windowlock','groundview','invopen','cmopen','optopen','topwindow','loading','linkedareas','rtree','wobstructed', \
@@ -5293,7 +5292,7 @@ def handle_keys():
            CreatureDone, SCREEN_WIDTH, SCREEN_HEIGHT, movetime, mouse, ButtonList, \
            scaleswitch, NoKeys, MenuSetting, PX, PY, GameWorld, MenuList, \
            MouseLock, TextList, PCX, PCY, hpcswitch, pathclass, pathlock, lastmove, \
-           movekeys, MoveLock, relswitch, cannotleave, marker, music, \
+           movekeys, MoveLock, relswitch, marker, music, \
            changecursor, Cursor, toplayer, killkeycheck, DoScaleLayer, NoButtons, NoMenus, \
            q, GUITiles, GUICon, XConsoles, moveclouds, GUIBlurbCon
 
@@ -5693,14 +5692,13 @@ def handle_keys():
                             if GameWorld.zgrid[GameWorld.curz]['%s,%s' % (PCX,PCY)][5] in ['up-stairs','up-ladder']:
                                 GameWorld.climbStairs(PCX,PCY)
                         except:
-                            if not cannotleave:
-                                try:
-                                    pathclass.killswitch = True
-                                except NameError:
-                                    pass
-                                if not GameWorld.windowlock:
-                                    time.sleep(0.3)
-                                    GameWorld.leaveRegion()
+                            try:
+                                pathclass.killswitch = True
+                            except NameError:
+                                pass
+                            if not GameWorld.windowlock:
+                                time.sleep(0.3)
+                                GameWorld.leaveRegion()
 
             elif key.c == ord('>'):
                 if DOSCREEN == 2:

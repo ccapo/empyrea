@@ -171,8 +171,6 @@ freeze = False
 DoMessageLog = False
 lastmove = time.time()
 
-globaljobs = []
-
 LockName = 'None'
 RenderTiles = []
 
@@ -4952,7 +4950,7 @@ def killMenus():
     MenuList = []
 
 def renderButtons():
-    global ButtonList, NoButtons, GButtonList, MGButtonList, globaljobs
+    global ButtonList, NoButtons, GButtonList, MGButtonList
     if len(ButtonList) + len(GButtonList) + len(MGButtonList) > 0:
         if not NoButtons:
             for button in ButtonList:

@@ -11695,7 +11695,7 @@ class WorldAtlas(threading.Thread):
             libtcod.console_print_ex(wswindow, 2, 4, libtcod.BKGND_NONE, libtcod.LEFT, 'No worlds are\nsaved.')
 
     def loadWorld(self):
-        global MouseLock, Cursor, BTorch, init
+        global MouseLock, Cursor, init
 
         MouseLock = True
         wdictfile = open('./data/world/%s' % wlist[mplayery - 1] + '.sav','rb')
@@ -15912,7 +15912,7 @@ class PlayWorld(threading.Thread):
 
     def doLeaveProc(self):
         global MenuList, Clouds, PX, PY, PCX, PCY, MouseLock, MoveLock, pathlock, moveclouds, pathclass, PCcol, \
-               OPCX, OPCY, hpcswitch, Cursor, BTorch, WeatherLayer, NoUpdate, DoLoadScreen, pathlock
+               OPCX, OPCY, hpcswitch, Cursor, WeatherLayer, NoUpdate, DoLoadScreen, pathlock
         NoUpdate = True
         self.packMap()
         Clouds.killswitch = True

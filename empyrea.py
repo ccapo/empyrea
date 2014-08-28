@@ -428,7 +428,7 @@ class PathMarker(threading.Thread):
             self.radius = min(self.radius,2)
 
     def doMarker(self):
-        global Clouds, PCX, PCY, toplayer, lock, LockName
+        global toplayer, lock, LockName
         for num in range(-self.radius,self.radius + 1):
             for num2 in range(-self.radius,self.radius + 1):
                 if self.rx - num >= 0 and self.rx - num < VIEW_WIDTH and self.ry >= 0 and self.ry < VIEW_HEIGHT:
@@ -599,7 +599,7 @@ class CloudNoise(threading.Thread):
         self.hover = False
 
     def run(self):
-        global MouseLock, MoveLock, pathlock, PX, PY
+        global PX, PY
         while not self.killswitch:
             if not self.paused:
                 self.render()
@@ -610,7 +610,7 @@ class CloudNoise(threading.Thread):
         del self
 
     def render(self):
-        global moveclouds, PX, PY, PCX, PCY, PCcol, GraphicsList, GameWorld
+        global moveclouds, PX, PY, PCX, PCY, GameWorld
         if not self.colorswitch:
             self.getColor(self.window)
             self.colorswitch = True
@@ -720,7 +720,6 @@ class CloudNoise(threading.Thread):
             self.curdrawing = False
 
     def getColor(self,window):
-        global MouseLock, MoveLock
         for x in range(RMAP_WIDTH):
             for y in range(RMAP_HEIGHT):
                 self.ocolordict['%s,%s' % (x,y)] = libtcod.console_get_char_background(window,x,y)
@@ -749,7 +748,6 @@ class WCloudNoise(threading.Thread):
         self.paused = False
 
     def run(self):
-        global MouseLock, MoveLock, pathlock
         while not self.killswitch:
             if not self.paused:
                 self.render()
@@ -760,7 +758,7 @@ class WCloudNoise(threading.Thread):
         del self
 
     def render(self):
-        global moveclouds, PX, PY, PCX, PCY, PCcol, lock
+        global moveclouds, PX, PY, lock
         if not self.colorswitch:
             self.getColor(self.window)
             self.colorswitch = True
@@ -814,7 +812,6 @@ class WCloudNoise(threading.Thread):
             self.curdrawing = False
 
     def getColor(self,window):
-        global MouseLock, MoveLock
         for x in range(MAP_WIDTH):
             for y in range(MAP_HEIGHT):
                 self.ocolordict['%s,%s' % (x,y)] = libtcod.console_get_char_background(window,x,y)
@@ -928,7 +925,7 @@ class ButtonBox():
 
     def __init__(self, window, x, y, text, ID, offx = 0, offy = 0, tcolor = libtcod.black, tbcolor = None, \
                  hovcolor = None):
-        global ButtonList, key
+        global ButtonList
         if not tbcolor:
             tbcolor = libtcod.darker_crimson
         self.window = window
@@ -982,7 +979,7 @@ class ButtonBox():
             del self
 
 def GButton(window,x,y,ID,dokey,offx,offy):
-    global GButtonList, NoButtons, ButtonLock, buttondict
+    global GButtonList, ButtonLock, buttondict
     button = buttondict[ID]
 
     FGButtonList = map(lambda x: x[3],GButtonList)
@@ -1043,7 +1040,7 @@ def GButton(window,x,y,ID,dokey,offx,offy):
             switched = False
 
 def MGButton(window,x,y,ID,dokey,offx,offy):
-    global MGButtonList, NoButtons, ButtonLock, buttondict
+    global MGButtonList, ButtonLock, buttondict
     button = buttondict[ID]
 
     FMGButtonList = map(lambda x: x[3],MGButtonList)
@@ -1146,8 +1143,9 @@ class Menu(threading.Thread):
         self.menugoing = False
 
     def drawMenu(self):
-        global playery, oplayery, mouse, hoveropt, MenuSetting, Atlas, MenuList, mplayery, relswitch, bplayery, ButtonList, \
-               DOSCREEN, PX, PY, GameWorld, hcolor, bgcolor, buttont, NoMenus, lock
+        global playery, oplayery, hoveropt, MenuSetting, Atlas, \
+                MenuList, mplayery, relswitch, bplayery, ButtonList, DOSCREEN, \
+                PX, PY, hcolor, bgcolor, buttont, NoMenus, lock
 
         lock.acquire()
 
@@ -2076,7 +2074,7 @@ class OptWindow(threading.Thread):
                     libtcod.console_set_char_background(self.oconsole, tile, 15, scrollcolor, libtcod.BKGND_SET)
 
     def doAudio(self):
-        global XConsoles, WeatherLayer, TopWindow, toplayer, freeze, Clouds, GameWorld, \
+        global XConsoles, WeatherLayer, TopWindow, toplayer, Clouds, GameWorld, \
                Nographics, NoButtons, NoMenus
 
         time.sleep(0.1)
@@ -2183,7 +2181,7 @@ class OptWindow(threading.Thread):
         return savefile
 
     def loadSave(self,save):
-        global XConsoles, WeatherLayer, TopWindow, toplayer, freeze, Clouds, GameWorld
+        global XConsoles, WeatherLayer, TopWindow, toplayer, Clouds, GameWorld
         savefile = GameWorld.saves[save]
         Clouds.killswitch = True
         time.sleep(0.1)
@@ -5275,7 +5273,7 @@ def textWrap(text, conwidth = VIEW_WIDTH):
 ####################################
 
 def handle_mouse(attribute):
-    global mouse, key
+    global mouse
     output = getattr(mouse,attribute)
     return output
 
@@ -5287,10 +5285,10 @@ def handle_keys():
     global playerx, playery, key, DOSCREEN, WorldGoing, WorldDone, NamingDone, \
            CreatureDone, SCREEN_WIDTH, SCREEN_HEIGHT, movetime, mouse, ButtonList, \
            scaleswitch, NoKeys, MenuSetting, PX, PY, GameWorld, MenuList, \
-           MouseLock, TextList, PCX, PCY, hpcswitch, pathclass, pathlock, lastmove, \
-           movekeys, MoveLock, relswitch, marker, music, \
+           MouseLock, TextList, PCX, PCY, pathclass, pathlock, lastmove, \
+           movekeys, MoveLock, relswitch, marker, \
            Cursor, toplayer, killkeycheck, DoScaleLayer, NoButtons, NoMenus, \
-           q, GUITiles, GUICon, XConsoles, moveclouds, GUIBlurbCon
+           q, GUITiles, GUICon, XConsoles, GUIBlurbCon
 
     if not NoKeys:
         if DOSCREEN == 1 and not scaleswitch and not MouseLock:
@@ -6006,7 +6004,7 @@ def doScreenSetup():
     lock.release()
 
 def doIntroSetup():
-    global SCREEN_WIDTH, SCREEN_HEIGHT, TextList, titlepic, MenuList, playery, DOSCREEN, Clouds, \
+    global SCREEN_WIDTH, SCREEN_HEIGHT, TextList, MenuList, playery, DOSCREEN, Clouds, \
            introwindow, IntroBG, wgwindow, MouseLock, IntroHover
 
     IntroHover = False
@@ -6305,7 +6303,7 @@ def doWorldStartSetup():
         MenuSetting = 'NoWorlds'
 
 def doStartGame():
-    global GameWorld, Atlas, MenuList, music
+    global GameWorld, MenuList
     try:
         GameWorld.killswitch = True
         time.sleep(0.5)
@@ -6325,7 +6323,7 @@ def doStartGame():
 ####################################
 
 def doIntro():
-    global titlepicnum, tpcount, introwindow, IntroBG, oldtime, IntroHover
+    global tpcount, introwindow, IntroBG, oldtime, IntroHover
 
     try:
         oldtime
@@ -6416,10 +6414,10 @@ def introSettings():
 ####################################
 
 def wipeIntro():
-    global TextList
     libtcod.console_clear(toplayer)
     libtcod.console_set_default_background(0, libtcod.Color(2,0,0))
     libtcod.console_clear(0)
+
 
 ####################################
 # VIII. World-Drawing Functions    #
@@ -6802,7 +6800,7 @@ class World(threading.Thread):
                wtundradict, wcavedict, wriverdict, wlangdict, PLang, \
                rivcoldict, rivchardict, rivbgdict, ivar, worldname, PName, \
                tribdict, wtmapdict, ButtonList, scaleswitch, tivar, wtexturedict, \
-               moveclouds, wtempdict, wgcoldict, wmountaindict, wrivdirdict
+               wtempdict, wgcoldict, wmountaindict, wrivdirdict
 
         # Create a precursor language using the included language module.
 
@@ -8892,11 +8890,11 @@ class WorldCreatures(threading.Thread):
 
     def run(self):
         global SCREEN_HEIGHT, VIEW_HEIGHT, SCREEN_WIDTH, VIEW_WIDTH, wiwindow, \
-               wgwindow, wswindow, worldmap, wheighdict, wfeaturedict, wgpic, \
+               wgwindow, wswindow, worldmap, wheighdict, wgpic, \
                NoKeys, WorldGoing, CreatureDone, woceandict, wlakedict, \
                wlakedict, wtundradict, wcavedict, wriverdict, wlangdict, PLang, \
                wcreaturedict, wspiritdict, wgoddict, ButtonList, bodydict, idict, \
-               paraswitch, ctitles, curchoice, wtexturedict, wbiomedict
+               paraswitch, ctitles, wtexturedict, wbiomedict
 
         WorldGoing = True
 
@@ -11674,8 +11672,7 @@ class WorldAtlas(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        global playery, oplayery, wawindow, wswindow, DOSCREEN, wtmapdict, nation, \
-               natnum, relswitch, civreldict, hoveropt, MenuSetting
+        global playery, oplayery, wswindow, MenuSetting
 
         MenuList = []
         MenuSetting = 'WAMain'
@@ -11695,7 +11692,7 @@ class WorldAtlas(threading.Thread):
             libtcod.console_print_ex(wswindow, 2, 4, libtcod.BKGND_NONE, libtcod.LEFT, 'No worlds are\nsaved.')
 
     def loadWorld(self):
-        global MouseLock, Cursor, init
+        global MouseLock
 
         MouseLock = True
         wdictfile = open('./data/world/%s' % wlist[mplayery - 1] + '.sav','rb')
@@ -11711,7 +11708,7 @@ class WorldAtlas(threading.Thread):
         MouseLock = False
 
     def loadWorldScreen(self):
-        global MenuSetting, MenuList, playery, oplayery, bplayery, ButtonList
+        global MenuSetting, MenuList, bplayery, ButtonList
 
         bplayery = {}
         ButtonList = []
@@ -11749,7 +11746,7 @@ class WorldAtlas(threading.Thread):
         self.atlasmenu.start()
 
     def loadIndivNation(self):
-        global MenuSetting, MenuList, playery, oplayery, mplayery
+        global MenuSetting, MenuList, mplayery
 
         libtcod.console_clear(wswindow)
         MenuSetting = 'WAIndivNation'
@@ -11781,7 +11778,7 @@ class WorldAtlas(threading.Thread):
         self.atlasmenu.start()
 
     def loadNationRelations(self):
-        global MenuSetting, MenuList, playery, oplayery, mplayery, relswitch
+        global relswitch
 
         nation = self.nation
         natnum = self.natnum
@@ -11858,7 +11855,7 @@ class WorldAtlas(threading.Thread):
         RelationsMap = RelMap(wawindow, 10, 10, 20, 2, VIEW_WIDTH - 20, VIEW_HEIGHT - 20, newrel[3], relpic, self.civreldict).start()
 
     def loadBestiaryMain(self):
-        global MenuList, MenuSetting, playery, oplayery, mplayery
+        global MenuList, MenuSetting
 
         libtcod.console_clear(wswindow)
         MenuSetting = 'WABestiaryMain'
@@ -11872,7 +11869,7 @@ class WorldAtlas(threading.Thread):
         self.atlasmenu.start()
 
     def loadBestiarySorted(self):
-        global MenuList, MenuSetting, playery, oplayery, mplayery
+        global MenuList, MenuSetting, mplayery
 
         libtcod.console_clear(wswindow)
         MenuList = []
@@ -11921,7 +11918,7 @@ class WorldAtlas(threading.Thread):
             Atlas.loadBestiary(req = option)
 
     def loadBestiary(self, req = None):
-        global MenuList, MenuSetting, playery, oplayery, mplayery
+        global MenuList, MenuSetting
 
         libtcod.console_clear(wswindow)
         MenuSetting = 'WABestiary'
@@ -11963,7 +11960,7 @@ class WorldAtlas(threading.Thread):
         self.atlasmenu.start()
 
     def loadCreature(self):
-        global MenuList, MenuSetting, playery, oplayery, mplayery, creature
+        global MenuList, MenuSetting, mplayery, creature
 
         option = self.atlasmenu.optionlist[mplayery - 1]
         libtcod.console_clear(wswindow)
@@ -12108,7 +12105,6 @@ class PlayWorld(threading.Thread):
     # Travel Functions
 
     def floodFill(self,wobstructed = False,captureimage = False):
-        global MouseLock, pathlock, MoveLock, moveclouds
         areas = {}
         if wobstructed:
             MW,MH = RMAP_WIDTH,RMAP_HEIGHT
@@ -12187,7 +12183,7 @@ class PlayWorld(threading.Thread):
     # Game Menu/Status Screen Functions
 
     def updateStatus(self):
-        global DoHUD, NoRefresh, freeze, MGButtonList, ButtonLock, moveclouds, NoMenus, NoButtons, NoGraphics, Clouds
+        global DoHUD, NoRefresh, MGButtonList, ButtonLock, NoMenus, NoButtons, NoGraphics, Clouds
         NoButtons,NoMenus,NoGraphics = True,True,True
         ButtonLock = True
         lock.acquire()
@@ -13508,7 +13504,7 @@ class PlayWorld(threading.Thread):
         self.rdict['Plain-Arctic'] = curdict
 
     def doRegion(self, rtypes = None):
-        global MouseLock, MoveLock, pathlock, PCX, PCY, Clouds, hpcswitch, moveclouds, DoLoadScreen
+        global MouseLock, MoveLock, PCX, PCY, Clouds, hpcswitch, moveclouds, DoLoadScreen
         if not self.regiondict.get('%s,%s' % (self.curregion[0],self.curregion[1])):
             if not rtypes:
                 rtypes = wbiomedict['%s,%s' % (self.curregion[0],self.curregion[1])]
@@ -13571,7 +13567,6 @@ class PlayWorld(threading.Thread):
             return False
 
     def digRiver(self):
-        global PCX,PCY
         ntiles,stiles,etiles,wtiles = [],[],[],[]
         for x in range(20,RMAP_WIDTH - 20):
             ntiles.append((x,0))
@@ -13953,7 +13948,6 @@ class PlayWorld(threading.Thread):
     # def __init__(self,wobstructed,areas,x,y,x2,y2,actor = 'PC',domove = True,notify = True)
 
     def doShoreLine(self):
-        global PCX,PCY
         ntiles,stiles,etiles,wtiles = [],[],[],[]
         for x in range(RMAP_WIDTH):
             ntiles.append((x,0))
@@ -15591,7 +15585,7 @@ class PlayWorld(threading.Thread):
         NoUpdate = False
 
     def genMap(self,rtypes):
-        global MouseLock, rheightmap, moveclouds, GraphicsList, Clouds, NoKeys, rmap
+        global MouseLock, rheightmap, Clouds, NoKeys, rmap
 
         self.doLoadScreen('vectors')
 
@@ -15863,7 +15857,6 @@ class PlayWorld(threading.Thread):
         lock.release()
 
     def packMap(self):
-        global Clouds
         self.regiondict['%s,%s' % (self.curregion[0],self.curregion[1])] = {}
         self.regiondict['%s,%s' % (self.curregion[0],self.curregion[1])]['tempzone'] = copy.copy(self.tempzone)
         self.regiondict['%s,%s' % (self.curregion[0],self.curregion[1])]['rtypes'] = copy.copy(self.rtypes)
@@ -15891,7 +15884,7 @@ class PlayWorld(threading.Thread):
         self.regiondict['%s,%s' % (self.curregion[0],self.curregion[1])]['_bskip'] = copy.copy(Clouds.bskip)
 
     def leaveRegion(self):
-        global moveclouds, MouseLock, MoveLock, pathlock, pathclass
+        global pathclass
         try:
             pathclass.killswitch = True
         except NameError:
@@ -15908,8 +15901,8 @@ class PlayWorld(threading.Thread):
         time.sleep(1.0)
 
     def doLeaveProc(self):
-        global MenuList, Clouds, PX, PY, PCX, PCY, MouseLock, MoveLock, pathlock, moveclouds, pathclass, PCcol, \
-               OPCX, OPCY, hpcswitch, Cursor, WeatherLayer, NoUpdate, DoLoadScreen, pathlock
+        global MenuList, Clouds, PX, PY, PCX, PCY, MouseLock, MoveLock, pathlock, moveclouds, pathclass, \
+               OPCX, OPCY, hpcswitch, Cursor, WeatherLayer, NoUpdate, DoLoadScreen
         NoUpdate = True
         self.packMap()
         Clouds.killswitch = True
@@ -15951,7 +15944,7 @@ class PlayWorld(threading.Thread):
         Clouds.start()
 
     def loadWorld(self):
-        global MenuSetting, MenuList, wdict
+        global MenuList, wdict
         MenuList = []
         wdictfile = open('./data/world/%s' % self.world + '.sav','rb')
         gc.disable()
@@ -15962,7 +15955,7 @@ class PlayWorld(threading.Thread):
         DrawWorld(wpwindow,caves = False,drawcolors = False)
 
     def displayCity(self,city = None):
-        global PX,PY, TextList, Clouds
+        global PX,PY, TextList
 
         TextList = []
         for Button in ButtonList:
@@ -16068,7 +16061,10 @@ class PlayWorld(threading.Thread):
             GameWorld.displayCity(city = self.optionlist[mplayery - 1])
 
     def setupStart(self):
-        global MenuSetting, MenuList, TextList, PX, PY, PCX, PCY, OPCX, OPCY, MLogBar, Clouds, MouseLock, moveclouds, hpcswitch, music, DoHUD, rtypes, DoLoadScreen, MoveLock
+        global MenuSetting, MenuList, PX, PY, PCX, PCY, OPCX, OPCY, MLogBar, \
+                Clouds, MouseLock, moveclouds, hpcswitch, DoHUD, rtypes, \
+                DoLoadScreen, MoveLock
+
         MoveLock,MouseLock = True,True
         DoHUD = True
         Clouds.killswitch = True
@@ -16378,7 +16374,7 @@ class PlayWorld(threading.Thread):
             self.getItem()
 
     def placeItem(self,item,x,y):
-        global PCX, PCY, Clouds
+        global PCX, PCY
         if GameWorld.itemdict[GameWorld.curz]['%s,%s' % (x,y)].get('%s-%s' % (item[0],item[2])):
             GameWorld.itemdict[GameWorld.curz]['%s,%s' % (x,y)]['%s-%s' % (item[0],item[2])][0][3] += item[3]
         else:
@@ -16454,7 +16450,7 @@ class PlayWorld(threading.Thread):
         return atype
 
     def doActionMenu(self,x,y,ox,oy):
-        global PCX, PCY, PX, PY, ActionMenu
+        global ActionMenu
         choices = self.adict[self.getActionType(x,y)]
         ActionMenu = Dialogue(choices, resume = True, offx = ox, offy = oy, killonclick = True, align = 'left')
         ActionMenu.x,ActionMenu.y = x,y
@@ -16463,7 +16459,7 @@ class PlayWorld(threading.Thread):
     # PC Actions
 
     def fellTree(self):
-        global ActionMenu, Clouds, PCX, PCY, PCcol, MoveLock
+        global ActionMenu, Clouds, PCX, PCY, MoveLock
         canchop = False
         for item in self.inventory.values():
             try:
@@ -16874,7 +16870,7 @@ class PlayWorld(threading.Thread):
     # PC Movement
 
     def handlePC(self):
-        global PX, PY, PCX, PCY, OPCX, OPCY, OPX, OPY, PCcol, ViewRad, Clouds, moveclouds
+        global PX, PY, PCX, PCY, OPCX, OPCY, OPX, OPY, Clouds, moveclouds
         if Clouds.initdone or not GameWorld.rswitch:
             if self.rinit:
                 while self.wobstructed[self.curz].get('%s,%s' % (PCX,PCY)):
@@ -16958,7 +16954,7 @@ class PlayWorld(threading.Thread):
         lock.release()
 
     def handlePCview(self):
-        global Clouds, PCX, PCY, PCcol, ViewRad, LockName
+        global Clouds, PCX, PCY, ViewRad, LockName
         lock.acquire()
         donotdraw = {}
         for num in range(-(ViewRad + 2),ViewRad + 2):
@@ -17871,7 +17867,7 @@ class PlayWorld(threading.Thread):
     # In-Game Visual Functionality
 
     def groundView(self):
-        global ButtonList, Clouds, NoButtons, NoMenus, DoHUD, moveclouds
+        global ButtonList, Clouds, NoButtons, NoMenus, DoHUD
         NoButtons,NoMenus,DoHUD = True,True,False
         ButtonList = []
         if not self.groundview:
@@ -17977,7 +17973,7 @@ class PlayWorld(threading.Thread):
     # Game Startup
 
     def run(self):
-        global MenuSetting, MenuList, DOSCREEN, TextList, MouseLock, MoveLock, moveclouds, Clouds, DoHUD, NoUpdate, q, NoKeys, PX, PY
+        global MenuList, DOSCREEN, TextList, MouseLock, MoveLock, moveclouds, Clouds, DoHUD, NoUpdate, q, NoKeys, PX, PY
 
         DOSCREEN = 2
 

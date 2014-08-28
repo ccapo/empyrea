@@ -162,7 +162,6 @@ relswitch = False
 scaleswitch = False
 ctitles = []
 curchoice = ''
-lastcity = None
 moveclouds = False
 hpcswitch = False
 pathlock = False
@@ -5293,7 +5292,7 @@ def mouse_isvisible():
 def handle_keys():
     global playerx, playery, key, DOSCREEN, WorldGoing, WorldDone, NamingDone, \
            CreatureDone, SCREEN_WIDTH, SCREEN_HEIGHT, movetime, mouse, ButtonList, \
-           scaleswitch, NoKeys, MenuSetting, PX, PY, GameWorld, lastcity, MenuList, \
+           scaleswitch, NoKeys, MenuSetting, PX, PY, GameWorld, MenuList, \
            MouseLock, TextList, PCX, PCY, hpcswitch, pathclass, pathlock, lastmove, \
            movekeys, MoveLock, relswitch, ignoreclick, cannotleave, marker, music, \
            changecursor, Cursor, toplayer, killkeycheck, DoScaleLayer, NoButtons, NoMenus, \
@@ -5588,7 +5587,6 @@ def handle_keys():
                         city = GameWorld.citygrid['%s,%s' % (PX + handle_mouse('cx') - 20,PY + handle_mouse('cy') - 2)]
                         if city:
                             GameWorld.displayCity(city)
-                            lastcity = city
 
             # Pathfinding
             if handle_mouse('lbutton_pressed') and (handle_mouse('cx') in range(SCREEN_WIDTH - VIEW_WIDTH - 2,SCREEN_WIDTH - 2) and \

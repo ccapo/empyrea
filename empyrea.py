@@ -172,7 +172,6 @@ DoMessageLog = False
 lastmove = time.time()
 
 LockName = 'None'
-RenderTiles = []
 
 wmlev = 180
 wwlev = 151

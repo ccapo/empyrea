@@ -166,7 +166,6 @@ moveclouds = False
 hpcswitch = False
 pathlock = False
 MoveLock = False
-ignoreclick = True
 cannotleave = False
 changecursor = False
 killkeycheck = False
@@ -2173,7 +2172,7 @@ class OptWindow(threading.Thread):
     def createSave(self):
         if GameWorld.rswitch:
             GameWorld.packMap()
-        glist = ['moveclouds','hpcswitch','pathlock','MouseLock','MoveLock','ignoreclick','cannotleave','changecursor', \
+        glist = ['moveclouds','hpcswitch','pathlock','MouseLock','MoveLock','cannotleave','changecursor', \
                  'killkeycheck','MenuSetting','PX','PY','PCX','PCY','OPCX','OPCY','PCcol','toplayer']
         gwlist = ['regiondict','invdict','inventory','rswitch','messagelog','lastmessage','lastmessagecount','setupdone','rinit','winit', \
                   'rdict','windowlock','groundview','invopen','cmopen','optopen','topwindow','loading','linkedareas','rtree','wobstructed', \
@@ -5294,7 +5293,7 @@ def handle_keys():
            CreatureDone, SCREEN_WIDTH, SCREEN_HEIGHT, movetime, mouse, ButtonList, \
            scaleswitch, NoKeys, MenuSetting, PX, PY, GameWorld, MenuList, \
            MouseLock, TextList, PCX, PCY, hpcswitch, pathclass, pathlock, lastmove, \
-           movekeys, MoveLock, relswitch, ignoreclick, cannotleave, marker, music, \
+           movekeys, MoveLock, relswitch, cannotleave, marker, music, \
            changecursor, Cursor, toplayer, killkeycheck, DoScaleLayer, NoButtons, NoMenus, \
            q, GUITiles, GUICon, XConsoles, moveclouds, GUIBlurbCon
 

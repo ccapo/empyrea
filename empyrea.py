@@ -15,15 +15,16 @@ import empyrea.audio
 from empyrea.chardefs import *
 from empyrea.namegen import MakeLang, MakeName
 import empyrea.inflect as inflect
+from empyrea.screen import Screen
 from empyrea.utils import *
 from empyrea.thesaurus import t
 
-os.putenv("SDL_VIDEO_CENTERED", "1")
 sys.setrecursionlimit(50000)
-
 
 init = LoadInit('init.txt')
 audio = empyrea.audio.audio(int(init['MUSIC VOLUME']), int(init['SFX VOLUME']))
+screen = Screen(int(init['SCREEN WIDTH']), int(init['SCREEN HEIGHT']),
+        init['FULLSCREEN'] == 'yes', init['FONT'], init['FONT TYPE'])
 
 p = inflect.engine()
 __author__ = 'D.M. Hagar'
@@ -82,20 +83,13 @@ __version__ = '0.3 Alpha Tech Demo by ' + __author__
 ####################################
 
 DOSCREEN = 0
-SCREEN_WIDTH = int(init['SCREEN WIDTH'])
-SCREEN_HEIGHT = int(init['SCREEN HEIGHT'])
-VIEW_WIDTH = SCREEN_WIDTH - 22
-VIEW_HEIGHT = SCREEN_HEIGHT - 16
+
 MAP_WIDTH = int(init['WORLD MAP WIDTH'])
 MAP_HEIGHT = int(init['WORLD MAP HEIGHT'])
 RMAP_WIDTH = int(init['REGION MAP WIDTH'])
 RMAP_HEIGHT = int(init['REGION MAP HEIGHT'])
-LIMIT_FPS = 30
 
 NoRefresh = False
-
-fontx = 32
-fonty = 2055
 
 playerx, oplayerx = 1,1
 playery, oplayery = 1,1
@@ -117,29 +111,18 @@ MenuList = []
 PathList = []
 XConsoles = []
 TopWindow = []
-GraphicsLayer = libtcod.console_new(SCREEN_WIDTH,SCREEN_HEIGHT)
+
 wpwindow = libtcod.console_new(MAP_WIDTH, MAP_HEIGHT)
 wrwindow = libtcod.console_new(RMAP_WIDTH, RMAP_HEIGHT)
-wiwindow = libtcod.console_new(VIEW_WIDTH, SCREEN_HEIGHT - VIEW_HEIGHT - 3)
-wswindow = libtcod.console_new(SCREEN_WIDTH - VIEW_WIDTH - 3,SCREEN_HEIGHT - 2)
-toplayer = libtcod.console_new(VIEW_WIDTH,VIEW_HEIGHT)
+
 PCRlayer = libtcod.console_new(RMAP_WIDTH,RMAP_HEIGHT)
 PCWlayer = libtcod.console_new(MAP_WIDTH,MAP_HEIGHT)
-LoadScreen = libtcod.console_new(VIEW_WIDTH,VIEW_HEIGHT)
-GUILayer = libtcod.console_new(32,9)
-GUIBlurb = libtcod.console_new(24,6)
-GUIBlurbCon = [GUIBlurb,0,0,24,6,0,0,1.0,1.0,None]
-TimeLayer = libtcod.console_new(16,5)
-PauseLayer = libtcod.console_new(5,5)
+GUIBlurbCon = [screen.GUIBlurb, 0, 0, 24, 6, 0, 0, 1.0, 1.0, None]
 
 wpfxwindow = libtcod.console_new(MAP_WIDTH, MAP_HEIGHT)
 libtcod.console_set_key_color(wpfxwindow,libtcod.magenta)
-libtcod.console_set_key_color(LoadScreen,libtcod.magenta)
 libtcod.console_set_default_background(wpfxwindow,libtcod.magenta)
 libtcod.console_clear(wpfxwindow)
-libtcod.console_set_key_color(GUIBlurb,libtcod.magenta)
-libtcod.console_set_default_background(GUIBlurb,libtcod.magenta)
-libtcod.console_clear(GUIBlurb)
 
 WeatherLayer = []
 NoUpdate = False
@@ -428,10 +411,10 @@ class PathMarker(threading.Thread):
             self.radius = min(self.radius,2)
 
     def doMarker(self):
-        global toplayer, lock, LockName
+        global lock, LockName
         for num in range(-self.radius,self.radius + 1):
             for num2 in range(-self.radius,self.radius + 1):
-                if self.rx - num >= 0 and self.rx - num < VIEW_WIDTH and self.ry >= 0 and self.ry < VIEW_HEIGHT:
+                if self.rx - num >= 0 and self.rx - num < screen.view_width and self.ry >= 0 and self.ry < screen.view_height:
                     a = pow(num, 2)
                     b = pow(num2, 2)
                     d = sqrt(a + b)
@@ -442,7 +425,7 @@ class PathMarker(threading.Thread):
                         colg = 255 - int(ocol.g)
                         colb = 255 - int(ocol.b)
                         self.col = libtcod.Color(colr,colg,colb)
-                        libtcod.console_set_default_foreground(toplayer, self.col)
+                        libtcod.console_set_default_foreground(screen.toplayer, self.col)
                         if num == 0 and abs(num2) > 0:
                             circlechar = [8,1,190]
                         elif abs(num) > 0 and num2 == 0:
@@ -454,17 +437,17 @@ class PathMarker(threading.Thread):
                         elif [num,num2] == [0,0]:
                             circlechar = [14,4,190]
                         if LockName != 'HandleView':
-                            libtcod.console_print_ex(toplayer, self.rx - num, self.ry - num2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(circlechar)))
+                            libtcod.console_print_ex(screen.toplayer, self.rx - num, self.ry - num2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(circlechar)))
                         lock.release()
         self.radius -= 1
 
     def run(self):
-        global PCX, PCY, toplayer
-        self.rx = self.x - (SCREEN_WIDTH - VIEW_WIDTH) + 2
+        global PCX, PCY
+        self.rx = self.x - (screen.width - screen.view_width) + 2
         self.ry = self.y - 2
-        self.mxpos = PX + self.x - (SCREEN_WIDTH - VIEW_WIDTH - 2)
+        self.mxpos = PX + self.x - (screen.width - screen.view_width - 2)
         self.mypos = PY + self.y - 2
-        libtcod.console_clear(toplayer)
+        libtcod.console_clear(screen.toplayer)
         dist = int(sqrt((pow(PCX - self.mxpos,2) + pow(PCY - self.mypos,2))))
         if dist < 7:
             self.radius -= 7 - dist
@@ -473,7 +456,7 @@ class PathMarker(threading.Thread):
                 break
             self.doMarker()
             time.sleep(self.sleeptime)
-            libtcod.console_clear(toplayer)
+            libtcod.console_clear(screen.toplayer)
 
 class IntroGraphics(threading.Thread):
     # Intro Screen Function
@@ -510,8 +493,8 @@ class IntroGraphics(threading.Thread):
         self.randnum = max(min(self.randnum + randrange(-1,2),self.lightmax),self.lightmin)
         for y in range(self.h):
             for x in range(self.w):
-                f = [3.5 * x / (SCREEN_WIDTH - 4) + self.intro_noise_dx,
-                     3.5 * y / (SCREEN_HEIGHT - 4) + self.intro_noise_dy]
+                f = [3.5 * x / (screen.width - 4) + self.intro_noise_dx,
+                     3.5 * y / (screen.height - 4) + self.intro_noise_dy]
                 value = libtcod.noise_get_fbm(intronoise, f, 3)
                 c = int((value + 1.0) / 2.0 * 255)
                 if c < 0:
@@ -622,8 +605,8 @@ class CloudNoise(threading.Thread):
             if not self.hover:
                 self.cloudnoise_dx += 0.005
                 self.cloudnoise_dy += 0.005
-            ylist = range(-5,VIEW_HEIGHT + 5)
-            xlist = range(-5,VIEW_WIDTH + 5)
+            ylist = range(-5,screen.view_height + 5)
+            xlist = range(-5,screen.view_width + 5)
             for y in ylist:
                 for x in xlist:
                     while self.paused:
@@ -647,8 +630,8 @@ class CloudNoise(threading.Thread):
                         pass
 
                     if isinstance(self.rheightmap['%s,%s' % (nx,ny)],str):
-                        f = [3.5 * nx / (VIEW_WIDTH - 4) + self.cloudnoise_dx,
-                             3.5 * ny / (VIEW_HEIGHT - 4) + self.cloudnoise_dy]
+                        f = [3.5 * nx / (screen.view_width - 4) + self.cloudnoise_dx,
+                             3.5 * ny / (screen.view_height - 4) + self.cloudnoise_dy]
                         value = libtcod.noise_get_fbm(self.cloudnoise, f, 3)
                         c = int((value + 1.0) / 2.0 * 255)
                         c = max(min(c,255),0)
@@ -682,8 +665,8 @@ class CloudNoise(threading.Thread):
                         except KeyError:
                             br = False
                         if (not vr or d < ViewRad) and not br:
-                            f = [3.5 * nx / (VIEW_WIDTH - 4) + self.cloudnoise_dx,
-                                 3.5 * ny / (VIEW_HEIGHT - 4) + self.cloudnoise_dy]
+                            f = [3.5 * nx / (screen.view_width - 4) + self.cloudnoise_dx,
+                                 3.5 * ny / (screen.view_height - 4) + self.cloudnoise_dy]
                             value = libtcod.noise_get_fbm(self.cloudnoise, f, 3)
                             c = int((value + 1.0) / 2.0 * 255)
                             c = max(min(c,255),0)
@@ -769,10 +752,10 @@ class WCloudNoise(threading.Thread):
                 self.colorswitch = True
             self.cloudnoise_dx += 0.005
             self.cloudnoise_dy += 0.005
-            ylist = range(-5,VIEW_HEIGHT + 5)
-            xlist = range(-5,VIEW_WIDTH + 5)
-            ylist.sort(key=lambda y: abs((VIEW_HEIGHT / 2) - y),reverse=True)
-            xlist.sort(key=lambda x: abs((VIEW_WIDTH / 2) - x),reverse=True)
+            ylist = range(-5,screen.view_height + 5)
+            xlist = range(-5,screen.view_width + 5)
+            ylist.sort(key=lambda y: abs((screen.view_height / 2) - y),reverse=True)
+            xlist.sort(key=lambda x: abs((screen.view_width / 2) - x),reverse=True)
             for y in ylist:
                 for x in xlist:
                     while self.paused:
@@ -821,7 +804,7 @@ class WCloudNoise(threading.Thread):
 class FadeText(threading.Thread):
     # This class updates fading text.
 
-    def __init__(self, text, x, y, speed=50, con=0, fadefrom=False, fadeto=libtcod.white, align='left', conwidth=VIEW_WIDTH, wait=0, domouse = False, \
+    def __init__(self, text, x, y, speed=50, con=0, fadefrom=False, fadeto=libtcod.white, align='left', conwidth=screen.view_width, wait=0, domouse = False, \
                  hookmethod = None, hoverhook = None, unhoverhook = None):
         global TextList
         self.hoverswitch = False
@@ -1452,7 +1435,7 @@ class InvWindow(threading.Thread):
         self.items = {}
 
     def run(self):
-        global PX, PY, MenuSetting, Clouds, pathlock, MenuList, moveclouds, hoveropt, MoveLock, XConsoles, toplayer
+        global PX, PY, MenuSetting, Clouds, pathlock, MenuList, moveclouds, hoveropt, MoveLock, XConsoles
         if not GameWorld.windowlock:
             GameWorld.windowlock = True
             self.mcloudstate = moveclouds
@@ -1461,12 +1444,12 @@ class InvWindow(threading.Thread):
             pathlock = True
             self.conw = 40
             self.conh = 21
-            self.CX = PX + (VIEW_WIDTH / 2) - 20
-            self.CY = PY + (VIEW_HEIGHT / 2) - 10
+            self.CX = PX + (screen.view_width / 2) - 20
+            self.CY = PY + (screen.view_height / 2) - 10
             self.invconsole = libtcod.console_new(self.conw,self.conh)
-            self.rx = self.CX - PX + (SCREEN_WIDTH - VIEW_WIDTH) - 3
+            self.rx = self.CX - PX + (screen.width - screen.view_width) - 3
             self.ry = self.CY - PY + 1
-            self.InvBar = ScrollBar(self.invconsole, self.conw - 2, 1, self.conh - 2, self.CX - PX + self.conw - 5 + (SCREEN_WIDTH - VIEW_WIDTH), self.CY - PY + 2, \
+            self.InvBar = ScrollBar(self.invconsole, self.conw - 2, 1, self.conh - 2, self.CX - PX + self.conw - 5 + (screen.width - screen.view_width), self.CY - PY + 2, \
                                     hcolor = scrollcolor2, arrowcolor = bordercolh2, bgcolor = scrollbcolh, ID = 'InvBar', hookmethod = self.reDraw, \
                                     scrolldims = [self.rx,self.rx + self.conw,self.ry,self.ry + self.conh])
             self.InvBar.start()
@@ -1494,9 +1477,9 @@ class InvWindow(threading.Thread):
                             itemstruct = GameWorld.invdict[self.moveitem[0][1]][itemname]
                             char = [int(itemstruct['CHAR'][0]),int(itemstruct['CHAR'][1]),255]
                             col = libtcod.white
-                            libtcod.console_set_default_foreground(toplayer,col)
-                            libtcod.console_clear(toplayer)
-                            libtcod.console_print_ex(toplayer, handle_mouse('cx') - 20, handle_mouse('cy') - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
+                            libtcod.console_set_default_foreground(screen.toplayer,col)
+                            libtcod.console_clear(screen.toplayer)
+                            libtcod.console_print_ex(screen.toplayer, handle_mouse('cx') - 20, handle_mouse('cy') - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
                     elif handle_mouse('lbutton_pressed') and self.moveitem:
                         if key.shift and not self.moveitem[0][3] == 1:
                             if type(self.isquares.get('%s,%s' % (ccx,ccy))) == int:
@@ -1555,7 +1538,7 @@ class InvWindow(threading.Thread):
                             DrawScroll(self.blurbcon, 0, 0, 24, wblurb[1] + 3,1)
                             libtcod.console_set_default_foreground(self.blurbcon, libtcod.black)
                             libtcod.console_print_ex(self.blurbcon, 12, 2, libtcod.BKGND_NONE, libtcod.CENTER, wblurb[0])
-                            ccx = max(min(ccx,SCREEN_WIDTH - 3 - 12),0)
+                            ccx = max(min(ccx,screen.width - 3 - 12),0)
                             posy = ccy - 1 - (wblurb[1] + 4)
                             if posy < 2:
                                 posy = ccy + 2
@@ -1577,7 +1560,7 @@ class InvWindow(threading.Thread):
                             self.movewindow = False
                         elif self.movewindow and (handle_mouse('cx') != self.ox or handle_mouse('cy') != self.oy):
                             nrx,nry = self.rx - (self.ox - handle_mouse('cx')),self.ry - (self.oy - handle_mouse('cy'))
-                            if nrx > SCREEN_WIDTH - VIEW_WIDTH - 3 and nrx + self.conw < SCREEN_WIDTH - 1 and nry > 1 and nry + self.conh < VIEW_HEIGHT + 3:
+                            if nrx > screen.width - screen.view_width - 3 and nrx + self.conw < screen.width - 1 and nry > 1 and nry + self.conh < screen.view_height + 3:
                                 self.CX,self.CY = self.CX - (self.ox - handle_mouse('cx')),self.CY - (self.oy - handle_mouse('cy'))
                                 self.InvBar.rx,self.InvBar.ry = self.InvBar.rx - (self.ox - handle_mouse('cx')),self.InvBar.ry - (self.oy - handle_mouse('cy'))
                                 self.rx,self.ry = nrx,nry
@@ -1587,7 +1570,7 @@ class InvWindow(threading.Thread):
                                 XConsoles += [self.conlist]
                             self.movewindow = False
                     else:
-                        libtcod.console_clear(toplayer)
+                        libtcod.console_clear(screen.toplayer)
                         if self.bconlist in XConsoles:
                             XConsoles.remove(self.bconlist)
                         libtcod.console_set_char_background(self.invconsole, self.conw - 2, 0, scrollbcol, libtcod.BKGND_SET)
@@ -1739,8 +1722,8 @@ class InvWindow(threading.Thread):
 
 class Dialogue(threading.Thread):
     def __init__(self,choicelist,title = None,resume = False, \
-                 offx = (SCREEN_WIDTH - VIEW_WIDTH - 3) + (VIEW_WIDTH / 2), \
-                 offy = (VIEW_HEIGHT / 2), killonclick = False, cornerstyle = 1, \
+                 offx = (screen.width - screen.view_width - 3) + (screen.view_width / 2), \
+                 offy = (screen.view_height / 2), killonclick = False, cornerstyle = 1, \
                  align = 'center', talign = 'center'):
         threading.Thread.__init__(self)
         self.killswitch = False
@@ -1791,8 +1774,8 @@ class Dialogue(threading.Thread):
             MPY = (self.conh / 2) - (len(self.choicelist) / 2)
         if self.title:
             MPY += 1
-        self.rx = max(min(self.offx - MPX,SCREEN_WIDTH - 2 - self.conw),(SCREEN_WIDTH - VIEW_WIDTH) - 2)
-        self.ry = max(min(2 + self.offy - MPY,2 + VIEW_HEIGHT - self.conh),2)
+        self.rx = max(min(self.offx - MPX,screen.width - 2 - self.conw),(screen.width - screen.view_width) - 2)
+        self.ry = max(min(2 + self.offy - MPY,2 + screen.view_height - self.conh),2)
         for x in range(self.conw):
             for y in range(self.conh):
                 bcol = libtcod.console_get_char_background(0, x + self.rx, y + self.ry)
@@ -1866,8 +1849,8 @@ class NDialogue(threading.Thread):
         MenuSetting = None
         MPX = self.conw / 2
         MPY = self.conh / 2
-        self.rx = (SCREEN_WIDTH - VIEW_WIDTH - 3) + (VIEW_WIDTH / 2) - MPX
-        self.ry = 2 + (VIEW_HEIGHT / 2) - MPY
+        self.rx = (screen.width - screen.view_width - 3) + (screen.view_width / 2) - MPX
+        self.ry = 2 + (screen.view_height / 2) - MPY
         self.conlist = [self.ndialogue,0,0,self.conw,self.conh,self.rx,self.ry,1.0,1.0]
         TopWindow += [self.conlist]
         for num in range(wadjust,3 + wadjust):
@@ -1962,8 +1945,8 @@ class OptWindow(threading.Thread):
 
         MPX = 9
         MPY = 9
-        self.rx = (SCREEN_WIDTH - VIEW_WIDTH - 2) + (VIEW_WIDTH / 2) - MPX
-        self.ry = 2 + (VIEW_HEIGHT / 2) - MPY
+        self.rx = (screen.width - screen.view_width - 2) + (screen.view_width / 2) - MPX
+        self.ry = 2 + (screen.view_height / 2) - MPY
 
         DrawScroll(self.oconsole, 5, 2, 8, 2)
         libtcod.console_set_default_foreground(self.oconsole, libtcod.black)
@@ -2074,7 +2057,7 @@ class OptWindow(threading.Thread):
                     libtcod.console_set_char_background(self.oconsole, tile, 15, scrollcolor, libtcod.BKGND_SET)
 
     def doAudio(self):
-        global XConsoles, WeatherLayer, TopWindow, toplayer, Clouds, GameWorld, \
+        global XConsoles, WeatherLayer, TopWindow, Clouds, GameWorld, \
                Nographics, NoButtons, NoMenus
 
         time.sleep(0.1)
@@ -2082,8 +2065,8 @@ class OptWindow(threading.Thread):
         libtcod.console_set_default_background(self.audiowindow, libtcod.darkest_azure)
         libtcod.console_clear(self.audiowindow)
         DrawBox(self.audiowindow, 0, 0, 23, 29, 1, libtcod.desaturated_yellow, libtcod.desaturated_flame)
-        srx = (SCREEN_WIDTH - VIEW_WIDTH - 2) + (VIEW_WIDTH / 2) - 12
-        sry = 1 + (VIEW_HEIGHT / 2) - 15
+        srx = (screen.width - screen.view_width - 2) + (screen.view_width / 2) - 12
+        sry = 1 + (screen.view_height / 2) - 15
 
         libtcod.console_set_default_foreground(self.audiowindow, hcolor2)
         libtcod.console_set_default_background(self.audiowindow, scrollcolor2)
@@ -2166,7 +2149,7 @@ class OptWindow(threading.Thread):
         if GameWorld.rswitch:
             GameWorld.packMap()
         glist = ['moveclouds','hpcswitch','pathlock','MouseLock','MoveLock', \
-                 'killkeycheck','MenuSetting','PX','PY','PCX','PCY','OPCX','OPCY','PCcol','toplayer']
+                 'killkeycheck','MenuSetting','PX','PY','PCX','PCY','OPCX','OPCY','PCcol','screen.toplayer']
         gwlist = ['regiondict','invdict','inventory','rswitch','messagelog','lastmessage','lastmessagecount','setupdone','rinit','winit', \
                   'rdict','windowlock','groundview','invopen','cmopen','optopen','topwindow','loading','linkedareas','rtree','wobstructed', \
                   'wcdict','zgrid','ztop','translayer','itemdict','curz','rtypes','subtypes','maintype','tempzone','wlev','mlev', \
@@ -2181,7 +2164,7 @@ class OptWindow(threading.Thread):
         return savefile
 
     def loadSave(self,save):
-        global XConsoles, WeatherLayer, TopWindow, toplayer, Clouds, GameWorld
+        global XConsoles, WeatherLayer, TopWindow, Clouds, GameWorld
         savefile = GameWorld.saves[save]
         Clouds.killswitch = True
         time.sleep(0.1)
@@ -2233,8 +2216,8 @@ class OptWindow(threading.Thread):
             libtcod.console_set_char_background(self.savewindow, x, 11, libtcod.darker_azure, libtcod.BKGND_SET)
         for tile in range(3,21):
             libtcod.console_set_char_background(self.savewindow, tile, 3, libtcod.black, libtcod.BKGND_SET)
-        srx = (SCREEN_WIDTH - VIEW_WIDTH - 2) + (VIEW_WIDTH / 2) - 12
-        sry = 1 + (VIEW_HEIGHT / 2) - 15
+        srx = (screen.width - screen.view_width - 2) + (screen.view_width / 2) - 12
+        sry = 1 + (screen.view_height / 2) - 15
         self.sconlist = [self.savewindow,0,0,24,30,srx,sry,1.0,1.0]
         XConsoles = [self.sconlist]
         savestr = ''
@@ -2451,8 +2434,8 @@ class OptWindow(threading.Thread):
                 libtcod.console_set_char_background(self.loadwindow, x, y, libtcod.black, libtcod.BKGND_SET)
         for x in range(3,20):
             libtcod.console_set_char_background(self.loadwindow, x, 7, libtcod.darker_azure, libtcod.BKGND_SET)
-        srx = (SCREEN_WIDTH - VIEW_WIDTH - 2) + (VIEW_WIDTH / 2) - 12
-        sry = 1 + (VIEW_HEIGHT / 2) - 15
+        srx = (screen.width - screen.view_width - 2) + (screen.view_width / 2) - 12
+        sry = 1 + (screen.view_height / 2) - 15
         self.lconlist = [self.loadwindow,0,0,24,30,srx,sry,1.0,1.0]
         XConsoles = [self.lconlist]
         self.LBar = ScrollBar(self.loadwindow, 20, 7, 20, srx + 20, sry + 7, arrowcolor = scrollcolor2,
@@ -2745,10 +2728,10 @@ class CWindow(threading.Thread):
         libtcod.console_set_default_foreground(self.cconsole, bordercol)
         MPX = (self.conw + 20) / 2
         MPY = self.conh / 2
-        self.rx = (SCREEN_WIDTH - VIEW_WIDTH - 2) + (VIEW_WIDTH / 2) - MPX
-        self.ry = 2 + (VIEW_HEIGHT / 2) - MPY
+        self.rx = (screen.width - screen.view_width - 2) + (screen.view_width / 2) - MPX
+        self.ry = 2 + (screen.view_height / 2) - MPY
         self.tcrx = self.rx + self.conw
-        self.tcry = 2 + (VIEW_HEIGHT / 2) - 18
+        self.tcry = 2 + (screen.view_height / 2) - 18
         self.conlist = [self.cconsole,0,0,self.conw,self.conh,self.rx,self.ry,1.0,1.0]
         XConsoles += [self.conlist]
         self.tconlist = [self.tconsole,0,0,20,36,self.tcrx,self.tcry,1.0,1.0]
@@ -3753,8 +3736,8 @@ class CWindow(threading.Thread):
             libtcod.console_set_char_background(self.savewindow, x, 11, libtcod.darker_azure, libtcod.BKGND_SET)
         for tile in range(3,21):
             libtcod.console_set_char_background(self.savewindow, tile, 3, libtcod.black, libtcod.BKGND_SET)
-        srx = (SCREEN_WIDTH - VIEW_WIDTH - 2) + (VIEW_WIDTH / 2) - 12
-        sry = 1 + (VIEW_HEIGHT / 2) - 15
+        srx = (screen.width - screen.view_width - 2) + (screen.view_width / 2) - 12
+        sry = 1 + (screen.view_height / 2) - 15
         self.sconlist = [self.savewindow,0,0,24,30,srx,sry,1.0,1.0]
         XConsoles = [self.sconlist]
         savestr = ''
@@ -3962,8 +3945,8 @@ class CWindow(threading.Thread):
                 libtcod.console_set_char_background(self.loadwindow, x, y, libtcod.black, libtcod.BKGND_SET)
         for x in range(3,20):
             libtcod.console_set_char_background(self.loadwindow, x, 7, libtcod.darker_azure, libtcod.BKGND_SET)
-        srx = (SCREEN_WIDTH - VIEW_WIDTH - 2) + (VIEW_WIDTH / 2) - 12
-        sry = 1 + (VIEW_HEIGHT / 2) - 15
+        srx = (screen.width - screen.view_width - 2) + (screen.view_width / 2) - 12
+        sry = 1 + (screen.view_height / 2) - 15
         self.lconlist = [self.loadwindow,0,0,24,30,srx,sry,1.0,1.0]
         XConsoles = [self.lconlist]
         LBar = ScrollBar(self.loadwindow, 20, 7, 20, srx + 20, sry + 7, arrowcolor = bordercolh2, \
@@ -4129,19 +4112,19 @@ class CWindow(threading.Thread):
         self.pconlist = [self.pconsole,0,0,self.mconw,self.mconh,None,None,1.0,0.0]
         if canplace:
             while True:
-                if handle_mouse('cx') in range(SCREEN_WIDTH - VIEW_WIDTH - 1,SCREEN_WIDTH - 2) and \
-                   handle_mouse('cy') in range(3,VIEW_HEIGHT + 2):
+                if handle_mouse('cx') in range(screen.width - screen.view_width - 1,screen.width - 2) and \
+                   handle_mouse('cy') in range(3,screen.view_height + 2):
                     if handle_mouse('rbutton'):
                         break
                     elif handle_mouse('cx') != self.pconlist[5] or handle_mouse('cy') != self.pconlist[6]:
                         TopWindow = []
 
-                        mx = min(self.mconw,(SCREEN_WIDTH - 1) - handle_mouse('cx'))
-                        my = min(self.mconh,(VIEW_HEIGHT + 3) - handle_mouse('cy'))
+                        mx = min(self.mconw,(screen.width - 1) - handle_mouse('cx'))
+                        my = min(self.mconh,(screen.view_height + 3) - handle_mouse('cy'))
                         self.pconlist = [self.pconsole,0,0,mx,my,handle_mouse('cx') - 1,handle_mouse('cy') - 1,1.0,0.0]
                         TopWindow = [self.pconlist]
                         noplace = False
-                        cx = PX + handle_mouse('cx') - (SCREEN_WIDTH - (VIEW_WIDTH + 1))
+                        cx = PX + handle_mouse('cx') - (screen.width - (screen.view_width + 1))
                         cy = PY + handle_mouse('cy') - 3
                         for x in range(self.mconw):
                             for y in range(self.mconh):
@@ -4186,7 +4169,7 @@ class CWindow(threading.Thread):
                         if noplace:
                             GameWorld.addMesg('That\'s an invalid location to build.', col = libtcod.yellow)
                         else:
-                            cx = PX + handle_mouse('cx') - (SCREEN_WIDTH - (VIEW_WIDTH + 1))
+                            cx = PX + handle_mouse('cx') - (screen.width - (screen.view_width + 1))
                             cy = PY + handle_mouse('cy') - 3
                             zrange = range(100)
                             zrange.reverse()
@@ -4490,24 +4473,24 @@ class CWindow(threading.Thread):
             XConsoles.remove(self.tconlist)
             libtcod.console_set_default_background(self.cconsole, libtcod.black)
             libtcod.console_clear(self.cconsole)
-            self.conw,self.conh = min(self.mconw + 2,VIEW_WIDTH - 20),min(self.mconh + 2,VIEW_HEIGHT)
+            self.conw,self.conh = min(self.mconw + 2,screen.view_width - 20),min(self.mconh + 2,screen.view_height)
             MPX = (self.conw + 20) / 2
             MPY = self.conh / 2
-            self.rx = (SCREEN_WIDTH - VIEW_WIDTH - 2) + (VIEW_WIDTH / 2) - MPX
-            self.ry = 2 + (VIEW_HEIGHT / 2) - MPY
+            self.rx = (screen.width - screen.view_width - 2) + (screen.view_width / 2) - MPX
+            self.ry = 2 + (screen.view_height / 2) - MPY
             self.tcrx = self.rx + self.conw
-            self.tcry = 2 + (VIEW_HEIGHT / 2) - 18
+            self.tcry = 2 + (screen.view_height / 2) - 18
             self.sh = self.mconh - (self.conh - 2)
             self.sw = self.mconw - (self.conw - 2)
 
-            if self.mconw + 2 > VIEW_WIDTH - 20:
+            if self.mconw + 2 > screen.view_width - 20:
                 self.WBar = WScrollBar(self.cconsole, 1, self.conh - 2, self.conw - 3, self.rx + 1, \
                                       self.ry + self.conh - 2, arrowcolor = bordercolh2, \
                                        bgcolor = bgcolor2, hcolor = globals()['hcolor'], hookmethod = self.reDraw, \
                                        hookarg = False, charnum = 190)
                 self.WBar.start()
                 self.WBar.max = self.sw
-            if self.mconh > VIEW_HEIGHT - 2:
+            if self.mconh > screen.view_height - 2:
                 self.HBar = ScrollBar(self.cconsole, self.conw - 2, 1, self.conh - 3, self.rx + self.conw - 2, \
                                       self.ry + 1, arrowcolor = bordercolh2, bgcolor = bgcolor2, \
                                       hcolor = globals()['hcolor'], hookmethod = self.reDraw, \
@@ -4569,8 +4552,8 @@ class ProgressBar(threading.Thread):
         DrawScroll(self.pconsole, 0, 0, self.conw - 1, self.conh - 1, 1)
         libtcod.console_set_default_foreground(self.pconsole, libtcod.black)
         libtcod.console_print_ex(self.pconsole, self.conw / 2, 1, libtcod.BKGND_NONE, libtcod.CENTER, self.title)
-        self.rx = (SCREEN_WIDTH - VIEW_WIDTH - 3) + (VIEW_WIDTH / 2) - (self.conw / 2)
-        self.ry = (VIEW_HEIGHT / 2)
+        self.rx = (screen.width - screen.view_width - 3) + (screen.view_width / 2) - (self.conw / 2)
+        self.ry = (screen.view_height / 2)
         self.conlist = [self.pconsole,0,0,self.conw,self.conh,self.rx,self.ry,1.0,1.0]
         TopWindow += [self.conlist]
         libtcod.console_set_default_foreground(self.pconsole, libtcod.light_grey)
@@ -5247,7 +5230,7 @@ def solidScale(image, newx, newy, territory = 0):
 
     return [scaleimage,xscale,yscale,terrcivdict]
 
-def textWrap(text, conwidth = VIEW_WIDTH):
+def textWrap(text, conwidth = screen.view_width):
     if len(text) > conwidth - 2:
         n = conwidth - 2
         fline = ''
@@ -5283,19 +5266,19 @@ def mouse_isvisible():
 
 def handle_keys():
     global playerx, playery, key, DOSCREEN, WorldGoing, WorldDone, NamingDone, \
-           CreatureDone, SCREEN_WIDTH, SCREEN_HEIGHT, movetime, mouse, ButtonList, \
+           CreatureDone, movetime, mouse, ButtonList, \
            scaleswitch, NoKeys, MenuSetting, PX, PY, GameWorld, MenuList, \
            MouseLock, TextList, PCX, PCY, pathclass, pathlock, lastmove, \
            movekeys, MoveLock, relswitch, marker, \
-           Cursor, toplayer, killkeycheck, DoScaleLayer, NoButtons, NoMenus, \
+           Cursor, killkeycheck, DoScaleLayer, NoButtons, NoMenus, \
            q, GUITiles, GUICon, XConsoles, GUIBlurbCon
 
     if not NoKeys:
         if DOSCREEN == 1 and not scaleswitch and not MouseLock:
-            if handle_mouse('lbutton') and (handle_mouse('cx') in range(SCREEN_WIDTH - VIEW_WIDTH - 2,SCREEN_WIDTH - 2) and \
-                                  handle_mouse('cy') in range(2,VIEW_HEIGHT + 2)):
-                playery = min(max(playery - handle_mouse('dcy'),0),MAP_HEIGHT - VIEW_HEIGHT)
-                playerx = min(max(playerx - handle_mouse('dcx'),0),MAP_WIDTH - VIEW_WIDTH)
+            if handle_mouse('lbutton') and (handle_mouse('cx') in range(screen.width - screen.view_width - 2,screen.width - 2) and \
+                                  handle_mouse('cy') in range(2,screen.view_height + 2)):
+                playery = min(max(playery - handle_mouse('dcy'),0),MAP_HEIGHT - screen.view_height)
+                playerx = min(max(playerx - handle_mouse('dcx'),0),MAP_WIDTH - screen.view_width)
 
         if DOSCREEN == 2 and not (MoveLock or MouseLock):
             dogui = False
@@ -5341,17 +5324,17 @@ def handle_keys():
                             GUIMenu['page'] = 1
                         GameWorld.doGUIMenu(page = GUIMenu['page'])
                     if addhover:
-                        libtcod.console_set_default_foreground(GUILayer,libtcod.white)
+                        libtcod.console_set_default_foreground(screen.GUILayer,libtcod.white)
                         for x in range(2):
                             lock.acquire()
                             char = [button_addh[0] + x,button_addh[1],255]
-                            libtcod.console_print_ex(GUILayer,GUITiles['add'][0][0] + x,GUITiles['add'][0][1],libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                            libtcod.console_print_ex(screen.GUILayer,GUITiles['add'][0][0] + x,GUITiles['add'][0][1],libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                             lock.release()
                     else:
                         for x in range(2):
                             lock.acquire()
                             char = [button_add[0] + x,button_add[1],255]
-                            libtcod.console_print_ex(GUILayer,GUITiles['add'][0][0] + x,GUITiles['add'][0][1],libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                            libtcod.console_print_ex(screen.GUILayer,GUITiles['add'][0][0] + x,GUITiles['add'][0][1],libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                             lock.release()
                     subbutton = GUITiles['sub']
                     subhover = False
@@ -5368,11 +5351,11 @@ def handle_keys():
                             GUIMenu['page'] = 6
                         GameWorld.doGUIMenu(page = GUIMenu['page'])
                     if subhover:
-                        libtcod.console_set_default_foreground(GUILayer,libtcod.white)
+                        libtcod.console_set_default_foreground(screen.GUILayer,libtcod.white)
                         for x in range(2):
                             lock.acquire()
                             char = [button_subh[0] + x,button_subh[1],255]
-                            libtcod.console_print_ex(GUILayer,GUITiles['sub'][0][0] + x,GUITiles['sub'][0][1],libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                            libtcod.console_print_ex(screen.GUILayer,GUITiles['sub'][0][0] + x,GUITiles['sub'][0][1],libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                             lock.release()
                         if handle_mouse('lbutton_pressed'):
                             audio.playSound('sounds/wav/click2.wav')
@@ -5380,7 +5363,7 @@ def handle_keys():
                         for x in range(2):
                             lock.acquire()
                             char = [button_sub[0] + x,button_sub[1],255]
-                            libtcod.console_print_ex(GUILayer,GUITiles['sub'][0][0] + x,GUITiles['sub'][0][1],libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                            libtcod.console_print_ex(screen.GUILayer,GUITiles['sub'][0][0] + x,GUITiles['sub'][0][1],libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                             lock.release()
                     b1hover = False
                     button1 = GUITiles['button1']
@@ -5413,8 +5396,8 @@ def handle_keys():
                         if (handle_mouse('cx'),handle_mouse('cy')) == (tile[0] + GUIxloc,tile[1] + GUIyloc):
                             b6hover = True
                     if not (b1hover or b2hover or b3hover or b4hover or b5hover or b6hover):
-                        libtcod.console_set_default_background(GUIBlurb,libtcod.magenta)
-                        libtcod.console_clear(GUIBlurb)
+                        libtcod.console_set_default_background(screen.GUIBlurb,libtcod.magenta)
+                        libtcod.console_clear(screen.GUIBlurb)
                         if GUIBlurbCon in XConsoles:
                             XConsoles.remove(GUIBlurbCon)
                     elif b1hover:
@@ -5431,11 +5414,11 @@ def handle_keys():
                                 blurblen = 2
                             for x in range(24):
                                 for y in range(blurblen + 2):
-                                    libtcod.console_set_char_background(GUIBlurb,x,y,bgcolor,libtcod.BKGND_SET)
-                            DrawBox(GUIBlurb,0,0,23,blurblen + 1,1,bordercol,bordercolh2)
-                            libtcod.console_set_default_foreground(GUIBlurb,libtcod.white)
+                                    libtcod.console_set_char_background(screen.GUIBlurb,x,y,bgcolor,libtcod.BKGND_SET)
+                            DrawBox(screen.GUIBlurb,0,0,23,blurblen + 1,1,bordercol,bordercolh2)
+                            libtcod.console_set_default_foreground(screen.GUIBlurb,libtcod.white)
                             libtcod.console_set_color_control(libtcod.COLCTRL_1,libtcod.light_orange,libtcod.black)
-                            libtcod.console_print_ex(GUIBlurb,12,1,libtcod.BKGND_NONE,libtcod.CENTER,'%c' % (libtcod.COLCTRL_1) + action + \
+                            libtcod.console_print_ex(screen.GUIBlurb,12,1,libtcod.BKGND_NONE,libtcod.CENTER,'%c' % (libtcod.COLCTRL_1) + action + \
                                                      '%c' % (libtcod.COLCTRL_STOP) + '\n' + blurb[0])
                             GUIBlurbCon[5] = handle_mouse('cx') - 12
                             GUIBlurbCon[6] = handle_mouse('cy') - 6
@@ -5454,11 +5437,11 @@ def handle_keys():
                                 blurblen = 2
                             for x in range(24):
                                 for y in range(blurblen + 2):
-                                    libtcod.console_set_char_background(GUIBlurb,x,y,bgcolor,libtcod.BKGND_SET)
-                            DrawBox(GUIBlurb,0,0,23,blurblen + 1,1,bordercol,bordercolh2)
-                            libtcod.console_set_default_foreground(GUIBlurb,libtcod.white)
+                                    libtcod.console_set_char_background(screen.GUIBlurb,x,y,bgcolor,libtcod.BKGND_SET)
+                            DrawBox(screen.GUIBlurb,0,0,23,blurblen + 1,1,bordercol,bordercolh2)
+                            libtcod.console_set_default_foreground(screen.GUIBlurb,libtcod.white)
                             libtcod.console_set_color_control(libtcod.COLCTRL_1,libtcod.light_orange,libtcod.black)
-                            libtcod.console_print_ex(GUIBlurb,12,1,libtcod.BKGND_NONE,libtcod.CENTER,'%c' % (libtcod.COLCTRL_1) + action + \
+                            libtcod.console_print_ex(screen.GUIBlurb,12,1,libtcod.BKGND_NONE,libtcod.CENTER,'%c' % (libtcod.COLCTRL_1) + action + \
                                                      '%c' % (libtcod.COLCTRL_STOP) + '\n' + blurb[0])
                             GUIBlurbCon[5] = handle_mouse('cx') - 12
                             GUIBlurbCon[6] = handle_mouse('cy') - 6
@@ -5477,11 +5460,11 @@ def handle_keys():
                                 blurblen = 2
                             for x in range(24):
                                 for y in range(blurblen + 2):
-                                    libtcod.console_set_char_background(GUIBlurb,x,y,bgcolor,libtcod.BKGND_SET)
-                            DrawBox(GUIBlurb,0,0,23,blurblen + 1,1,bordercol,bordercolh2)
-                            libtcod.console_set_default_foreground(GUIBlurb,libtcod.white)
+                                    libtcod.console_set_char_background(screen.GUIBlurb,x,y,bgcolor,libtcod.BKGND_SET)
+                            DrawBox(screen.GUIBlurb,0,0,23,blurblen + 1,1,bordercol,bordercolh2)
+                            libtcod.console_set_default_foreground(screen.GUIBlurb,libtcod.white)
                             libtcod.console_set_color_control(libtcod.COLCTRL_1,libtcod.light_orange,libtcod.black)
-                            libtcod.console_print_ex(GUIBlurb,12,1,libtcod.BKGND_NONE,libtcod.CENTER,'%c' % (libtcod.COLCTRL_1) + action + \
+                            libtcod.console_print_ex(screen.GUIBlurb,12,1,libtcod.BKGND_NONE,libtcod.CENTER,'%c' % (libtcod.COLCTRL_1) + action + \
                                                      '%c' % (libtcod.COLCTRL_STOP) + '\n' + blurb[0])
                             GUIBlurbCon[5] = handle_mouse('cx') - 12
                             GUIBlurbCon[6] = handle_mouse('cy') - 6
@@ -5500,11 +5483,11 @@ def handle_keys():
                                 blurblen = 2
                             for x in range(24):
                                 for y in range(blurblen + 2):
-                                    libtcod.console_set_char_background(GUIBlurb,x,y,bgcolor,libtcod.BKGND_SET)
-                            DrawBox(GUIBlurb,0,0,23,blurblen + 1,1,bordercol,bordercolh2)
-                            libtcod.console_set_default_foreground(GUIBlurb,libtcod.white)
+                                    libtcod.console_set_char_background(screen.GUIBlurb,x,y,bgcolor,libtcod.BKGND_SET)
+                            DrawBox(screen.GUIBlurb,0,0,23,blurblen + 1,1,bordercol,bordercolh2)
+                            libtcod.console_set_default_foreground(screen.GUIBlurb,libtcod.white)
                             libtcod.console_set_color_control(libtcod.COLCTRL_1,libtcod.light_orange,libtcod.black)
-                            libtcod.console_print_ex(GUIBlurb,12,1,libtcod.BKGND_NONE,libtcod.CENTER,'%c' % (libtcod.COLCTRL_1) + action + \
+                            libtcod.console_print_ex(screen.GUIBlurb,12,1,libtcod.BKGND_NONE,libtcod.CENTER,'%c' % (libtcod.COLCTRL_1) + action + \
                                                      '%c' % (libtcod.COLCTRL_STOP) + '\n' + blurb[0])
                             GUIBlurbCon[5] = handle_mouse('cx') - 12
                             GUIBlurbCon[6] = handle_mouse('cy') - 6
@@ -5523,11 +5506,11 @@ def handle_keys():
                                 blurblen = 2
                             for x in range(24):
                                 for y in range(blurblen + 2):
-                                    libtcod.console_set_char_background(GUIBlurb,x,y,bgcolor,libtcod.BKGND_SET)
-                            DrawBox(GUIBlurb,0,0,23,blurblen + 1,1,bordercol,bordercolh2)
-                            libtcod.console_set_default_foreground(GUIBlurb,libtcod.white)
+                                    libtcod.console_set_char_background(screen.GUIBlurb,x,y,bgcolor,libtcod.BKGND_SET)
+                            DrawBox(screen.GUIBlurb,0,0,23,blurblen + 1,1,bordercol,bordercolh2)
+                            libtcod.console_set_default_foreground(screen.GUIBlurb,libtcod.white)
                             libtcod.console_set_color_control(libtcod.COLCTRL_1,libtcod.light_orange,libtcod.black)
-                            libtcod.console_print_ex(GUIBlurb,12,1,libtcod.BKGND_NONE,libtcod.CENTER,'%c' % (libtcod.COLCTRL_1) + action + \
+                            libtcod.console_print_ex(screen.GUIBlurb,12,1,libtcod.BKGND_NONE,libtcod.CENTER,'%c' % (libtcod.COLCTRL_1) + action + \
                                                      '%c' % (libtcod.COLCTRL_STOP) + '\n' + blurb[0])
                             GUIBlurbCon[5] = handle_mouse('cx') - 12
                             GUIBlurbCon[6] = handle_mouse('cy') - 6
@@ -5546,11 +5529,11 @@ def handle_keys():
                                 blurblen = 2
                             for x in range(24):
                                 for y in range(blurblen + 2):
-                                    libtcod.console_set_char_background(GUIBlurb,x,y,bgcolor,libtcod.BKGND_SET)
-                            DrawBox(GUIBlurb,0,0,23,blurblen + 1,1,bordercol,bordercolh2)
-                            libtcod.console_set_default_foreground(GUIBlurb,libtcod.white)
+                                    libtcod.console_set_char_background(screen.GUIBlurb,x,y,bgcolor,libtcod.BKGND_SET)
+                            DrawBox(screen.GUIBlurb,0,0,23,blurblen + 1,1,bordercol,bordercolh2)
+                            libtcod.console_set_default_foreground(screen.GUIBlurb,libtcod.white)
                             libtcod.console_set_color_control(libtcod.COLCTRL_1,libtcod.light_orange,libtcod.black)
-                            libtcod.console_print_ex(GUIBlurb,12,1,libtcod.BKGND_NONE,libtcod.CENTER,'%c' % (libtcod.COLCTRL_1) + action + \
+                            libtcod.console_print_ex(screen.GUIBlurb,12,1,libtcod.BKGND_NONE,libtcod.CENTER,'%c' % (libtcod.COLCTRL_1) + action + \
                                                      '%c' % (libtcod.COLCTRL_STOP) + '\n' + blurb[0])
                             GUIBlurbCon[5] = handle_mouse('cx') - 12
                             GUIBlurbCon[6] = handle_mouse('cy') - 6
@@ -5562,16 +5545,16 @@ def handle_keys():
                         XConsoles.remove(GUIBlurbCon)
 
             # World Start Site Selection
-            if handle_mouse('lbutton') and (handle_mouse('cx') in range(SCREEN_WIDTH - VIEW_WIDTH - 2,SCREEN_WIDTH - 2) and \
-                                  handle_mouse('cy') in range(2,VIEW_HEIGHT + 2)) and not dogui:
+            if handle_mouse('lbutton') and (handle_mouse('cx') in range(screen.width - screen.view_width - 2,screen.width - 2) and \
+                                  handle_mouse('cy') in range(2,screen.view_height + 2)) and not dogui:
                 if GameWorld.rswitch:
-                    PY = min(max(PY - handle_mouse('dcy'),0),RMAP_HEIGHT - VIEW_HEIGHT)
-                    PX = min(max(PX - handle_mouse('dcx'),0),RMAP_WIDTH - VIEW_WIDTH)
+                    PY = min(max(PY - handle_mouse('dcy'),0),RMAP_HEIGHT - screen.view_height)
+                    PX = min(max(PX - handle_mouse('dcx'),0),RMAP_WIDTH - screen.view_width)
                     if handle_mouse('dcy') != 0 or handle_mouse('dcx') != 0:
                         pathlock = True
                 else:
-                    PY = min(max(PY - handle_mouse('dcy'),0),MAP_HEIGHT - VIEW_HEIGHT)
-                    PX = min(max(PX - handle_mouse('dcx'),0),MAP_WIDTH - VIEW_WIDTH)
+                    PY = min(max(PY - handle_mouse('dcy'),0),MAP_HEIGHT - screen.view_height)
+                    PX = min(max(PX - handle_mouse('dcx'),0),MAP_WIDTH - screen.view_width)
                     if handle_mouse('dcy') != 0 or handle_mouse('dcx') != 0:
                         pathlock = True
 
@@ -5581,8 +5564,8 @@ def handle_keys():
                             GameWorld.displayCity(city)
 
             # Pathfinding
-            if handle_mouse('lbutton_pressed') and (handle_mouse('cx') in range(SCREEN_WIDTH - VIEW_WIDTH - 2,SCREEN_WIDTH - 2) and \
-                                          handle_mouse('cy') in range(2,VIEW_HEIGHT + 2)) and not dogui:
+            if handle_mouse('lbutton_pressed') and (handle_mouse('cx') in range(screen.width - screen.view_width - 2,screen.width - 2) and \
+                                          handle_mouse('cy') in range(2,screen.view_height + 2)) and not dogui:
                 if GameWorld.rswitch and not (pathlock or MoveLock):
                     try:
                         pathclass.killswitch = True
@@ -5590,12 +5573,12 @@ def handle_keys():
                         pass
                     try:
                         marker.killswitch = True
-                        libtcod.console_clear(toplayer)
+                        libtcod.console_clear(screen.toplayer)
                     except NameError:
                         pass
                     marker = PathMarker(GameWorld.window,handle_mouse('cx'),handle_mouse('cy'))
                     marker.start()
-                    mxpos = PX + handle_mouse('cx') - (SCREEN_WIDTH - VIEW_WIDTH - 2)
+                    mxpos = PX + handle_mouse('cx') - (screen.width - screen.view_width - 2)
                     mypos = PY + handle_mouse('cy') - 2
                     pathclass = Pathfinder(GameWorld.wobstructed[GameWorld.curz],GameWorld.flood[GameWorld.curz],PCX,PCY,mxpos,mypos)
                     pathclass.start()
@@ -5607,7 +5590,7 @@ def handle_keys():
 
                     marker = PathMarker(GameWorld.window,handle_mouse('cx'),handle_mouse('cy'))
                     marker.start()
-                    mxpos = PX + handle_mouse('cx') - (SCREEN_WIDTH - VIEW_WIDTH - 2)
+                    mxpos = PX + handle_mouse('cx') - (screen.width - screen.view_width - 2)
                     mypos = PY + handle_mouse('cy') - 2
                     pathclass = Pathfinder(GameWorld.ffobdict,GameWorld.flood[GameWorld.curz],PCX,PCY,mxpos,mypos)
                     pathclass.start()
@@ -5619,12 +5602,7 @@ def handle_keys():
 
         if not killkeycheck:
             if key.vk == libtcod.KEY_ENTER and key.lalt:
-                if not libtcod.console_is_fullscreen():
-                    libtcod.sys_set_renderer(libtcod.RENDERER_SDL)
-                    libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-                else:
-                    libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-                    libtcod.sys_set_renderer(libtcod.RENDERER_SDL)
+                    screen.set_fullscreen(not screen.is_fullscreen())
 
             elif key.lctrl and key.c == ord('q'):
                 return True
@@ -5632,8 +5610,8 @@ def handle_keys():
             elif movekeys.get(key.vk):
                 if DOSCREEN == 1:
                     if NoKeys == False:
-                        playerx = max(min(playerx + movekeys[key.vk][0],MAP_WIDTH - VIEW_WIDTH),0)
-                        playery = max(min(playery + movekeys[key.vk][1],MAP_HEIGHT - VIEW_HEIGHT),0)
+                        playerx = max(min(playerx + movekeys[key.vk][0],MAP_WIDTH - screen.view_width),0)
+                        playery = max(min(playery + movekeys[key.vk][1],MAP_HEIGHT - screen.view_height),0)
                 elif DOSCREEN == 2:
                     if not MoveLock and GameWorld.setupdone:
                         if time.time() - lastmove < 0.15:
@@ -5672,9 +5650,9 @@ def handle_keys():
             elif handle_mouse('rbutton_pressed') and DOSCREEN == 2:
                 if GameWorld.rswitch == True:
                     if not GameWorld.windowlock:
-                        if handle_mouse('cx') > (SCREEN_WIDTH - VIEW_WIDTH) - 3 and handle_mouse('cx') < (SCREEN_WIDTH - 2) and \
-                           handle_mouse('cy') > 1 and handle_mouse('cy') < 2 + VIEW_HEIGHT:
-                            mxpos = handle_mouse('cx') - (SCREEN_WIDTH - VIEW_WIDTH - 2) + PX
+                        if handle_mouse('cx') > (screen.width - screen.view_width) - 3 and handle_mouse('cx') < (screen.width - 2) and \
+                           handle_mouse('cy') > 1 and handle_mouse('cy') < 2 + screen.view_height:
+                            mxpos = handle_mouse('cx') - (screen.width - screen.view_width - 2) + PX
                             mypos = handle_mouse('cy') - 2 + PY
                             ox,oy = handle_mouse('cx'),handle_mouse('cy') - 1
                             GameWorld.doActionMenu(mxpos,mypos,ox,oy)
@@ -5729,12 +5707,12 @@ def handle_keys():
                         ButtonList = []
                         libtcod.console_clear(0)
                         doScreenSetup()
-                        libtcod.console_clear(wiwindow)
+                        libtcod.console_clear(screen.wiwindow)
                         DrawTerrain(wpwindow,doClouds = True)
                         libtcod.console_set_default_background(wpfxwindow,libtcod.magenta)
                         libtcod.console_clear(wpfxwindow)
                         GameWorld.displayCity()
-                        nborderbutton = ButtonBox(wswindow, 5, 44, '+ Borders', '+')
+                        nborderbutton = ButtonBox(screen.wswindow, 5, 44, '+ Borders', '+')
 
             elif key.c == ord('+'):
                 if DOSCREEN == 2:
@@ -5747,11 +5725,11 @@ def handle_keys():
                         libtcod.console_clear(0)
                         doScreenSetup()
                         DrawTerritory(wpwindow,doClouds = True)
-                        libtcod.console_clear(wiwindow)
+                        libtcod.console_clear(screen.wiwindow)
                         libtcod.console_set_default_background(wpfxwindow,libtcod.magenta)
                         libtcod.console_clear(wpfxwindow)
                         GameWorld.displayCity()
-                        nborderbutton = ButtonBox(wswindow, 5, 44, '- Borders', '-')
+                        nborderbutton = ButtonBox(screen.wswindow, 5, 44, '- Borders', '-')
 
             elif key.c == ord(','):
                 if DOSCREEN == 2 and GameWorld.rswitch:
@@ -5797,7 +5775,7 @@ def handle_keys():
                 if DOSCREEN == 1:
                     if WorldGoing == False:
                         if NamingDone == True and CreatureDone == False:
-                            libtcod.console_set_default_background(wswindow, bgcolor)
+                            libtcod.console_set_default_background(screen.wswindow, bgcolor)
                             ButtonList = []
                             libtcod.console_clear(wgwindow)
                             doScreenSetup()
@@ -5827,7 +5805,7 @@ def handle_keys():
                     if WorldGoing == False:
                         if WorldDone == True:
                             if CreatureDone == True:
-                                libtcod.console_set_default_background(wswindow, bgcolor)
+                                libtcod.console_set_default_background(screen.wswindow, bgcolor)
                                 ButtonList = []
                                 libtcod.console_clear(wgwindow)
                                 doScreenSetup()
@@ -5872,43 +5850,43 @@ def handle_keys():
                             if scaleswitch == False:
                                 playerx,playery = 0,0
                                 scalepic = libtcod.image_from_console(wgwindow)
-                                libtcod.image_scale(scalepic, VIEW_WIDTH * 2, VIEW_HEIGHT * 2)
+                                libtcod.image_scale(scalepic, screen.view_width * 2, screen.view_height * 2)
 
                                 DoScaleLayer = True
-                                libtcod.image_blit_2x(scalepic, toplayer, 0, 0)
+                                libtcod.image_blit_2x(scalepic, screen.toplayer, 0, 0)
 
                                 ButtonList = []
                                 doScreenSetup()
 
-                                libtcod.console_set_default_foreground(wswindow, hcolor)
-                                libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 11, libtcod.BKGND_NONE, libtcod.CENTER, 'Terrain gen\nfinished!')
+                                libtcod.console_set_default_foreground(screen.wswindow, hcolor)
+                                libtcod.console_print_ex(screen.wswindow, 9, ((screen.height - 2) / 2) - 11, libtcod.BKGND_NONE, libtcod.CENTER, 'Terrain gen\nfinished!')
 
-                                libtcod.console_set_default_foreground(wswindow, libtcod.white)
-                                libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 8, libtcod.BKGND_NONE, libtcod.CENTER, 'To move on to\nfeature naming,\ntype \'n\'.\n\nOtherwise,\npress \'g\' to\ngenerate a\nnew map.')
+                                libtcod.console_set_default_foreground(screen.wswindow, libtcod.white)
+                                libtcod.console_print_ex(screen.wswindow, 9, ((screen.height - 2) / 2) - 8, libtcod.BKGND_NONE, libtcod.CENTER, 'To move on to\nfeature naming,\ntype \'n\'.\n\nOtherwise,\npress \'g\' to\ngenerate a\nnew map.')
 
-                                libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 4, libtcod.BKGND_NONE, libtcod.CENTER, 'To view a scaled\ndown version of\nthe world,\npress \'s\'.')
+                                libtcod.console_print_ex(screen.wswindow, 9, ((screen.height - 2) / 2) - 4, libtcod.BKGND_NONE, libtcod.CENTER, 'To view a scaled\ndown version of\nthe world,\npress \'s\'.')
 
-                                genbutton = ButtonBox(wswindow, 6, ((SCREEN_HEIGHT - 2) / 2) + 2, 'New Map', 'g')
-                                namebutton = ButtonBox(wswindow, 5, ((SCREEN_HEIGHT - 2) / 2) + 6, 'Name Gen.', 'n')
-                                scalebutton = ButtonBox(wswindow, 4, ((SCREEN_HEIGHT - 2) / 2) + 10, 'Unscale Map', 's')
+                                genbutton = ButtonBox(screen.wswindow, 6, ((screen.height - 2) / 2) + 2, 'New Map', 'g')
+                                namebutton = ButtonBox(screen.wswindow, 5, ((screen.height - 2) / 2) + 6, 'Name Gen.', 'n')
+                                scalebutton = ButtonBox(screen.wswindow, 4, ((screen.height - 2) / 2) + 10, 'Unscale Map', 's')
                                 scaleswitch = True
                             else:
                                 DoScaleLayer = False
-                                libtcod.console_clear(toplayer)
+                                libtcod.console_clear(screen.toplayer)
                                 ButtonList = []
                                 doScreenSetup()
 
-                                libtcod.console_set_default_foreground(wswindow, hcolor)
-                                libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 11, libtcod.BKGND_NONE, libtcod.CENTER, 'Terrain gen\nfinished!')
+                                libtcod.console_set_default_foreground(screen.wswindow, hcolor)
+                                libtcod.console_print_ex(screen.wswindow, 9, ((screen.height - 2) / 2) - 11, libtcod.BKGND_NONE, libtcod.CENTER, 'Terrain gen\nfinished!')
 
-                                libtcod.console_set_default_foreground(wswindow, libtcod.white)
-                                libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 8, libtcod.BKGND_NONE, libtcod.CENTER, 'To move on to\nfeature naming,\ntype \'n\'.\n\nOtherwise,\npress \'g\' to\ngenerate a\nnew map.')
+                                libtcod.console_set_default_foreground(screen.wswindow, libtcod.white)
+                                libtcod.console_print_ex(screen.wswindow, 9, ((screen.height - 2) / 2) - 8, libtcod.BKGND_NONE, libtcod.CENTER, 'To move on to\nfeature naming,\ntype \'n\'.\n\nOtherwise,\npress \'g\' to\ngenerate a\nnew map.')
 
-                                libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 4, libtcod.BKGND_NONE, libtcod.CENTER, 'To view a scaled\nup version of\nthe world,\npress \'s\'.')
+                                libtcod.console_print_ex(screen.wswindow, 9, ((screen.height - 2) / 2) - 4, libtcod.BKGND_NONE, libtcod.CENTER, 'To view a scaled\nup version of\nthe world,\npress \'s\'.')
 
-                                genbutton = ButtonBox(wswindow, 6, ((SCREEN_HEIGHT - 2) / 2) + 2, 'New Map', 'g')
-                                namebutton = ButtonBox(wswindow, 5, ((SCREEN_HEIGHT - 2) / 2) + 6, 'Name Gen.', 'n')
-                                scalebutton = ButtonBox(wswindow, 5, ((SCREEN_HEIGHT - 2) / 2) + 10, 'Scale Map', 's')
+                                genbutton = ButtonBox(screen.wswindow, 6, ((screen.height - 2) / 2) + 2, 'New Map', 'g')
+                                namebutton = ButtonBox(screen.wswindow, 5, ((screen.height - 2) / 2) + 6, 'Name Gen.', 'n')
+                                scalebutton = ButtonBox(screen.wswindow, 5, ((screen.height - 2) / 2) + 10, 'Scale Map', 's')
                                 scaleswitch = False
 
         if DOSCREEN == 2:
@@ -5916,8 +5894,8 @@ def handle_keys():
                 limitx,limity = RMAP_WIDTH,RMAP_HEIGHT
             else:
                 limitx,limity = MAP_WIDTH,MAP_HEIGHT
-            PY = min(max(PY,0),limity - (VIEW_HEIGHT / 2))
-            PX = min(max(PX,0),limitx - (VIEW_WIDTH / 2))
+            PY = min(max(PY,0),limity - (screen.view_height / 2))
+            PX = min(max(PX,0),limitx - (screen.view_width / 2))
             PCY = min(max(PCY,0),limity)
             PCX = min(max(PCX,0),limitx)
 
@@ -5927,9 +5905,9 @@ def adjustScreen():
         limitx,limity = RMAP_WIDTH,RMAP_HEIGHT
     else:
         limitx,limity = MAP_WIDTH,MAP_HEIGHT
-    if (PCX,PCY) != (PX - (VIEW_WIDTH / 2) - 1,PY - (VIEW_HEIGHT / 2)):
-        PY = min(max(PCY - (VIEW_HEIGHT / 2),0),limity - VIEW_HEIGHT)
-        PX = min(max(PCX - (VIEW_WIDTH / 2) + 1,0),limitx - VIEW_WIDTH)
+    if (PCX,PCY) != (PX - (screen.view_width / 2) - 1,PY - (screen.view_height / 2)):
+        PY = min(max(PCY - (screen.view_height / 2),0),limity - screen.view_height)
+        PX = min(max(PCX - (screen.view_width / 2) + 1,0),limitx - screen.view_width)
 
 ####################################
 # V. Screen Change Functions       #
@@ -5943,12 +5921,12 @@ def doScreenSetup():
     NoRefresh,NoButtons,NoMenus,freeze = True,True,True,True
     lock.acquire()
     libtcod.console_set_default_background(0, libtcod.black)
-    libtcod.console_set_default_background(wiwindow, bgcolor2)
-    libtcod.console_set_default_background(wswindow, bgcolor)
-    libtcod.console_clear(wswindow)
-    libtcod.console_clear(wiwindow)
-    for x in range(SCREEN_WIDTH):
-        for y in range(SCREEN_HEIGHT):
+    libtcod.console_set_default_background(screen.wiwindow, bgcolor2)
+    libtcod.console_set_default_background(screen.wswindow, bgcolor)
+    libtcod.console_clear(screen.wswindow)
+    libtcod.console_clear(screen.wiwindow)
+    for x in range(screen.width):
+        for y in range(screen.height):
             libtcod.console_print_ex(0,x,y,libtcod.BKGND_SET,libtcod.LEFT,' ')
 
     for Button in ButtonList:
@@ -5956,55 +5934,55 @@ def doScreenSetup():
         Button.redrawbox = True
 
     libtcod.console_set_default_foreground(0, libtcod.white)
-    libtcod.console_print_ex(0, 46 + ((SCREEN_WIDTH - 102) / 2), 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
+    libtcod.console_print_ex(0, 46 + ((screen.width - 102) / 2), 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
     libtcod.console_set_default_foreground(0, libtcod.white)
 
     libtcod.console_set_default_foreground(0, libtcod.white)
-    libtcod.console_print_ex(0, 73 + ((SCREEN_WIDTH - 102) / 2), 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapw)))
+    libtcod.console_print_ex(0, 73 + ((screen.width - 102) / 2), 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapw)))
     libtcod.console_set_default_foreground(0, libtcod.white)
 
     for x in range(24):
         for y in range(2):
             char = [x,44 + y,255]
-            libtcod.console_print_ex(0,48 + ((SCREEN_WIDTH - 102) / 2) + x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+            libtcod.console_print_ex(0,48 + ((screen.width - 102) / 2) + x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
 
     libtcod.console_print_ex(0, 19, 0, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapn)))
     libtcod.console_print_ex(0, 19, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
-    libtcod.console_print_ex(0, 19, VIEW_HEIGHT + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(border3waye)))
-    libtcod.console_print_ex(0, SCREEN_WIDTH - 2, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
-    libtcod.console_print_ex(0, SCREEN_WIDTH - 1, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
-    libtcod.console_print_ex(0, SCREEN_WIDTH - 2, 0, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapn)))
-    libtcod.console_print_ex(0, SCREEN_WIDTH - 2, VIEW_HEIGHT + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
-    libtcod.console_print_ex(0, SCREEN_WIDTH - 1, VIEW_HEIGHT + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
-    for y in range(VIEW_HEIGHT + 2)[1:-1] + range(SCREEN_HEIGHT)[VIEW_HEIGHT + 2:-1]:
+    libtcod.console_print_ex(0, 19, screen.view_height + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(border3waye)))
+    libtcod.console_print_ex(0, screen.width - 2, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
+    libtcod.console_print_ex(0, screen.width - 1, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
+    libtcod.console_print_ex(0, screen.width - 2, 0, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapn)))
+    libtcod.console_print_ex(0, screen.width - 2, screen.view_height + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
+    libtcod.console_print_ex(0, screen.width - 1, screen.view_height + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
+    for y in range(screen.view_height + 2)[1:-1] + range(screen.height)[screen.view_height + 2:-1]:
         libtcod.console_set_default_foreground(0, libtcod.white)
         borderv = bordervchars[y % 3]
-        libtcod.console_print_ex(0, (SCREEN_WIDTH - VIEW_WIDTH) - 3, y + 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderv)))
-    for y in range(VIEW_HEIGHT + 2)[1:-1] + range(SCREEN_HEIGHT)[VIEW_HEIGHT + 2:-1]:
+        libtcod.console_print_ex(0, (screen.width - screen.view_width) - 3, y + 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderv)))
+    for y in range(screen.view_height + 2)[1:-1] + range(screen.height)[screen.view_height + 2:-1]:
         libtcod.console_set_default_foreground(0, libtcod.white)
         borderv = bordervchars[y % 3]
-        libtcod.console_print_ex(0, SCREEN_WIDTH - 2, y + 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderv)))
-    for x in range(SCREEN_WIDTH - VIEW_WIDTH)[:-3]:
+        libtcod.console_print_ex(0, screen.width - 2, y + 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderv)))
+    for x in range(screen.width - screen.view_width)[:-3]:
         libtcod.console_set_default_foreground(0, libtcod.white)
         borderh = borderhchars[x % 3]
         libtcod.console_print_ex(0, x, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderh)))
-    for x in range(VIEW_WIDTH + 1)[1:27 + ((SCREEN_WIDTH - 102) / 2)] + range(VIEW_WIDTH + 1)[55 + ((SCREEN_WIDTH - 102) / 2):]:
+    for x in range(screen.view_width + 1)[1:27 + ((screen.width - 102) / 2)] + range(screen.view_width + 1)[55 + ((screen.width - 102) / 2):]:
         libtcod.console_set_default_foreground(0, libtcod.white)
         borderh = borderhchars[x % 3]
-        libtcod.console_print_ex(0, x + (SCREEN_WIDTH - VIEW_WIDTH) - 3, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderh)))
-    for x in range(VIEW_WIDTH + 2)[1:-1]:
+        libtcod.console_print_ex(0, x + (screen.width - screen.view_width) - 3, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderh)))
+    for x in range(screen.view_width + 2)[1:-1]:
         libtcod.console_set_default_foreground(0, libtcod.white)
         borderh = borderhchars[x % 3]
-        libtcod.console_print_ex(0, x + (SCREEN_WIDTH - VIEW_WIDTH) - 3, VIEW_HEIGHT + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderh)))
+        libtcod.console_print_ex(0, x + (screen.width - screen.view_width) - 3, screen.view_height + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderh)))
     if DoMessageLog:
-        libtcod.console_print_ex(0, (SCREEN_WIDTH - (VIEW_WIDTH / 2)) - 9, VIEW_HEIGHT + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
-        libtcod.console_print_ex(0, (SCREEN_WIDTH - (VIEW_WIDTH / 2)) - 8, VIEW_HEIGHT + 2, libtcod.BKGND_NONE, libtcod.LEFT, ' Message Log ')
-        libtcod.console_print_ex(0, (SCREEN_WIDTH - (VIEW_WIDTH / 2)) + 5, VIEW_HEIGHT + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapw)))
+        libtcod.console_print_ex(0, (screen.width - (screen.view_width / 2)) - 9, screen.view_height + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
+        libtcod.console_print_ex(0, (screen.width - (screen.view_width / 2)) - 8, screen.view_height + 2, libtcod.BKGND_NONE, libtcod.LEFT, ' Message Log ')
+        libtcod.console_print_ex(0, (screen.width - (screen.view_width / 2)) + 5, screen.view_height + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapw)))
     NoRefresh,NoButtons,NoMenus,freeze = False,False,False,False
     lock.release()
 
 def doIntroSetup():
-    global SCREEN_WIDTH, SCREEN_HEIGHT, TextList, MenuList, playery, DOSCREEN, Clouds, \
+    global TextList, MenuList, playery, DOSCREEN, Clouds, \
            introwindow, IntroBG, wgwindow, MouseLock, IntroHover
 
     IntroHover = False
@@ -6068,66 +6046,66 @@ def doIntroSetup():
             wobutton.append(char)
         wobutton.append('break')
 
-    if SCREEN_WIDTH != 100:
-        modx = float(SCREEN_WIDTH) / float(100)
+    if screen.width != 100:
+        modx = float(screen.width) / float(100)
     else:
         modx = 1.0
-    if SCREEN_HEIGHT != 70:
-        mody = float(SCREEN_HEIGHT) / float(70)
+    if screen.height != 70:
+        mody = float(screen.height) / float(70)
     else:
         mody = 1.0
 
     mod = (modx + mody) / 2.0
 
-    CurText = FadeText(title, (SCREEN_WIDTH / 2), 2, align='center', fadefrom=libtcod.black, fadeto=libtcod.white, \
-                       con=GraphicsLayer).start()
+    CurText = FadeText(title, (screen.width / 2), 2, align='center', fadefrom=libtcod.black, fadeto=libtcod.white, \
+                       con=screen.GraphicsLayer).start()
 
-    CurText = FadeText(wgbutton, 14, (SCREEN_HEIGHT / 2) - 4, align='center', fadefrom=libtcod.white, fadeto=libtcod.darkest_grey, \
-                       hookmethod=introWorldGen, hoverhook = WGHover, unhoverhook = IntroHoverWipe, con=GraphicsLayer, domouse=True).start()
+    CurText = FadeText(wgbutton, 14, (screen.height / 2) - 4, align='center', fadefrom=libtcod.white, fadeto=libtcod.darkest_grey, \
+                       hookmethod=introWorldGen, hoverhook = WGHover, unhoverhook = IntroHoverWipe, con=screen.GraphicsLayer, domouse=True).start()
 
-    CurText = FadeText(webutton, 14, (SCREEN_HEIGHT / 2) + 8, align='center', fadefrom=libtcod.white, fadeto=libtcod.darkest_grey, \
-                       hookmethod=introWorldStart, hoverhook = WEHover, unhoverhook = IntroHoverWipe, con=GraphicsLayer, domouse=True).start()
+    CurText = FadeText(webutton, 14, (screen.height / 2) + 8, align='center', fadefrom=libtcod.white, fadeto=libtcod.darkest_grey, \
+                       hookmethod=introWorldStart, hoverhook = WEHover, unhoverhook = IntroHoverWipe, con=screen.GraphicsLayer, domouse=True).start()
 
-    CurText = FadeText(wabutton, SCREEN_WIDTH - 14, (SCREEN_HEIGHT / 2) - 4, align='center', fadefrom=libtcod.white, fadeto=libtcod.darkest_grey, \
-                       hookmethod=introWorldAtlas, hoverhook = WAHover, unhoverhook = IntroHoverWipe, con=GraphicsLayer, domouse=True).start()
+    CurText = FadeText(wabutton, screen.width - 14, (screen.height / 2) - 4, align='center', fadefrom=libtcod.white, fadeto=libtcod.darkest_grey, \
+                       hookmethod=introWorldAtlas, hoverhook = WAHover, unhoverhook = IntroHoverWipe, con=screen.GraphicsLayer, domouse=True).start()
 
-    CurText = FadeText(wobutton, SCREEN_WIDTH - 14, (SCREEN_HEIGHT / 2) + 8, align='center', fadefrom=libtcod.white, fadeto=libtcod.darkest_grey, \
-                       hookmethod=introSettings, hoverhook = WOHover, unhoverhook = IntroHoverWipe, con=GraphicsLayer, domouse=True).start()
+    CurText = FadeText(wobutton, screen.width - 14, (screen.height / 2) + 8, align='center', fadefrom=libtcod.white, fadeto=libtcod.darkest_grey, \
+                       hookmethod=introSettings, hoverhook = WOHover, unhoverhook = IntroHoverWipe, con=screen.GraphicsLayer, domouse=True).start()
 
     lightwindow = libtcod.console_new(int(42 * mod) * 2,int(42*mod) * 2)
-    IntroBG = IntroGraphics((SCREEN_WIDTH / 2),(SCREEN_HEIGHT / 2),14,30,60,color=candlecolor,con = introwindow,lightcon = lightwindow, \
+    IntroBG = IntroGraphics((screen.width / 2),(screen.height / 2),14,30,60,color=candlecolor,con = introwindow,lightcon = lightwindow, \
                             xmod = 6, ymod = 4)
     IntroBG.start()
 ##    libtcod.console_set_default_foreground(introwindow, libtcod.white)
 ##    libtcod.console_print_ex(introwindow, 0, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapw)))
 ##    libtcod.console_print_ex(introwindow, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapn)))
 ##    libtcod.console_print_ex(introwindow, 1, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
-##    libtcod.console_print_ex(introwindow, 0, SCREEN_HEIGHT - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapw)))
-##    libtcod.console_print_ex(introwindow, 1, SCREEN_HEIGHT - 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercaps)))
-##    libtcod.console_print_ex(introwindow, 1, SCREEN_HEIGHT - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
-##    libtcod.console_print_ex(introwindow, SCREEN_WIDTH - 1, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
-##    libtcod.console_print_ex(introwindow, SCREEN_WIDTH - 2, 0, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapn)))
-##    libtcod.console_print_ex(introwindow, SCREEN_WIDTH - 2, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
-##    libtcod.console_print_ex(introwindow, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
-##    libtcod.console_print_ex(introwindow, SCREEN_WIDTH - 2, SCREEN_HEIGHT - 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercaps)))
-##    libtcod.console_print_ex(introwindow, SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
+##    libtcod.console_print_ex(introwindow, 0, screen.height - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapw)))
+##    libtcod.console_print_ex(introwindow, 1, screen.height - 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercaps)))
+##    libtcod.console_print_ex(introwindow, 1, screen.height - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
+##    libtcod.console_print_ex(introwindow, screen.width - 1, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
+##    libtcod.console_print_ex(introwindow, screen.width - 2, 0, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapn)))
+##    libtcod.console_print_ex(introwindow, screen.width - 2, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
+##    libtcod.console_print_ex(introwindow, screen.width - 1, screen.height - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
+##    libtcod.console_print_ex(introwindow, screen.width - 2, screen.height - 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercaps)))
+##    libtcod.console_print_ex(introwindow, screen.width - 2, screen.height - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
 ##    libtcod.console_set_default_foreground(introwindow, libtcod.white)
-##    for y in range(SCREEN_HEIGHT)[2:-2]:
+##    for y in range(screen.height)[2:-2]:
 ##        libtcod.console_set_default_foreground(introwindow, libtcod.white)
 ##        borderv = bordervchars[y % 3]
 ##        libtcod.console_print_ex(introwindow, 1, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderv)))
-##    for y in range(SCREEN_HEIGHT)[2:-2]:
+##    for y in range(screen.height)[2:-2]:
 ##        libtcod.console_set_default_foreground(introwindow, libtcod.white)
 ##        borderv = bordervchars[y % 3]
-##        libtcod.console_print_ex(introwindow, SCREEN_WIDTH - 2, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderv)))
-##    for x in range(SCREEN_WIDTH)[2:-2]:
+##        libtcod.console_print_ex(introwindow, screen.width - 2, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderv)))
+##    for x in range(screen.width)[2:-2]:
 ##        libtcod.console_set_default_foreground(introwindow, libtcod.white)
 ##        borderh = borderhchars[x % 3]
 ##        libtcod.console_print_ex(introwindow, x, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderh)))
-##    for x in range(SCREEN_WIDTH)[2:-2]:
+##    for x in range(screen.width)[2:-2]:
 ##        libtcod.console_set_default_foreground(introwindow, libtcod.white)
 ##        borderh = borderhchars[x % 3]
-##        libtcod.console_print_ex(introwindow, x, SCREEN_HEIGHT - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderh)))
+##        libtcod.console_print_ex(introwindow, x, screen.height - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderh)))
 
 def IntroHoverWipe():
     global IntroHover,IntroBG
@@ -6155,14 +6133,14 @@ def WOHover():
     IntroHover = 9
 
 def doWorldGenSetup():
-    global SCREEN_HEIGHT, VIEW_HEIGHT, SCREEN_WIDTH, VIEW_WIDTH, wgwindow, wiwindow, wswindow
+    global wgwindow
 
     wgwindow = libtcod.console_new(MAP_WIDTH, MAP_HEIGHT)
-    wiwindow = libtcod.console_new(VIEW_WIDTH, SCREEN_HEIGHT - VIEW_HEIGHT - 3)
-    wswindow = libtcod.console_new(SCREEN_WIDTH - VIEW_WIDTH - 3,SCREEN_HEIGHT - 2)
+    screen.wiwindow = libtcod.console_new(screen.view_width, screen.height - screen.view_height - 3)
+    screen.wswindow = libtcod.console_new(screen.width - screen.view_width - 3,screen.height - 2)
 
-    libtcod.console_set_default_foreground(wswindow, libtcod.white)
-    libtcod.console_print_ex(wswindow, 9, 3, libtcod.BKGND_NONE, libtcod.CENTER, \
+    libtcod.console_set_default_foreground(screen.wswindow, libtcod.white)
+    libtcod.console_print_ex(screen.wswindow, 9, 3, libtcod.BKGND_NONE, libtcod.CENTER, \
                                     "Press \'G\' or\n" \
                                     "click the button\n" \
                                     "below to generate\n" \
@@ -6181,56 +6159,55 @@ def doWorldGenSetup():
                                     "the map with\n" \
                                     "the mouse.")
 
-    genbutton = ButtonBox(wswindow, 3, 25, 'Generate Map', 'g')
+    genbutton = ButtonBox(screen.wswindow, 3, 25, 'Generate Map', 'g')
     doScreenSetup()
-    libtcod.console_set_default_background(wiwindow, bgcolor2)
+    libtcod.console_set_default_background(screen.wiwindow, bgcolor2)
 
 def doWorldAtlasSetup():
-    global SCREEN_HEIGHT, VIEW_HEIGHT, SCREEN_WIDTH, VIEW_WIDTH, \
-           wawindow, wiwindow, wswindow, wgwindow, wlist, playery, MenuList
+    global wawindow, wgwindow, wlist, playery, MenuList
 
     playery,MenuList = 1,[]
 
     wgwindow = libtcod.console_new(MAP_WIDTH, MAP_HEIGHT)
     wawindow = libtcod.console_new(MAP_WIDTH, MAP_HEIGHT)
-    wiwindow = libtcod.console_new(VIEW_WIDTH, SCREEN_HEIGHT - VIEW_HEIGHT - 3)
-    wswindow = libtcod.console_new(SCREEN_WIDTH - VIEW_WIDTH - 3,SCREEN_HEIGHT - 2)
+    screen.wiwindow = libtcod.console_new(screen.view_width, screen.height - screen.view_height - 3)
+    screen.wswindow = libtcod.console_new(screen.width - screen.view_width - 3,screen.height - 2)
 
-    libtcod.console_set_default_background(wswindow, bgcolor)
-    libtcod.console_rect(wswindow,0,0,SCREEN_WIDTH - VIEW_WIDTH - 3,SCREEN_HEIGHT - 2,False,libtcod.BKGND_SET)
-    libtcod.console_set_default_foreground(wswindow, libtcod.white)
-
-    libtcod.console_set_default_foreground(0, libtcod.white)
-    libtcod.console_print_ex(0, 56 + ((SCREEN_WIDTH - 102) / 2), 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
-    libtcod.console_set_default_foreground(0, libtcod.white)
+    libtcod.console_set_default_background(screen.wswindow, bgcolor)
+    libtcod.console_rect(screen.wswindow,0,0,screen.width - screen.view_width - 3,screen.height - 2,False,libtcod.BKGND_SET)
+    libtcod.console_set_default_foreground(screen.wswindow, libtcod.white)
 
     libtcod.console_set_default_foreground(0, libtcod.white)
-    libtcod.console_print_ex(0, 63 + ((SCREEN_WIDTH - 102) / 2), 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapw)))
+    libtcod.console_print_ex(0, 56 + ((screen.width - 102) / 2), 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
+    libtcod.console_set_default_foreground(0, libtcod.white)
+
+    libtcod.console_set_default_foreground(0, libtcod.white)
+    libtcod.console_print_ex(0, 63 + ((screen.width - 102) / 2), 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapw)))
     libtcod.console_set_default_foreground(0, libtcod.white)
     borderh = borderhchars[0 % 3]
     libtcod.console_print_ex(0, 19, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
     libtcod.console_print_ex(0, 19, 0, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapn)))
-    libtcod.console_print_ex(0, SCREEN_WIDTH - 2, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
-    libtcod.console_print_ex(0, SCREEN_WIDTH - 2, 0, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapn)))
-    libtcod.console_print_ex(0, SCREEN_WIDTH - 1, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
-    libtcod.console_print_ex(0, SCREEN_WIDTH - 2, VIEW_HEIGHT + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
-    libtcod.console_print_ex(0, SCREEN_WIDTH - 1, VIEW_HEIGHT + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
-    for y in range(SCREEN_HEIGHT)[1:-1]:
+    libtcod.console_print_ex(0, screen.width - 2, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
+    libtcod.console_print_ex(0, screen.width - 2, 0, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapn)))
+    libtcod.console_print_ex(0, screen.width - 1, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
+    libtcod.console_print_ex(0, screen.width - 2, screen.view_height + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
+    libtcod.console_print_ex(0, screen.width - 1, screen.view_height + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
+    for y in range(screen.height)[1:-1]:
         libtcod.console_set_default_foreground(0, libtcod.white)
         borderv = bordervchars[y % 3]
-        libtcod.console_print_ex(0, (SCREEN_WIDTH - VIEW_WIDTH) - 3, y + 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderv)))
-    for y in range(SCREEN_HEIGHT)[1:-1]:
+        libtcod.console_print_ex(0, (screen.width - screen.view_width) - 3, y + 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderv)))
+    for y in range(screen.height)[1:-1]:
         libtcod.console_set_default_foreground(0, libtcod.white)
         borderv = bordervchars[y % 3]
-        libtcod.console_print_ex(0, SCREEN_WIDTH - 2, y + 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderv)))
-    for x in range(SCREEN_WIDTH - VIEW_WIDTH)[:-3]:
+        libtcod.console_print_ex(0, screen.width - 2, y + 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderv)))
+    for x in range(screen.width - screen.view_width)[:-3]:
         libtcod.console_set_default_foreground(0, libtcod.white)
         borderh = borderhchars[x % 3]
         libtcod.console_print_ex(0, x, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderh)))
-    for x in range(VIEW_WIDTH + 1)[1:37 + ((SCREEN_WIDTH - 102) / 2)] + range(VIEW_WIDTH + 1)[45 + ((SCREEN_WIDTH - 102) / 2):]:
+    for x in range(screen.view_width + 1)[1:37 + ((screen.width - 102) / 2)] + range(screen.view_width + 1)[45 + ((screen.width - 102) / 2):]:
         libtcod.console_set_default_foreground(0, libtcod.white)
         borderh = borderhchars[x % 3]
-        libtcod.console_print_ex(0, x + (SCREEN_WIDTH - VIEW_WIDTH) - 3, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderh)))
+        libtcod.console_print_ex(0, x + (screen.width - screen.view_width) - 3, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderh)))
 
     wlist = os.listdir('./data/world')
     wlist = filter(lambda x: x[-4:] == '.sav', wlist)
@@ -6240,11 +6217,10 @@ def doWorldAtlasSetup():
             wlist[printline] = save[0:-4]
             printline += 1
     else:
-        libtcod.console_print_ex(wswindow, 2, 4, libtcod.BKGND_NONE, libtcod.LEFT, 'No worlds are\nsaved.')
+        libtcod.console_print_ex(screen.wswindow, 2, 4, libtcod.BKGND_NONE, libtcod.LEFT, 'No worlds are\nsaved.')
 
 def doWorldStartSetup():
-    global SCREEN_HEIGHT, SCREEN_WIDTH, MenuSetting, DOSCREEN, wpwindow, wiwindow, wswindow, wrwindow, toplayer, \
-           PCRlayer, PCWlayer
+    global MenuSetting, DOSCREEN, wpwindow, wrwindow, PCRlayer, PCWlayer
 
     killMenus()
     libtcod.console_set_default_foreground(0, libtcod.white)
@@ -6254,8 +6230,8 @@ def doWorldStartSetup():
         for y in range(7):
             starchar = [29 + x,66 + y,255]
             starchars.append(starchar)
-    for x in range(SCREEN_WIDTH):
-        for y in range(SCREEN_HEIGHT):
+    for x in range(screen.width):
+        for y in range(screen.height):
             if randrange(5) == 1:
                 char = choice(starchars)
                 libtcod.console_print_ex(0,x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
@@ -6265,26 +6241,26 @@ def doWorldStartSetup():
     printline = 0
     for x in range(6):
         for y in range(6):
-            ox = (SCREEN_WIDTH / 2) - 19 + x
-            oy = (SCREEN_HEIGHT / 2) - 3 + y
+            ox = (screen.width / 2) - 19 + x
+            oy = (screen.height / 2) - 3 + y
             char = [17 + x,66 + y,255]
             libtcod.console_print_ex(0,ox,oy,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
     for x in range(6):
         for y in range(6):
-            ox = (SCREEN_WIDTH / 2) + 14 + x
-            oy = (SCREEN_HEIGHT / 2) - 3 + y
+            ox = (screen.width / 2) + 14 + x
+            oy = (screen.height / 2) - 3 + y
             char = [23 + x,66 + y,255]
             libtcod.console_print_ex(0,ox,oy,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
     for x in range(12):
         for y in range(12):
-            ox = (SCREEN_WIDTH / 2) - 6  + x
-            oy = (SCREEN_HEIGHT / 2) - (((len(wlist) + 1) / 2) + 16) + y
+            ox = (screen.width / 2) - 6  + x
+            oy = (screen.height / 2) - (((len(wlist) + 1) / 2) + 16) + y
             char = [17 + x,72 + y,255]
             libtcod.console_print_ex(0,ox,oy,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
     for x in range(12):
         for y in range(12):
-            ox = (SCREEN_WIDTH / 2) - 6  + x
-            oy = (SCREEN_HEIGHT / 2) + (((len(wlist) + 1) / 2) + 6) + y
+            ox = (screen.width / 2) - 6  + x
+            oy = (screen.height / 2) + (((len(wlist) + 1) / 2) + 6) + y
             char = [17 + x,84 + y,255]
             libtcod.console_print_ex(0,ox,oy,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
 
@@ -6294,12 +6270,12 @@ def doWorldStartSetup():
             printline += 1
         playery,oplayery = 1,1
         MenuSetting = 'WStart'
-        startmenu = Menu(0, (SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2) - len(wlist) + 2, wlist, align = 'center', doback = 0, title = 'Choose A World:', \
+        startmenu = Menu(0, (screen.width / 2), (screen.height / 2) - len(wlist) + 2, wlist, align = 'center', doback = 0, title = 'Choose A World:', \
                          tcolor = libtcod.black, talign = 'center', linespace = 2, offy = -2, tback = True, fhcolor = libtcod.crimson, bannertitle = True, \
                          drawbox = True, MethodList = [(True,doStartGame)], BMethodList = [doIntroSetup]).start()
     else:
         libtcod.console_set_default_foreground(0, libtcod.white)
-        libtcod.console_print_ex(0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, libtcod.BKGND_NONE, libtcod.CENTER, 'No saved worlds.')
+        libtcod.console_print_ex(0, screen.width / 2, screen.height / 2, libtcod.BKGND_NONE, libtcod.CENTER, 'No saved worlds.')
         MenuSetting = 'NoWorlds'
 
 def doStartGame():
@@ -6346,7 +6322,7 @@ def doIntro():
                     libtcod.console_set_default_foreground(introwindow,libtcod.white)
                 char = [2 + x,1547 + y + (tpnumber * 38),255]
                 libtcod.console_print_ex(introwindow,x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
-        libtcod.console_blit(introwindow,0,0,28,38,0,(SCREEN_WIDTH / 2) - 14,SCREEN_HEIGHT - 38 - (SCREEN_HEIGHT / 10))
+        libtcod.console_blit(introwindow,0,0,28,38,0,(screen.width / 2) - 14,screen.height - 38 - (screen.height / 10))
         tpcount += 1
 
 def introWorldGen():
@@ -6354,8 +6330,8 @@ def introWorldGen():
     for text in TextList:
         del text
     TextList = []
-    libtcod.sys_set_fps(LIMIT_FPS)
-    libtcod.console_clear(GraphicsLayer)
+    libtcod.sys_set_fps(screen.limit_fps)
+    libtcod.console_clear(screen.GraphicsLayer)
     MenuList = []
     playery = 0
     playerx = 0
@@ -6371,7 +6347,7 @@ def introWorldStart():
     for text in TextList:
         del text
     TextList = []
-    libtcod.console_clear(GraphicsLayer)
+    libtcod.console_clear(screen.GraphicsLayer)
     MenuList = []
     wipeIntro()
     playery = 0
@@ -6386,7 +6362,7 @@ def introWorldAtlas():
     for text in TextList:
         del text
     TextList = []
-    libtcod.console_clear(GraphicsLayer)
+    libtcod.console_clear(screen.GraphicsLayer)
     MenuList = []
     wipeIntro()
     doWorldAtlasSetup()
@@ -6403,7 +6379,7 @@ def introSettings():
     for text in TextList:
         del text
     TextList = []
-    libtcod.console_clear(GraphicsLayer)
+    libtcod.console_clear(screen.GraphicsLayer)
     MenuList = []
     DOSCREEN = 4
     IntroBG.killswitch = True
@@ -6414,7 +6390,7 @@ def introSettings():
 ####################################
 
 def wipeIntro():
-    libtcod.console_clear(toplayer)
+    libtcod.console_clear(screen.toplayer)
     libtcod.console_set_default_background(0, libtcod.Color(2,0,0))
     libtcod.console_clear(0)
 
@@ -6794,8 +6770,7 @@ class World(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        global SCREEN_HEIGHT, VIEW_HEIGHT, SCREEN_WIDTH, VIEW_WIDTH, wiwindow, \
-               wgwindow, wswindow, worldmap, wheightdict, wfeaturedict, wgpic, \
+        global wgwindow, worldmap, wheightdict, wfeaturedict, wgpic, \
                NoKeys, WorldGoing, WorldDone, woceandict, wlakedict, wlakedict, \
                wtundradict, wcavedict, wriverdict, wlangdict, PLang, \
                rivcoldict, rivchardict, rivbgdict, ivar, worldname, PName, \
@@ -6815,14 +6790,14 @@ class World(threading.Thread):
         wheightdict = {}
         rainfall = 4
 
-        libtcod.console_set_default_foreground(wswindow, libtcod.white)
-        libtcod.console_print_ex(wswindow, 9, 1, libtcod.BKGND_NONE, libtcod.CENTER, 'Map Creation')
+        libtcod.console_set_default_foreground(screen.wswindow, libtcod.white)
+        libtcod.console_print_ex(screen.wswindow, 9, 1, libtcod.BKGND_NONE, libtcod.CENTER, 'Map Creation')
 
-        libtcod.console_set_default_foreground(wswindow, hcolor)
-        libtcod.console_print_ex(wswindow, 9, 3, libtcod.BKGND_NONE, libtcod.CENTER, '~*~*~*~')
+        libtcod.console_set_default_foreground(screen.wswindow, hcolor)
+        libtcod.console_print_ex(screen.wswindow, 9, 3, libtcod.BKGND_NONE, libtcod.CENTER, '~*~*~*~')
 
         wgtext = 'Generating\nterrain...'
-        CurText = FadeText(wgtext, 1, 5, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 5, con=screen.wswindow, speed=25).start()
 
         # Initialize the world feature dictionary.
         for x in range(MAP_WIDTH):
@@ -6918,17 +6893,17 @@ class World(threading.Thread):
                    libtcod.Color(0,20,60), libtcod.Color(0,8,30)]
         colmap = libtcod.color_gen_map(keycols, keyidx)
         libtcod.console_set_default_foreground(0, libtcod.white)
-        libtcod.console_print_ex(wiwindow, VIEW_WIDTH / 2, 2, libtcod.BKGND_NONE, libtcod.CENTER, 'The Land of ' + worldname)
+        libtcod.console_print_ex(screen.wiwindow, screen.view_width / 2, 2, libtcod.BKGND_NONE, libtcod.CENTER, 'The Land of ' + worldname)
         wgtext = choice(['Once, the %s people ruled over the known world.', \
                                 'In the past, the empire of the %s stretched from sea to sea.', \
                                 'Long ago, the world was populated by the ancient %s.', \
                                 'According to legend, the %s people once ruled the entire world.', \
                                 'Myth states that the %s had a domain that knew no bounds.']) % (PName)
-        CurText = FadeText(textWrap(wgtext)[0], VIEW_WIDTH / 2, 4, con=wiwindow, speed=50, align='center').start()
+        CurText = FadeText(textWrap(wgtext)[0], screen.view_width / 2, 4, con=screen.wiwindow, speed=50, align='center').start()
         PFName = MakeName(PLang)
         wgtext = choice(['But the mysterious catastrophe now known as the \'%s\' ended the reign of the %s forever.' % (PFName, PName), \
                                 'However, the %s empire fell during the great cataclysm now referred to only as the \'%s\'.' % (PName, PFName)])
-        CurText = FadeText(textWrap(wgtext)[0], VIEW_WIDTH / 2, 6, con=wiwindow, speed=50, align='center').start()
+        CurText = FadeText(textWrap(wgtext)[0], screen.view_width / 2, 6, con=screen.wiwindow, speed=50, align='center').start()
 
         # Generate forests.
 
@@ -7002,7 +6977,7 @@ class World(threading.Thread):
         saltrange = sminmax[1] - sminmax[0]
 
         wgtext = 'Adding terrain...'
-        CurText = FadeText(wgtext, 1, 8, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 8, con=screen.wswindow, speed=25).start()
         wheightlist = []
         landcount = 0
 
@@ -7136,7 +7111,7 @@ class World(threading.Thread):
                     wtexturedict['%s,%s' % (x,y)] = [char,libtcod.white]
 
         wgtext = 'Adding deserts...'
-        CurText = FadeText(wgtext, 1, 10, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 10, con=screen.wswindow, speed=25).start()
 
         for y in range(MAP_HEIGHT):
             for x in range(MAP_WIDTH):
@@ -7173,7 +7148,7 @@ class World(threading.Thread):
 
 
         wgtext = 'Adding swamps...'
-        CurText = FadeText(wgtext, 1, 12, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 12, con=screen.wswindow, speed=25).start()
 
         # Record temperature zones to the world dictionary.
 
@@ -7225,7 +7200,7 @@ class World(threading.Thread):
                             libtcod.console_set_char_background(wgwindow, x, y, swcol, libtcod.BKGND_ALPHA(0.4))
 
         wgtext = 'Adding forests...'
-        CurText = FadeText(wgtext, 1, 14, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 14, con=screen.wswindow, speed=25).start()
 
 
         fseed = randrange(39,43)
@@ -7268,7 +7243,7 @@ class World(threading.Thread):
                                     wfeaturedict['%s,%s' % (x,y)] = [ftype]
 
         wgtext = 'Adding snow...'
-        CurText = FadeText(wgtext, 1, 16, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 16, con=screen.wswindow, speed=25).start()
 
         # Draw snow.
         for x in range(MAP_WIDTH):
@@ -7304,7 +7279,7 @@ class World(threading.Thread):
                             wtexturedict['%s,%s' % (x,y)] = [char,col]
 
         wgtext = 'Adding forest\ndetails...'
-        CurText = FadeText(wgtext, 1, 18, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 18, con=screen.wswindow, speed=25).start()
 
         # Add 'winterized' forests.
         for x in range(MAP_WIDTH):
@@ -7353,7 +7328,7 @@ class World(threading.Thread):
                         libtcod.console_set_char_background(wgwindow, x, y, sccol, libtcod.BKGND_ALPHA(alphperc))
 
         wgtext = 'Adding glaciers...'
-        CurText = FadeText(wgtext, 1, 21, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 21, con=screen.wswindow, speed=25).start()
 
         gvar = {}
         gyvar = float(randrange(int(MAP_HEIGHT * .02),int(MAP_HEIGHT * .045)))
@@ -7413,7 +7388,7 @@ class World(threading.Thread):
                         libtcod.console_set_default_background(wgwindow, gcol)
 
         wgtext = 'Adding scrub...'
-        CurText = FadeText(wgtext, 1, 23, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 23, con=screen.wswindow, speed=25).start()
 
         # Add scrubland and plains.
         slpdict = {'sl': [14,5,255], 'hl': [3,5,255], 'ml': [1,5,255], 'dl': [2,5,255]}
@@ -7466,7 +7441,7 @@ class World(threading.Thread):
                     wtexturedict['%s,%s' % (x,y)] = [plchar,libtcod.white]
 
         wgtext = 'Running rivers...\n(This may take\na few moments.)'
-        CurText = FadeText(wgtext, 1, 25, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 25, con=screen.wswindow, speed=25).start()
 
         # Generate rivers.
 
@@ -7487,7 +7462,7 @@ class World(threading.Thread):
         rivernum = int(rivernum * mod)
 
         startnum = rivernum
-        libtcod.console_print_ex(wswindow, 9, 29, libtcod.BKGND_NONE, libtcod.CENTER, '(%s/%s)' % (startnum - rivernum,startnum))
+        libtcod.console_print_ex(screen.wswindow, 9, 29, libtcod.BKGND_NONE, libtcod.CENTER, '(%s/%s)' % (startnum - rivernum,startnum))
         sourcelist = []
         courselist = []
         for x in range(MAP_WIDTH):
@@ -7630,7 +7605,7 @@ class World(threading.Thread):
                         wfeaturedict['%s,%s' % (pos[0],pos[1])] = wfeaturedict['%s,%s' % (pos[0],pos[1])] + ['r']
                 else:
                     wfeaturedict['%s,%s' % (pos[0],pos[1])] = ['r']
-            libtcod.console_print_ex(wswindow, 9, 29, libtcod.BKGND_NONE, libtcod.CENTER, '(%s/%s)' % (startnum - rivernum,startnum))
+            libtcod.console_print_ex(screen.wswindow, 9, 29, libtcod.BKGND_NONE, libtcod.CENTER, '(%s/%s)' % (startnum - rivernum,startnum))
             rivernum -= 1
 
         rdictlist = []
@@ -7743,7 +7718,7 @@ class World(threading.Thread):
                                 pass
 
         wgtext = 'Adding mountain\ndetails...'
-        CurText = FadeText(wgtext, 1, 29, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 29, con=screen.wswindow, speed=25).start()
 
         for y in range(MAP_HEIGHT):
             for x in range(MAP_WIDTH):
@@ -7793,7 +7768,7 @@ class World(threading.Thread):
 
         libtcod.console_set_default_background(wgwindow, libtcod.black)
         wgtext = 'Adding caves...'
-        CurText = FadeText(wgtext, 1, 32, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 32, con=screen.wswindow, speed=25).start()
 
         # Add caves.
 
@@ -7868,7 +7843,9 @@ class World(threading.Thread):
             except WindowsError:
                 pass
 
-        libtcod.console_set_custom_font('fonts/heightmap.bmp', libtcod.FONT_LAYOUT_TCOD | libtcod.FONT_TYPE_GREYSCALE, fontx, fonty)
+        libtcod.console_set_custom_font('fonts/heightmap.bmp',
+                libtcod.FONT_LAYOUT_TCOD | libtcod.FONT_TYPE_GREYSCALE,
+                screen.fontx, screen.fonty)
 
         testconsole = libtcod.console_new(MAP_WIDTH,MAP_HEIGHT)
         for x in range(MAP_WIDTH):
@@ -7890,22 +7867,22 @@ class World(threading.Thread):
 
         NoKeys = False
 
-        libtcod.console_clear(wswindow)
+        libtcod.console_clear(screen.wswindow)
 
-        libtcod.console_set_default_foreground(wswindow, hcolor)
-        libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 11, libtcod.BKGND_NONE, libtcod.CENTER, 'Terrain gen\nfinished!')
+        libtcod.console_set_default_foreground(screen.wswindow, hcolor)
+        libtcod.console_print_ex(screen.wswindow, 9, ((screen.height - 2) / 2) - 11, libtcod.BKGND_NONE, libtcod.CENTER, 'Terrain gen\nfinished!')
 
-        libtcod.console_set_default_foreground(wswindow, libtcod.white)
-        libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 8, libtcod.BKGND_NONE, libtcod.CENTER, 'To move on to\nfeature naming,\ntype \'n\'.\n\nOtherwise,\npress \'g\' to\ngenerate a\nnew map.')
+        libtcod.console_set_default_foreground(screen.wswindow, libtcod.white)
+        libtcod.console_print_ex(screen.wswindow, 9, ((screen.height - 2) / 2) - 8, libtcod.BKGND_NONE, libtcod.CENTER, 'To move on to\nfeature naming,\ntype \'n\'.\n\nOtherwise,\npress \'g\' to\ngenerate a\nnew map.')
 
-        libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 4, libtcod.BKGND_NONE, libtcod.CENTER, 'To view a scaled\ndown view of\nthe world,\npress \'s\'.')
+        libtcod.console_print_ex(screen.wswindow, 9, ((screen.height - 2) / 2) - 4, libtcod.BKGND_NONE, libtcod.CENTER, 'To view a scaled\ndown view of\nthe world,\npress \'s\'.')
 
         WorldGoing = False
         WorldDone = True
         NamingDone = False
-        genbutton = ButtonBox(wswindow, 6, ((SCREEN_HEIGHT - 2) / 2) + 2, 'New Map', 'g')
-        namebutton = ButtonBox(wswindow, 5, ((SCREEN_HEIGHT - 2) / 2) + 6, 'Name Gen.', 'n')
-        scalebutton = ButtonBox(wswindow, 5, ((SCREEN_HEIGHT - 2) / 2) + 10, 'Scale Map', 's')
+        genbutton = ButtonBox(screen.wswindow, 6, ((screen.height - 2) / 2) + 2, 'New Map', 'g')
+        namebutton = ButtonBox(screen.wswindow, 5, ((screen.height - 2) / 2) + 6, 'Name Gen.', 'n')
+        scalebutton = ButtonBox(screen.wswindow, 5, ((screen.height - 2) / 2) + 10, 'Scale Map', 's')
         del self
 
 ####################################
@@ -7917,8 +7894,7 @@ class WorldNaming(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        global SCREEN_HEIGHT, VIEW_HEIGHT, SCREEN_WIDTH, VIEW_WIDTH, wiwindow, \
-               wgwindow, wswindow, worldmap, wheightdict, wfeaturedict, wgpic, \
+        global wgwindow, worldmap, wheightdict, wfeaturedict, wgpic, \
                NoKeys, WorldGoing, NamingDone, wisledict, wlangdict, PLang, \
                wisledict, wpeakdict, wforestdict, wdesertdict, wtundradict, \
                wlakedict, wisledict, woceandict, wtmapdict, wplainsdict, ButtonList, \
@@ -7927,14 +7903,14 @@ class WorldNaming(threading.Thread):
         WorldGoing = True
         ButtonList = []
 
-        libtcod.console_set_default_foreground(wswindow, libtcod.white)
-        libtcod.console_print_ex(wswindow, 9, 1, libtcod.BKGND_NONE, libtcod.CENTER, 'Named Features')
+        libtcod.console_set_default_foreground(screen.wswindow, libtcod.white)
+        libtcod.console_print_ex(screen.wswindow, 9, 1, libtcod.BKGND_NONE, libtcod.CENTER, 'Named Features')
 
-        libtcod.console_set_default_foreground(wswindow, hcolor)
-        libtcod.console_print_ex(wswindow, 9, 3, libtcod.BKGND_NONE, libtcod.CENTER, '~*~*~*~')
+        libtcod.console_set_default_foreground(screen.wswindow, hcolor)
+        libtcod.console_print_ex(screen.wswindow, 9, 3, libtcod.BKGND_NONE, libtcod.CENTER, '~*~*~*~')
 
         wgtext = 'Naming\nmountains...'
-        CurText = FadeText(wgtext, 1, 5, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 5, con=screen.wswindow, speed=25).start()
 
         # Generate mountain names.
 
@@ -7984,7 +7960,7 @@ class WorldNaming(threading.Thread):
             wpeakdict[mountname] = [pos[0],pos[1]]
 
         wgtext = 'Naming forests...'
-        CurText = FadeText(wgtext, 1, 8, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 8, con=screen.wswindow, speed=25).start()
 
         # Generate forest names.
 
@@ -8084,7 +8060,7 @@ class WorldNaming(threading.Thread):
             wforestdict[forestname] = [fposlist[grid],[x,y]]
 
         wgtext = 'Naming deserts...'
-        CurText = FadeText(wgtext, 1, 10, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 10, con=screen.wswindow, speed=25).start()
 
         # Generate desert names.
 
@@ -8172,7 +8148,7 @@ class WorldNaming(threading.Thread):
             wdesertdict[desertname] = [dposlist[grid],[x,y]]
 
         wgtext = 'Naming tundras...'
-        CurText = FadeText(wgtext, 1, 12, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 12, con=screen.wswindow, speed=25).start()
 
         # Generate arctic desert names.
 
@@ -8249,7 +8225,7 @@ class WorldNaming(threading.Thread):
             wtundradict[mtundraname] = [tposlist[grid],[x,y]]
 
         wgtext = 'Naming swamps...'
-        CurText = FadeText(wgtext, 1, 14, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 14, con=screen.wswindow, speed=25).start()
 
         # Generate swamp names.
 
@@ -8328,7 +8304,7 @@ class WorldNaming(threading.Thread):
         libtcod.console_set_default_foreground(wgwindow, libtcod.white)
 
         wgtext = 'Naming plains...'
-        CurText = FadeText(wgtext, 1, 16, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 16, con=screen.wswindow, speed=25).start()
 
         # Generate plains & names.
 
@@ -8410,7 +8386,7 @@ class WorldNaming(threading.Thread):
         libtcod.console_set_default_foreground(wgwindow, libtcod.white)
 
         wgtext = 'Naming glaciers...'
-        CurText = FadeText(wgtext, 1, 18, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 18, con=screen.wswindow, speed=25).start()
 
         # Name glaciers.
 
@@ -8496,7 +8472,7 @@ class WorldNaming(threading.Thread):
         libtcod.console_set_default_foreground(wgwindow, libtcod.white)
 
         wgtext = 'Naming lakes\nand seas,\nthis may take\nsome time...'
-        CurText = FadeText(wgtext, 1, 20, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 20, con=screen.wswindow, speed=25).start()
 
         # Locate lakes.
 
@@ -8607,10 +8583,10 @@ class WorldNaming(threading.Thread):
                 wlakedict[lakename] = lake
 
         wgtext = 'Finished!'
-        CurText = FadeText(wgtext, 1, 25, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 25, con=screen.wswindow, speed=25).start()
 
         wgtext = 'Naming islands,\nthis may take\nsome time...'
-        CurText = FadeText(wgtext, 1, 27, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 27, con=screen.wswindow, speed=25).start()
 
         # Locate islands.
 
@@ -8701,10 +8677,10 @@ class WorldNaming(threading.Thread):
                 wisledict[islename] = island
 
         wgtext = 'Finished!'
-        CurText = FadeText(wgtext, 1, 31, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 31, con=screen.wswindow, speed=25).start()
 
         wgtext = 'Naming oceans...'
-        CurText = FadeText(wgtext, 1, 33, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 33, con=screen.wswindow, speed=25).start()
 
         # Name oceans/seas.
 
@@ -8770,17 +8746,17 @@ class WorldNaming(threading.Thread):
 
         NoKeys = False
 
-        libtcod.console_clear(wswindow)
+        libtcod.console_clear(screen.wswindow)
 
-        libtcod.console_set_default_foreground(wswindow, hcolor)
-        libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 9, libtcod.BKGND_NONE, libtcod.CENTER, 'Naming complete!')
+        libtcod.console_set_default_foreground(screen.wswindow, hcolor)
+        libtcod.console_print_ex(screen.wswindow, 9, ((screen.height - 2) / 2) - 9, libtcod.BKGND_NONE, libtcod.CENTER, 'Naming complete!')
 
-        libtcod.console_set_default_foreground(wswindow, libtcod.white)
-        libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 7, libtcod.BKGND_NONE, libtcod.CENTER, 'To move on to\ncreature gen,\ntype \'c\'.\n\nOtherwise,\npress \'g\' or\nclick the button\nto generate a\nnew map.')
+        libtcod.console_set_default_foreground(screen.wswindow, libtcod.white)
+        libtcod.console_print_ex(screen.wswindow, 9, ((screen.height - 2) / 2) - 7, libtcod.BKGND_NONE, libtcod.CENTER, 'To move on to\ncreature gen,\ntype \'c\'.\n\nOtherwise,\npress \'g\' or\nclick the button\nto generate a\nnew map.')
 
         libtcod.console_set_default_background(wgwindow, libtcod.black)
-        genbutton = ButtonBox(wswindow, 6, ((SCREEN_HEIGHT - 2) / 2) + 4, 'New Map', 'g')
-        cgenbutton = ButtonBox(wswindow, 3, ((SCREEN_HEIGHT - 2) / 2) + 8, 'Creature Gen.', 'c')
+        genbutton = ButtonBox(screen.wswindow, 6, ((screen.height - 2) / 2) + 4, 'New Map', 'g')
+        cgenbutton = ButtonBox(screen.wswindow, 3, ((screen.height - 2) / 2) + 8, 'Creature Gen.', 'c')
 
         WorldGoing = False
         NamingDone = True
@@ -8889,8 +8865,7 @@ class WorldCreatures(threading.Thread):
                 break
 
     def run(self):
-        global SCREEN_HEIGHT, VIEW_HEIGHT, SCREEN_WIDTH, VIEW_WIDTH, wiwindow, \
-               wgwindow, wswindow, worldmap, wheighdict, wgpic, \
+        global wgwindow, worldmap, wheighdict, wgpic, \
                NoKeys, WorldGoing, CreatureDone, woceandict, wlakedict, \
                wlakedict, wtundradict, wcavedict, wriverdict, wlangdict, PLang, \
                wcreaturedict, wspiritdict, wgoddict, ButtonList, bodydict, idict, \
@@ -8900,16 +8875,16 @@ class WorldCreatures(threading.Thread):
 
         DrawWorld(wgwindow, cities = False)
 
-        libtcod.console_set_default_foreground(wswindow, libtcod.white)
-        libtcod.console_print_ex(wswindow, 9, 1, libtcod.BKGND_NONE, libtcod.CENTER, 'Gods, Spirits,\n& Creature Gen')
+        libtcod.console_set_default_foreground(screen.wswindow, libtcod.white)
+        libtcod.console_print_ex(screen.wswindow, 9, 1, libtcod.BKGND_NONE, libtcod.CENTER, 'Gods, Spirits,\n& Creature Gen')
 
-        libtcod.console_set_default_foreground(wswindow, hcolor)
-        libtcod.console_print_ex(wswindow, 9, 4, libtcod.BKGND_NONE, libtcod.CENTER, '~*~*~*~')
+        libtcod.console_set_default_foreground(screen.wswindow, hcolor)
+        libtcod.console_print_ex(screen.wswindow, 9, 4, libtcod.BKGND_NONE, libtcod.CENTER, '~*~*~*~')
 
         # Creature Gen
 
         wgtext = 'Creating\ncreatures...'
-        CurText = FadeText(wgtext, 1, 6, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 6, con=screen.wswindow, speed=25).start()
 
         wcreaturedict = {}
 
@@ -11212,12 +11187,12 @@ class WorldCreatures(threading.Thread):
         # Spirits Gen
 
         wgtext = 'Creating\nspirits...'
-        CurText = FadeText(wgtext, 1, 9, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 9, con=screen.wswindow, speed=25).start()
 
         wspiritdict = {}
 
         wgtext = 'Establishing\nbiomes... this\nmay take a\nfew moments.'
-        CurText = FadeText(wgtext, 1, 12, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 12, con=screen.wswindow, speed=25).start()
 
         checklist = ['Shrubland','Heathland','Marshland','Cacti Forest','Broadleaf Forest','Deciduous Forest','Mixed Forest', \
                      'Coniferous Forest','Evergreen Forest','Tropical Forest','Swamp','Desert','Cave','Beach','River','Highland', \
@@ -11236,10 +11211,10 @@ class WorldCreatures(threading.Thread):
                         wbiomedict['%s,%s' % (x,y)] += [check]
 
         wgtext = 'Finished!'
-        CurText = FadeText(wgtext, 1, 17, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 17, con=screen.wswindow, speed=25).start()
 
         wgtext = 'Dispersing\ncreatures...'
-        CurText = FadeText(wgtext, 1, 19, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 19, con=screen.wswindow, speed=25).start()
 
         for creature in wcreaturedict.values():
             creature['extinct'] = False
@@ -11269,11 +11244,11 @@ class WorldCreatures(threading.Thread):
             libtcod.console_set_char_foreground(wgwindow, startpos[0], startpos[1], creature['charcolor'])
 
         wgtext = 'Finished!'
-        CurText = FadeText(wgtext, 1, 22, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 22, con=screen.wswindow, speed=25).start()
 
 
         wgtext = 'Spreading\ncreatures...\nThis may take\nquite a while...'
-        CurText = FadeText(wgtext, 1, 24, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 24, con=screen.wswindow, speed=25).start()
 
         cpopdict = {}
 
@@ -11307,7 +11282,7 @@ class WorldCreatures(threading.Thread):
             stepcount += 1
             if stepcount > 100:
                 break
-            libtcod.console_print_ex(wswindow, 9, 29, libtcod.BKGND_NONE, libtcod.CENTER, 'Step %s/100' % stepcount)
+            libtcod.console_print_ex(screen.wswindow, 9, 29, libtcod.BKGND_NONE, libtcod.CENTER, 'Step %s/100' % stepcount)
             for item in waitingdict.items():
                 if item[1][0] > 1:
                     waitingdict[item[0]] = [item[1][0] - 1,item[1][1]]
@@ -11348,19 +11323,19 @@ class WorldCreatures(threading.Thread):
                             waitingdict['%s,%s' % (newpos[0],newpos[1]) + ':%s' % name] = [spreadcheck + randrange(0,3),False]
                 spreaddict.pop(item[0])
 
-        libtcod.console_clear(wswindow)
+        libtcod.console_clear(screen.wswindow)
 
-        libtcod.console_set_default_foreground(wswindow, hcolor)
-        libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 9, libtcod.BKGND_NONE, libtcod.CENTER, 'Creature gen\nfinished!')
+        libtcod.console_set_default_foreground(screen.wswindow, hcolor)
+        libtcod.console_print_ex(screen.wswindow, 9, ((screen.height - 2) / 2) - 9, libtcod.BKGND_NONE, libtcod.CENTER, 'Creature gen\nfinished!')
 
-        libtcod.console_set_default_foreground(wswindow, libtcod.white)
-        libtcod.console_print_ex(wswindow, 9, ((SCREEN_HEIGHT - 2) / 2) - 6, libtcod.BKGND_NONE, libtcod.CENTER, 'To move on to\nhistory gen,\ntype \'h\'.\n\nOtherwise,\npress \'g\' to\ngenerate a\nnew map.')
+        libtcod.console_set_default_foreground(screen.wswindow, libtcod.white)
+        libtcod.console_print_ex(screen.wswindow, 9, ((screen.height - 2) / 2) - 6, libtcod.BKGND_NONE, libtcod.CENTER, 'To move on to\nhistory gen,\ntype \'h\'.\n\nOtherwise,\npress \'g\' to\ngenerate a\nnew map.')
 
         WorldGoing = False
         CreatureDone = True
 
-        genbutton = ButtonBox(wswindow, 6, ((SCREEN_HEIGHT - 2) / 2) + 4, 'New Map', 'g')
-        namebutton = ButtonBox(wswindow, 4, ((SCREEN_HEIGHT - 2) / 2) + 8, 'History Gen', 'h')
+        genbutton = ButtonBox(screen.wswindow, 6, ((screen.height - 2) / 2) + 4, 'New Map', 'g')
+        namebutton = ButtonBox(screen.wswindow, 4, ((screen.height - 2) / 2) + 8, 'History Gen', 'h')
 
         del self
 
@@ -11373,8 +11348,7 @@ class WorldHistory(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        global SCREEN_HEIGHT, VIEW_HEIGHT, SCREEN_WIDTH, VIEW_WIDTH, wiwindow, \
-               wgwindow, wswindow, worldmap, wheightdict, wfeaturedict, wgpic, \
+        global wgwindow, worldmap, wheightdict, wfeaturedict, wgpic, \
                NoKeys, WorldGoing, HistoryDone, woceandict, wlakedict, \
                wlakedict, wtundradict, wcavedict, wriverdict, wlangdict, PLang, \
                wcitydict, wvillagedict, wcastledict, year, wcivdict, wcreaturedict, \
@@ -11385,14 +11359,14 @@ class WorldHistory(threading.Thread):
 
         DrawWorld(wgwindow, cities = False)
 
-        libtcod.console_set_default_foreground(wswindow, libtcod.white)
-        libtcod.console_print_ex(wswindow, 9, 1, libtcod.BKGND_NONE, libtcod.CENTER, 'World History')
+        libtcod.console_set_default_foreground(screen.wswindow, libtcod.white)
+        libtcod.console_print_ex(screen.wswindow, 9, 1, libtcod.BKGND_NONE, libtcod.CENTER, 'World History')
 
-        libtcod.console_set_default_foreground(wswindow, hcolor)
-        libtcod.console_print_ex(wswindow, 9, 3, libtcod.BKGND_NONE, libtcod.CENTER, '~*~*~*~')
+        libtcod.console_set_default_foreground(screen.wswindow, hcolor)
+        libtcod.console_print_ex(screen.wswindow, 9, 3, libtcod.BKGND_NONE, libtcod.CENTER, '~*~*~*~')
 
         wgtext = 'Creating civs...'
-        CurText = FadeText(wgtext, 1, 5, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 5, con=screen.wswindow, speed=25).start()
         wcivdict = {}
         wcitydict = {}
         wvillagedict = {}
@@ -11403,13 +11377,13 @@ class WorldHistory(threading.Thread):
         civnum = randrange(15,35)
         wcivdict['civnum'] = civnum
         civleft = civnum
-        libtcod.console_set_default_foreground(wswindow, libtcod.white)
+        libtcod.console_set_default_foreground(screen.wswindow, libtcod.white)
         time.sleep(2)
 
         while civleft > 0:
             time.sleep(.1)
             civleft -= 1
-            libtcod.console_print_ex(wswindow, 9, 7, libtcod.BKGND_NONE, libtcod.CENTER, '(%s/%s)' % (civnum - civleft,civnum))
+            libtcod.console_print_ex(screen.wswindow, 9, 7, libtcod.BKGND_NONE, libtcod.CENTER, '(%s/%s)' % (civnum - civleft,civnum))
 
             # Civ Initialization
 
@@ -11450,7 +11424,7 @@ class WorldHistory(threading.Thread):
             wcivdict[name + '-civcol2'] = libtcod.Color(c / 2,b / 2,a / 2)
 
         wgtext = 'Placing civs...'
-        CurText = FadeText(wgtext, 1, 9, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 9, con=screen.wswindow, speed=25).start()
 
         civleft = civnum
         year = 1
@@ -11475,14 +11449,14 @@ class WorldHistory(threading.Thread):
             else:
                 libtcod.console_print_ex(wgwindow, x, y, libtcod.BKGND_ALPHA(0.8), libtcod.LEFT, chr(DoChar(villagechar)))
                 wvillagedict[name] = [[x,y],curciv,wcivdict[curciv + '-population'] - wcivdict[curciv + '-troops']]
-            libtcod.console_print_ex(wswindow, 9, 11, libtcod.BKGND_NONE, libtcod.CENTER, '(%s/%s)' % (civnum - civleft,civnum))
+            libtcod.console_print_ex(screen.wswindow, 9, 11, libtcod.BKGND_NONE, libtcod.CENTER, '(%s/%s)' % (civnum - civleft,civnum))
             libtcod.console_print_ex(wgwindow, x, y - 2, libtcod.BKGND_ALPHA(0.6), libtcod.CENTER, wcivdict[curciv + '-title'])
             wcivdict[wcivdict[civnum - civleft] + '-startpos'] = [x,y]
             wcivdict[wcivdict[civnum - civleft] + '-territory'] = [[x,y]]
             wterritorydict['%s,%s' % (x,y)] = civnum - civleft
 
         wgtext = 'Spreading civs...\nThis may take\nquite a while.'
-        CurText = FadeText(wgtext, 1, 13, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 13, con=screen.wswindow, speed=25).start()
 
         for civ in range(1,civnum + 1):
             rlist = []
@@ -11509,7 +11483,7 @@ class WorldHistory(threading.Thread):
         curcivs = range(1,civnum + 1)
 
         while year <= stopyear:
-            libtcod.console_print_ex(wswindow, 9, 17, libtcod.BKGND_NONE, libtcod.CENTER, 'Year %s' % year)
+            libtcod.console_print_ex(screen.wswindow, 9, 17, libtcod.BKGND_NONE, libtcod.CENTER, 'Year %s' % year)
 
             for civ in curcivs:
                 civname = wcivdict[civ]
@@ -11576,7 +11550,7 @@ class WorldHistory(threading.Thread):
         NoKeys = True
 
         wgtext = 'Finished!'
-        CurText = FadeText(wgtext, 1, 19, con=wswindow, speed=25).start()
+        CurText = FadeText(wgtext, 1, 19, con=screen.wswindow, speed=25).start()
 
         time.sleep(1.0)
 
@@ -11637,11 +11611,11 @@ class WorldHistory(threading.Thread):
         savedict['RMAP_HEIGHT'] = RMAP_HEIGHT
         savedict['RMAP_WIDTH'] = RMAP_WIDTH
 
-        libtcod.console_set_default_foreground(wswindow, hcolor)
-        libtcod.console_print_ex(wswindow, 9, 21, libtcod.BKGND_NONE, libtcod.CENTER, 'History gen\nfinished!')
+        libtcod.console_set_default_foreground(screen.wswindow, hcolor)
+        libtcod.console_print_ex(screen.wswindow, 9, 21, libtcod.BKGND_NONE, libtcod.CENTER, 'History gen\nfinished!')
 
-        libtcod.console_set_default_foreground(wswindow, libtcod.yellow)
-        libtcod.console_print_ex(wswindow, 9, 24, libtcod.BKGND_NONE, libtcod.CENTER, 'Saving world -\nplease wait...')
+        libtcod.console_set_default_foreground(screen.wswindow, libtcod.yellow)
+        libtcod.console_print_ex(screen.wswindow, 9, 24, libtcod.BKGND_NONE, libtcod.CENTER, 'Saving world -\nplease wait...')
 
         NoKeys = True
         time.sleep(1.0)
@@ -11652,11 +11626,11 @@ class WorldHistory(threading.Thread):
         worldfile.close()
         NoKeys = False
 
-        libtcod.console_set_default_foreground(wswindow, libtcod.yellow)
-        libtcod.console_print_ex(wswindow, 9, 27, libtcod.BKGND_NONE, libtcod.CENTER, 'Done!')
+        libtcod.console_set_default_foreground(screen.wswindow, libtcod.yellow)
+        libtcod.console_print_ex(screen.wswindow, 9, 27, libtcod.BKGND_NONE, libtcod.CENTER, 'Done!')
 
-        libtcod.console_set_default_foreground(wswindow, libtcod.white)
-        libtcod.console_print_ex(wswindow, 9, 29, libtcod.BKGND_NONE, libtcod.CENTER, 'World generation\nis done. To\nexit, press\nescape or\nright-click.')
+        libtcod.console_set_default_foreground(screen.wswindow, libtcod.white)
+        libtcod.console_print_ex(screen.wswindow, 9, 29, libtcod.BKGND_NONE, libtcod.CENTER, 'World generation\nis done. To\nexit, press\nescape or\nright-click.')
 
         WorldGoing = False
         HistoryDone = True
@@ -11672,7 +11646,7 @@ class WorldAtlas(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        global playery, oplayery, wswindow, MenuSetting
+        global playery, oplayery, MenuSetting
 
         MenuList = []
         MenuSetting = 'WAMain'
@@ -11685,11 +11659,11 @@ class WorldAtlas(threading.Thread):
                 wlist[printline] = save[0:-4]
                 printline += 1
             playery,oplayery = 1,1
-            self.atlasmenu = Menu(wswindow, 2, 4, wlist, title = 'Choose a World:', talign = 'center', tx = 9, ty = 2, \
+            self.atlasmenu = Menu(screen.wswindow, 2, 4, wlist, title = 'Choose a World:', talign = 'center', tx = 9, ty = 2, \
                              MethodList = [(True,Atlas.loadWorld)], BMethodList = [Atlas.exitAtlas])
             self.atlasmenu.start()
         else:
-            libtcod.console_print_ex(wswindow, 2, 4, libtcod.BKGND_NONE, libtcod.LEFT, 'No worlds are\nsaved.')
+            libtcod.console_print_ex(screen.wswindow, 2, 4, libtcod.BKGND_NONE, libtcod.LEFT, 'No worlds are\nsaved.')
 
     def loadWorld(self):
         global MouseLock
@@ -11703,7 +11677,7 @@ class WorldAtlas(threading.Thread):
         LoadWorld(wdict)
         DrawWorld(wgwindow, cities = False)
         self.worldpic = libtcod.image_from_console(wgwindow)
-        libtcod.image_scale(self.worldpic, (VIEW_WIDTH - 10) * 2, (VIEW_HEIGHT - 20) * 2)
+        libtcod.image_scale(self.worldpic, (screen.view_width - 10) * 2, (screen.view_height - 20) * 2)
         self.loadWorldScreen()
         MouseLock = False
 
@@ -11716,18 +11690,18 @@ class WorldAtlas(threading.Thread):
         libtcod.console_set_default_background(wawindow, libtcod.black)
         libtcod.console_clear(wawindow)
 
-        DrawScroll(wawindow, 4, 5, VIEW_WIDTH - 10 + 1, VIEW_HEIGHT - 20 + 1)
+        DrawScroll(wawindow, 4, 5, screen.view_width - 10 + 1, screen.view_height - 20 + 1)
         libtcod.image_blit_2x(self.worldpic, wawindow, 5, 6)
 
         MenuList = []
-        libtcod.console_clear(wswindow)
+        libtcod.console_clear(screen.wswindow)
         MenuSetting = 'WAWorld'
 
         libtcod.console_set_default_foreground(wawindow, libtcod.white)
-        libtcod.console_print_ex(wawindow, VIEW_WIDTH / 2, 2, libtcod.BKGND_NONE, libtcod.CENTER, 'The World of ' + worldname)
-        libtcod.console_clear(wswindow)
+        libtcod.console_print_ex(wawindow, screen.view_width / 2, 2, libtcod.BKGND_NONE, libtcod.CENTER, 'The World of ' + worldname)
+        libtcod.console_clear(screen.wswindow)
         optionlist = ['Locations', 'People', 'Bestiary', 'Nations', 'Events', 'Gods', 'Legends']
-        self.atlasmenu = Menu(wswindow, 2, 4, optionlist, title = 'Main Menu:', talign = 'center', tx = 9, ty = 2, \
+        self.atlasmenu = Menu(screen.wswindow, 2, 4, optionlist, title = 'Main Menu:', talign = 'center', tx = 9, ty = 2, \
                          MethodList = [('Nations',Atlas.loadNations),('Bestiary',Atlas.loadBestiaryMain)], \
                          BMethodList = [doWorldAtlasSetup,Atlas.run])
         self.atlasmenu.start()
@@ -11735,45 +11709,45 @@ class WorldAtlas(threading.Thread):
     def loadNations(self):
         global MenuSetting, MenuList, playery, oplayery
 
-        libtcod.console_clear(wswindow)
+        libtcod.console_clear(screen.wswindow)
         MenuSetting = 'WANationList'
         MenuList = []
         optionlist = []
         for civ in range(1, wcivdict['civnum'] + 1):
             optionlist.append(wcivdict[civ])
-        self.atlasmenu = Menu(wswindow, 2, 4, optionlist, title = 'Nations:', talign = 'center', tx = 9, ty = 2, \
+        self.atlasmenu = Menu(screen.wswindow, 2, 4, optionlist, title = 'Nations:', talign = 'center', tx = 9, ty = 2, \
                          MethodList = [(True,Atlas.loadIndivNation)], BMethodList = [Atlas.loadWorldScreen])
         self.atlasmenu.start()
 
     def loadIndivNation(self):
         global MenuSetting, MenuList, mplayery
 
-        libtcod.console_clear(wswindow)
+        libtcod.console_clear(screen.wswindow)
         MenuSetting = 'WAIndivNation'
         MenuList = []
 
         libtcod.console_set_default_background(wawindow, libtcod.black)
-        libtcod.console_clear(wswindow)
+        libtcod.console_clear(screen.wswindow)
         libtcod.console_clear(wawindow)
         self.nation = wcivdict[mplayery]
         self.natnum = mplayery
         nation = self.nation
         natnum = self.natnum
 
-        DrawScroll(wawindow, 9, 5, VIEW_WIDTH - 20 + 1, VIEW_HEIGHT - 30 + 1)
-        DrawWorld(wawindow, VIEW_WIDTH - 20, VIEW_HEIGHT - 30, \
+        DrawScroll(wawindow, 9, 5, screen.view_width - 20 + 1, screen.view_height - 30 + 1)
+        DrawWorld(wawindow, screen.view_width - 20, screen.view_height - 30, \
                   wcivdict[nation + '-startpos'][0], wcivdict[nation + '-startpos'][1], \
                   10, 6, territory = True)
 
         libtcod.console_set_default_foreground(wawindow, libtcod.white)
-        libtcod.console_print_ex(wawindow, VIEW_WIDTH / 2, 2, libtcod.BKGND_NONE, libtcod.CENTER, wcivdict[nation + '-title'])
+        libtcod.console_print_ex(wawindow, screen.view_width / 2, 2, libtcod.BKGND_NONE, libtcod.CENTER, wcivdict[nation + '-title'])
         libtcod.console_set_default_foreground(wawindow, wcivdict[nation + '-civcol'])
         libtcod.console_set_default_background(wawindow, wcivdict[nation + '-civcol2'])
         libtcod.console_print_ex(wawindow, 40, 19, libtcod.BKGND_ALPHA(0.6), libtcod.CENTER, \
                                      wcivdict[nation + '-title'])
 
         optionlist = ['Government', 'Towns/Castles', 'Other Places', 'Relations', 'History', 'Religion']
-        self.atlasmenu = Menu(wswindow, 2, 4, optionlist, title = nation + ':', talign = 'center', tx = 9, ty = 2, \
+        self.atlasmenu = Menu(screen.wswindow, 2, 4, optionlist, title = nation + ':', talign = 'center', tx = 9, ty = 2, \
                          MethodList = [('Relations',Atlas.loadNationRelations)], BMethodList = [Atlas.loadWorldScreen,Atlas.loadNations])
         self.atlasmenu.start()
 
@@ -11787,7 +11761,7 @@ class WorldAtlas(threading.Thread):
         libtcod.console_clear(wawindow)
         libtcod.console_set_default_foreground(wawindow, libtcod.white)
         libtcod.console_set_color_control(libtcod.COLCTRL_1, wcivdict[nation + '-civcol'], libtcod.black)
-        libtcod.console_print_ex(wawindow, VIEW_WIDTH / 2, 2, libtcod.BKGND_NONE, libtcod.CENTER, 'Foreign Relations of %c' % (libtcod.COLCTRL_1) \
+        libtcod.console_print_ex(wawindow, screen.view_width / 2, 2, libtcod.BKGND_NONE, libtcod.CENTER, 'Foreign Relations of %c' % (libtcod.COLCTRL_1) \
                                      + wcivdict[nation + '-title'] + '%c:' % (libtcod.COLCTRL_STOP))
         civreldict = {}
         DrawWorld(wgwindow, terrain = True, forests = False, scrub = False, caves = False, \
@@ -11826,18 +11800,18 @@ class WorldAtlas(threading.Thread):
                 civreldict[civ] = [relationship,relcol]
                 libtcod.console_set_default_foreground(wawindow, libtcod.white)
                 libtcod.console_set_color_control(libtcod.COLCTRL_1, relcol, libtcod.black)
-                libtcod.console_print_ex(wawindow, VIEW_WIDTH / 2, 3 + civ, libtcod.BKGND_NONE, libtcod.CENTER, wcivdict[civ] + \
+                libtcod.console_print_ex(wawindow, screen.view_width / 2, 3 + civ, libtcod.BKGND_NONE, libtcod.CENTER, wcivdict[civ] + \
                                              ': %c' % (libtcod.COLCTRL_1) + relationship + '%c' % (libtcod.COLCTRL_STOP))
             else:
-                libtcod.console_print_ex(wawindow, VIEW_WIDTH / 2, 3 + natnum, libtcod.BKGND_NONE, libtcod.CENTER, nation + ': ---')
+                libtcod.console_print_ex(wawindow, screen.view_width / 2, 3 + natnum, libtcod.BKGND_NONE, libtcod.CENTER, nation + ': ---')
                 civreldict[civ] = ['N/A',libtcod.white]
-            libtcod.console_print_ex(wawindow, VIEW_WIDTH / 2, 5 + wcivdict['civnum'], libtcod.BKGND_NONE, libtcod.CENTER, "To view a map of this civilization's\n" \
+            libtcod.console_print_ex(wawindow, screen.view_width / 2, 5 + wcivdict['civnum'], libtcod.BKGND_NONE, libtcod.CENTER, "To view a map of this civilization's\n" \
                                          "relations, press 'm'.")
-            relbutton = ButtonBox(wawindow, (VIEW_WIDTH / 2) - 6, 9 + wcivdict['civnum'],'Relations Map','m',offx = SCREEN_WIDTH - VIEW_WIDTH - 3)
+            relbutton = ButtonBox(wawindow, (screen.view_width / 2) - 6, 9 + wcivdict['civnum'],'Relations Map','m',offx = screen.width - screen.view_width - 3)
             self.civreldict = civreldict
 
     def loadRelationsMap(self):
-        global MAP_WIDTH, MAP_HEIGHT, VIEW_WIDTH, VIEW_HEIGHT
+        global MAP_WIDTH, MAP_HEIGHT
 
         libtcod.console_set_default_background(wawindow, libtcod.black)
         libtcod.console_clear(wawindow)
@@ -11850,20 +11824,20 @@ class WorldAtlas(threading.Thread):
                         pass
 
         relpic = libtcod.image_from_console(wgwindow)
-        newrel = solidScale(relpic, VIEW_WIDTH - 20, VIEW_HEIGHT - 20, 1)
-        libtcod.image_scale(relpic, (VIEW_WIDTH - 20) * 2, (VIEW_HEIGHT - 20) * 2)
-        RelationsMap = RelMap(wawindow, 10, 10, 20, 2, VIEW_WIDTH - 20, VIEW_HEIGHT - 20, newrel[3], relpic, self.civreldict).start()
+        newrel = solidScale(relpic, screen.view_width - 20, screen.view_height - 20, 1)
+        libtcod.image_scale(relpic, (screen.view_width - 20) * 2, (screen.view_height - 20) * 2)
+        RelationsMap = RelMap(wawindow, 10, 10, 20, 2, screen.view_width - 20, screen.view_height - 20, newrel[3], relpic, self.civreldict).start()
 
     def loadBestiaryMain(self):
         global MenuList, MenuSetting
 
-        libtcod.console_clear(wswindow)
+        libtcod.console_clear(screen.wswindow)
         MenuSetting = 'WABestiaryMain'
         MenuList = []
 
         optionlist = ['All','Sorted...']
 
-        self.atlasmenu = Menu(wswindow, 2, 4, optionlist, title = 'Bestiary:', talign = 'center', tx = 9, ty = 2, \
+        self.atlasmenu = Menu(screen.wswindow, 2, 4, optionlist, title = 'Bestiary:', talign = 'center', tx = 9, ty = 2, \
                          MethodList = [('All',Atlas.loadBestiary),('Sorted...',Atlas.loadBestiarySorted)], \
                          BMethodList = [Atlas.loadWorldScreen])
         self.atlasmenu.start()
@@ -11871,7 +11845,7 @@ class WorldAtlas(threading.Thread):
     def loadBestiarySorted(self):
         global MenuList, MenuSetting, mplayery
 
-        libtcod.console_clear(wswindow)
+        libtcod.console_clear(screen.wswindow)
         MenuList = []
         MenuSetting = 'WABestiarySorted'
 
@@ -11886,28 +11860,28 @@ class WorldAtlas(threading.Thread):
         if  option == 'Sorted...':
             optionlist = ['By Sphere...','By Biome...','By Region...','By Nation...','By Size...','Extinct']
 
-            self.atlasmenu = Menu(wswindow, 2, 4, optionlist, title = 'Bestiary:', talign = 'center', tx = 9, ty = 2, \
+            self.atlasmenu = Menu(screen.wswindow, 2, 4, optionlist, title = 'Bestiary:', talign = 'center', tx = 9, ty = 2, \
                                   MethodList = [(True,Atlas.loadBestiarySorted)], BMethodList = [Atlas.loadBestiaryMain])
             self.atlasmenu.start()
 
         elif option == 'By Sphere...':
             optionlist = spherelist
 
-            self.atlasmenu = Menu(wswindow, 2, 4, optionlist, title = 'Bestiary:', talign = 'center', tx = 9, ty = 2, \
+            self.atlasmenu = Menu(screen.wswindow, 2, 4, optionlist, title = 'Bestiary:', talign = 'center', tx = 9, ty = 2, \
                                   MethodList = [(True,Atlas.loadBestiarySorted)], BMethodList = [Atlas.loadBestiaryMain])
             self.atlasmenu.start()
 
         elif option == 'By Biome...':
             optionlist = biomelist
 
-            self.atlasmenu = Menu(wswindow, 2, 4, optionlist, title = 'Bestiary:', talign = 'center', tx = 9, ty = 2, \
+            self.atlasmenu = Menu(screen.wswindow, 2, 4, optionlist, title = 'Bestiary:', talign = 'center', tx = 9, ty = 2, \
                                   MethodList = [(True,Atlas.loadBestiarySorted)], BMethodList = [Atlas.loadBestiaryMain])
             self.atlasmenu.start()
 
         elif option == 'By Size...':
             optionlist = sizelist
 
-            self.atlasmenu = Menu(wswindow, 2, 4, optionlist, title = 'Bestiary:', talign = 'center', tx = 9, ty = 2, \
+            self.atlasmenu = Menu(screen.wswindow, 2, 4, optionlist, title = 'Bestiary:', talign = 'center', tx = 9, ty = 2, \
                                   MethodList = [(True,Atlas.loadBestiarySorted)], BMethodList = [Atlas.loadBestiaryMain])
             self.atlasmenu.start()
 
@@ -11920,7 +11894,7 @@ class WorldAtlas(threading.Thread):
     def loadBestiary(self, req = None):
         global MenuList, MenuSetting
 
-        libtcod.console_clear(wswindow)
+        libtcod.console_clear(screen.wswindow)
         MenuSetting = 'WABestiary'
         MenuList = []
 
@@ -11955,7 +11929,7 @@ class WorldAtlas(threading.Thread):
                 if wcreaturedict[creature]['extinct']:
                     optionlist.append(creature)
 
-        self.atlasmenu = Menu(wswindow, 2, 4, optionlist, title = 'Bestiary:', talign = 'center', tx = 9, ty = 2, \
+        self.atlasmenu = Menu(screen.wswindow, 2, 4, optionlist, title = 'Bestiary:', talign = 'center', tx = 9, ty = 2, \
                          MethodList = [(True,Atlas.loadCreature)], BMethodList = [Atlas.loadBestiaryMain])
         self.atlasmenu.start()
 
@@ -11963,7 +11937,7 @@ class WorldAtlas(threading.Thread):
         global MenuList, MenuSetting, mplayery, creature
 
         option = self.atlasmenu.optionlist[mplayery - 1]
-        libtcod.console_clear(wswindow)
+        libtcod.console_clear(screen.wswindow)
         MenuSetting = 'WACreature'
         MenuList = []
 
@@ -11971,7 +11945,7 @@ class WorldAtlas(threading.Thread):
         libtcod.console_set_default_background(wawindow, libtcod.black)
         libtcod.console_clear(wawindow)
 
-        DrawScroll(wawindow, 9, 3, VIEW_WIDTH - 19, VIEW_HEIGHT - 3)
+        DrawScroll(wawindow, 9, 3, screen.view_width - 19, screen.view_height - 3)
         libtcod.console_set_default_foreground(wawindow, creature['charcolor'])
 
         charfile = open('./image/txt/chars.txt','r')
@@ -11994,18 +11968,18 @@ class WorldAtlas(threading.Thread):
 
         y = 5
         for line in mcharlines:
-            libtcod.console_print_ex(wawindow, 10 + ((VIEW_WIDTH - 19) / 2) - (lline / 2), y, libtcod.BKGND_NONE, libtcod.LEFT, line)
+            libtcod.console_print_ex(wawindow, 10 + ((screen.view_width - 19) / 2) - (lline / 2), y, libtcod.BKGND_NONE, libtcod.LEFT, line)
             y += 1
 
         libtcod.console_set_default_foreground(wawindow, libtcod.dark_gray)
         libtcod.console_set_color_control(libtcod.COLCTRL_1,creature['charcolor'],libtcod.black)
-        libtcod.console_print_ex(wawindow, 9 + ((VIEW_WIDTH - 19) / 2), 6 + len(mcharlines), libtcod.BKGND_NONE, libtcod.CENTER, \
+        libtcod.console_print_ex(wawindow, 9 + ((screen.view_width - 19) / 2), 6 + len(mcharlines), libtcod.BKGND_NONE, libtcod.CENTER, \
                                      'The %c%s%c' % (libtcod.COLCTRL_1,creature['name'].capitalize(),libtcod.COLCTRL_STOP))
-        libtcod.console_print_rect_ex(wawindow, 11, 8 + len(mcharlines), (VIEW_WIDTH - 22), (VIEW_HEIGHT - 13), \
+        libtcod.console_print_rect_ex(wawindow, 11, 8 + len(mcharlines), (screen.view_width - 22), (screen.view_height - 13), \
                                           libtcod.BKGND_NONE, libtcod.LEFT, creature['description'])
 
         optionlist = ['Description','Information','Combat Stats','Legends']
-        self.atlasmenu = Menu(wswindow, 2, 4, optionlist, title = creature['name'] + ':', talign = 'center', tx = 9, ty = 2, \
+        self.atlasmenu = Menu(screen.wswindow, 2, 4, optionlist, title = creature['name'] + ':', talign = 'center', tx = 9, ty = 2, \
                               MethodList = [('Combat Stats',Atlas.loadCreatureStats)], BMethodList = [Atlas.loadBestiaryMain])
         self.atlasmenu.start()
 
@@ -12052,7 +12026,7 @@ class WorldAtlas(threading.Thread):
 
         for stat in StatDict.keys():
             statline = StatDict[stat][1] + ': ' + str(StatDict[stat][0])
-            libtcod.console_print_ex(wawindow, 9 + ((VIEW_WIDTH - 19) / 2), 14 + lineadd, libtcod.BKGND_NONE, libtcod.CENTER, statline)
+            libtcod.console_print_ex(wawindow, 9 + ((screen.view_width - 19) / 2), 14 + lineadd, libtcod.BKGND_NONE, libtcod.CENTER, statline)
             lineadd += 1
 
     def exitAtlas(self):
@@ -12076,7 +12050,7 @@ class PlayWorld(threading.Thread):
         self.messagelog = []
         self.lastmessage = None
         self.lastmessagecount = 0
-        self.mesglimit = SCREEN_HEIGHT - VIEW_HEIGHT - 4
+        self.mesglimit = screen.height - screen.view_height - 4
         self.shadowdict = {}
         self.clouddict = {}
         self.setupdone = False
@@ -12189,51 +12163,51 @@ class PlayWorld(threading.Thread):
         lock.acquire()
         NoRefresh = True
         Clouds.paused = True
-        libtcod.console_set_default_background(wiwindow, bgcolor2)
-        libtcod.console_set_default_background(wswindow, bgcolor)
+        libtcod.console_set_default_background(screen.wiwindow, bgcolor2)
+        libtcod.console_set_default_background(screen.wswindow, bgcolor)
         libtcod.console_set_default_background(0,bgcolor)
         libtcod.console_set_default_background(0,bgcolor2)
-        libtcod.console_set_default_foreground(wswindow,libtcod.white)
+        libtcod.console_set_default_foreground(screen.wswindow,libtcod.white)
         if not self.menudrawn:
             for x in range(17):
                 for y in range(29):
                     char = [0 + x,66 + y,255]
-                    libtcod.console_print_ex(wswindow,1 + x,16 + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    libtcod.console_print_ex(screen.wswindow,1 + x,16 + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
             self.menudrawn = True
 
 
         FMGButtonList = map(lambda x: x[3],MGButtonList)
         if 'Inventory' not in FMGButtonList:
-            MGButtonList.append([wswindow,1,20,'Inventory','i',0,1,False,False])
+            MGButtonList.append([screen.wswindow,1,20,'Inventory','i',0,1,False,False])
         if 'Skills and Spells' not in FMGButtonList:
-            MGButtonList.append([wswindow,1,23,'Skills and Spells','s',0,1,False,False])
+            MGButtonList.append([screen.wswindow,1,23,'Skills and Spells','s',0,1,False,False])
         if 'Character' not in FMGButtonList:
-            MGButtonList.append([wswindow,1,26,'Character','c',0,1,False,False])
+            MGButtonList.append([screen.wswindow,1,26,'Character','c',0,1,False,False])
         if 'Journal' not in FMGButtonList:
-            MGButtonList.append([wswindow,1,29,'Journal','j',0,1,False,False])
+            MGButtonList.append([screen.wswindow,1,29,'Journal','j',0,1,False,False])
         if 'Constructions' not in FMGButtonList:
-            MGButtonList.append([wswindow,1,32,'Constructions','b',0,1,False,False])
+            MGButtonList.append([screen.wswindow,1,32,'Constructions','b',0,1,False,False])
         if 'Ground View' not in FMGButtonList:
-            MGButtonList.append([wswindow,1,35,'Ground View','g',0,1,False,False])
+            MGButtonList.append([screen.wswindow,1,35,'Ground View','g',0,1,False,False])
         if 'Options' not in FMGButtonList:
-            MGButtonList.append([wswindow,1,38,'Options','o',0,1,False,False])
+            MGButtonList.append([screen.wswindow,1,38,'Options','o',0,1,False,False])
 
         # Draw the HUD, HP/Mana/Phase Meters, etc.
         if DoHUD:
             for x in range(15):
                 for y in range(5):
-                    libtcod.console_print_ex(wswindow,2 + x,2 + y,libtcod.BKGND_NONE,libtcod.LEFT,' ')
+                    libtcod.console_print_ex(screen.wswindow,2 + x,2 + y,libtcod.BKGND_NONE,libtcod.LEFT,' ')
             for x in range(15):
                 for y in range(5):
                     libtcod.console_print_ex(0,2 + x,4 + y,libtcod.BKGND_NONE,libtcod.LEFT,' ')
-            DrawScroll(wswindow,1,1,16,13,1)
+            DrawScroll(screen.wswindow,1,1,16,13,1)
             HP = max(self.PCHP - self.PCDamage,0)
             mult = 8 - int(((HP * 1.0) / (self.PCHP)) * 8)
             for x in range(3):
                 for y in range(4):
                     char = [0 + x + (3 * mult),54 + y,255]
-                    libtcod.console_set_default_foreground(wswindow,libtcod.white)
-                    libtcod.console_print_ex(wswindow,3 + x,3 + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    libtcod.console_set_default_foreground(screen.wswindow,libtcod.white)
+                    libtcod.console_print_ex(screen.wswindow,3 + x,3 + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
             MP = max(self.PCMP - self.PCManaDrain,0)
             mult = 9 - int(((MP * 1.0) / (self.PCMP)) * 9)
             for x in range(5):
@@ -12242,8 +12216,8 @@ class PlayWorld(threading.Thread):
                         char = [0 + x + (5 * mult),58 + y,255]
                     else:
                         char = [0 + x + (5 * (mult - 5)),62 + y,255]
-                    libtcod.console_set_default_foreground(wswindow,libtcod.white)
-                    libtcod.console_print_ex(wswindow,7 + x,3 + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    libtcod.console_set_default_foreground(screen.wswindow,libtcod.white)
+                    libtcod.console_print_ex(screen.wswindow,7 + x,3 + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
             if self.PCPhase == 100:
                 coords = (25,58)
             if self.PCPhase in range(75,100):
@@ -12258,23 +12232,23 @@ class PlayWorld(threading.Thread):
                         pass
                     else:
                         char = [coords[0] + x,coords[1] + y,255]
-                        libtcod.console_set_default_foreground(wswindow,libtcod.white)
-                        libtcod.console_print_ex(wswindow,13 + x,3 + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
-            libtcod.console_set_default_foreground(wswindow,libtcod.white)
+                        libtcod.console_set_default_foreground(screen.wswindow,libtcod.white)
+                        libtcod.console_print_ex(screen.wswindow,13 + x,3 + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+            libtcod.console_set_default_foreground(screen.wswindow,libtcod.white)
             for x in range(15):
                 for y in range(2):
                     char = [11 + x,52 + y,255]
-                    libtcod.console_print_ex(wswindow,2 + x,7 + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
-            libtcod.console_set_default_foreground(wswindow,libtcod.black)
-            libtcod.console_print_ex(wswindow,5,10,libtcod.BKGND_NONE,libtcod.RIGHT,str(HP))
-            libtcod.console_print_ex(wswindow,10,10,libtcod.BKGND_NONE,libtcod.RIGHT,str(MP))
-            libtcod.console_print_ex(wswindow,15,10,libtcod.BKGND_NONE,libtcod.RIGHT,str(self.PCPhase))
-            libtcod.console_set_default_foreground(wswindow,libtcod.darker_grey)
-            libtcod.console_print_ex(wswindow,3,11,libtcod.BKGND_NONE,libtcod.LEFT,'---  ---  ---')
-            libtcod.console_set_default_foreground(wswindow,libtcod.black)
-            libtcod.console_print_ex(wswindow,5,12,libtcod.BKGND_NONE,libtcod.RIGHT,str(self.PCHP))
-            libtcod.console_print_ex(wswindow,10,12,libtcod.BKGND_NONE,libtcod.RIGHT,str(self.PCMP))
-            libtcod.console_print_ex(wswindow,15,12,libtcod.BKGND_NONE,libtcod.RIGHT,'100')
+                    libtcod.console_print_ex(screen.wswindow,2 + x,7 + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+            libtcod.console_set_default_foreground(screen.wswindow,libtcod.black)
+            libtcod.console_print_ex(screen.wswindow,5,10,libtcod.BKGND_NONE,libtcod.RIGHT,str(HP))
+            libtcod.console_print_ex(screen.wswindow,10,10,libtcod.BKGND_NONE,libtcod.RIGHT,str(MP))
+            libtcod.console_print_ex(screen.wswindow,15,10,libtcod.BKGND_NONE,libtcod.RIGHT,str(self.PCPhase))
+            libtcod.console_set_default_foreground(screen.wswindow,libtcod.darker_grey)
+            libtcod.console_print_ex(screen.wswindow,3,11,libtcod.BKGND_NONE,libtcod.LEFT,'---  ---  ---')
+            libtcod.console_set_default_foreground(screen.wswindow,libtcod.black)
+            libtcod.console_print_ex(screen.wswindow,5,12,libtcod.BKGND_NONE,libtcod.RIGHT,str(self.PCHP))
+            libtcod.console_print_ex(screen.wswindow,10,12,libtcod.BKGND_NONE,libtcod.RIGHT,str(self.PCMP))
+            libtcod.console_print_ex(screen.wswindow,15,12,libtcod.BKGND_NONE,libtcod.RIGHT,'100')
         Clouds.paused = False
         NoButtons,NoMenus,NoGraphics = False,False,False
         ButtonLock = False
@@ -12286,12 +12260,12 @@ class PlayWorld(threading.Thread):
     def doPause(self):
         global Clouds, pathlock
         if self.runtime:
-            libtcod.console_set_default_foreground(GUILayer,libtcod.white)
+            libtcod.console_set_default_foreground(screen.GUILayer,libtcod.white)
             for x in range(3):
                 for y in range(3):
                     lock.acquire()
                     char = [icon_pause[0] + x,icon_pause[1] + y,255]
-                    libtcod.console_print_ex(GUILayer,GUITiles['unpause'][0][0] + x,GUITiles['unpause'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    libtcod.console_print_ex(screen.GUILayer,GUITiles['unpause'][0][0] + x,GUITiles['unpause'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                     lock.release()
             audio.playSound('sounds/wav/lb.wav')
             self.runtime = False
@@ -12299,12 +12273,12 @@ class PlayWorld(threading.Thread):
             pathlock = True
             self.paused = True
         else:
-            libtcod.console_set_default_foreground(GUILayer,libtcod.white)
+            libtcod.console_set_default_foreground(screen.GUILayer,libtcod.white)
             for x in range(3):
                 for y in range(3):
                     lock.acquire()
                     char = [icon_unpause[0] + x,icon_unpause[1] + y,255]
-                    libtcod.console_print_ex(GUILayer,GUITiles['unpause'][0][0] + x,GUITiles['unpause'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    libtcod.console_print_ex(screen.GUILayer,GUITiles['unpause'][0][0] + x,GUITiles['unpause'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                     lock.release()
             audio.playSound('sounds/wav/lbh.wav')
             self.runtime = True
@@ -12324,10 +12298,10 @@ class PlayWorld(threading.Thread):
             else:
                 page = GUIMenu['page']
             lock.acquire()
-            libtcod.console_set_default_foreground(GUILayer,libtcod.black)
-            libtcod.console_set_default_background(GUILayer,scrollcolor2)
-            libtcod.console_print_ex(GUILayer,15,4,libtcod.BKGND_SET,libtcod.LEFT,'%02d' % GUIMenu['page'])
-            libtcod.console_set_default_foreground(GUILayer,libtcod.white)
+            libtcod.console_set_default_foreground(screen.GUILayer,libtcod.black)
+            libtcod.console_set_default_background(screen.GUILayer,scrollcolor2)
+            libtcod.console_print_ex(screen.GUILayer,15,4,libtcod.BKGND_SET,libtcod.LEFT,'%02d' % GUIMenu['page'])
+            libtcod.console_set_default_foreground(screen.GUILayer,libtcod.white)
             if GUIMenu[menu][page][0]:
                 tile = GUIMenu[menu][page][0][0]
             else:
@@ -12335,7 +12309,7 @@ class PlayWorld(threading.Thread):
             for x in range(3):
                 for y in range(3):
                     char = [tile[0] + x,tile[1] + y,255]
-                    libtcod.console_print_ex(GUILayer,GUITiles['button1'][0][0] + x,GUITiles['button1'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    libtcod.console_print_ex(screen.GUILayer,GUITiles['button1'][0][0] + x,GUITiles['button1'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
             if GUIMenu[menu][page][1]:
                 tile = GUIMenu[menu][page][1][0]
             else:
@@ -12343,7 +12317,7 @@ class PlayWorld(threading.Thread):
             for x in range(3):
                 for y in range(3):
                     char = [tile[0] + x,tile[1] + y,255]
-                    libtcod.console_print_ex(GUILayer,GUITiles['button2'][0][0] + x,GUITiles['button2'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    libtcod.console_print_ex(screen.GUILayer,GUITiles['button2'][0][0] + x,GUITiles['button2'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
             if GUIMenu[menu][page][2]:
                 tile = GUIMenu[menu][page][2][0]
             else:
@@ -12351,7 +12325,7 @@ class PlayWorld(threading.Thread):
             for x in range(3):
                 for y in range(3):
                     char = [tile[0] + x,tile[1] + y,255]
-                    libtcod.console_print_ex(GUILayer,GUITiles['button3'][0][0] + x,GUITiles['button3'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    libtcod.console_print_ex(screen.GUILayer,GUITiles['button3'][0][0] + x,GUITiles['button3'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
             if GUIMenu[menu][page][3]:
                 tile = GUIMenu[menu][page][3][0]
             else:
@@ -12359,7 +12333,7 @@ class PlayWorld(threading.Thread):
             for x in range(3):
                 for y in range(3):
                     char = [tile[0] + x,tile[1] + y,255]
-                    libtcod.console_print_ex(GUILayer,GUITiles['button4'][0][0] + x,GUITiles['button4'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    libtcod.console_print_ex(screen.GUILayer,GUITiles['button4'][0][0] + x,GUITiles['button4'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
             if GUIMenu[menu][page][4]:
                 tile = GUIMenu[menu][page][4][0]
             else:
@@ -12367,7 +12341,7 @@ class PlayWorld(threading.Thread):
             for x in range(3):
                 for y in range(3):
                     char = [tile[0] + x,tile[1] + y,255]
-                    libtcod.console_print_ex(GUILayer,GUITiles['button5'][0][0] + x,GUITiles['button5'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    libtcod.console_print_ex(screen.GUILayer,GUITiles['button5'][0][0] + x,GUITiles['button5'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
             if GUIMenu[menu][page][5]:
                 tile = GUIMenu[menu][page][5][0]
             else:
@@ -12375,32 +12349,32 @@ class PlayWorld(threading.Thread):
             for x in range(3):
                 for y in range(3):
                     char = [tile[0] + x,tile[1] + y,255]
-                    libtcod.console_print_ex(GUILayer,GUITiles['button6'][0][0] + x,GUITiles['button6'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    libtcod.console_print_ex(screen.GUILayer,GUITiles['button6'][0][0] + x,GUITiles['button6'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
             lock.release()
         if menu == GUIMenu['menu']:
             pass
         else:
             audio.playSound('sounds/wav/click.wav')
             GUIMenu['menu'] = menu
-            libtcod.console_set_default_foreground(GUILayer,libtcod.white)
+            libtcod.console_set_default_foreground(screen.GUILayer,libtcod.white)
             if menu == 'task':
                 for x in range(3):
                     for y in range(3):
                         lock.acquire()
                         char = [icon_taskh[0] + x,icon_taskh[1] + y,255]
-                        libtcod.console_print_ex(GUILayer,GUITiles['task'][0][0] + x,GUITiles['task'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                        libtcod.console_print_ex(screen.GUILayer,GUITiles['task'][0][0] + x,GUITiles['task'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                         lock.release()
                 for x in range(3):
                     for y in range(3):
                         lock.acquire()
                         char = [icon_battle[0] + x,icon_battle[1] + y,255]
-                        libtcod.console_print_ex(GUILayer,GUITiles['battle'][0][0] + x,GUITiles['battle'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                        libtcod.console_print_ex(screen.GUILayer,GUITiles['battle'][0][0] + x,GUITiles['battle'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                         lock.release()
                 for x in range(3):
                     for y in range(3):
                         lock.acquire()
                         char = [icon_group[0] + x,icon_group[1] + y,255]
-                        libtcod.console_print_ex(GUILayer,GUITiles['group'][0][0] + x,GUITiles['group'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                        libtcod.console_print_ex(screen.GUILayer,GUITiles['group'][0][0] + x,GUITiles['group'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                         lock.release()
 
             elif menu == 'group':
@@ -12408,19 +12382,19 @@ class PlayWorld(threading.Thread):
                     for y in range(3):
                         lock.acquire()
                         char = [icon_task[0] + x,icon_task[1] + y,255]
-                        libtcod.console_print_ex(GUILayer,GUITiles['task'][0][0] + x,GUITiles['task'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                        libtcod.console_print_ex(screen.GUILayer,GUITiles['task'][0][0] + x,GUITiles['task'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                         lock.release()
                 for x in range(3):
                     for y in range(3):
                         lock.acquire()
                         char = [icon_battle[0] + x,icon_battle[1] + y,255]
-                        libtcod.console_print_ex(GUILayer,GUITiles['battle'][0][0] + x,GUITiles['battle'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                        libtcod.console_print_ex(screen.GUILayer,GUITiles['battle'][0][0] + x,GUITiles['battle'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                         lock.release()
                 for x in range(3):
                     for y in range(3):
                         lock.acquire()
                         char = [icon_grouph[0] + x,icon_grouph[1] + y,255]
-                        libtcod.console_print_ex(GUILayer,GUITiles['group'][0][0] + x,GUITiles['group'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                        libtcod.console_print_ex(screen.GUILayer,GUITiles['group'][0][0] + x,GUITiles['group'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                         lock.release()
 
             elif menu == 'battle':
@@ -12428,19 +12402,19 @@ class PlayWorld(threading.Thread):
                     for y in range(3):
                         lock.acquire()
                         char = [icon_task[0] + x,icon_task[1] + y,255]
-                        libtcod.console_print_ex(GUILayer,GUITiles['task'][0][0] + x,GUITiles['task'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                        libtcod.console_print_ex(screen.GUILayer,GUITiles['task'][0][0] + x,GUITiles['task'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                         lock.release()
                 for x in range(3):
                     for y in range(3):
                         lock.acquire()
                         char = [icon_battleh[0] + x,icon_battleh[1] + y,255]
-                        libtcod.console_print_ex(GUILayer,GUITiles['battle'][0][0] + x,GUITiles['battle'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                        libtcod.console_print_ex(screen.GUILayer,GUITiles['battle'][0][0] + x,GUITiles['battle'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                         lock.release()
                 for x in range(3):
                     for y in range(3):
                         lock.acquire()
                         char = [icon_group[0] + x,icon_group[1] + y,255]
-                        libtcod.console_print_ex(GUILayer,GUITiles['group'][0][0] + x,GUITiles['group'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                        libtcod.console_print_ex(screen.GUILayer,GUITiles['group'][0][0] + x,GUITiles['group'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                         lock.release()
 
     # Message Display Functions
@@ -12471,8 +12445,8 @@ class PlayWorld(threading.Thread):
 
     def dispMesgLog(self):
         global MLogBar
-        libtcod.console_set_default_background(wiwindow, bgcolor2)
-        libtcod.console_clear(wiwindow)
+        libtcod.console_set_default_background(screen.wiwindow, bgcolor2)
+        libtcod.console_clear(screen.wiwindow)
         MLogBar.reDraw()
         mesgcount = 0
         lbcount = 0
@@ -12481,8 +12455,8 @@ class PlayWorld(threading.Thread):
             mesgcount += 1
             if (lbcount + mesgcount) < self.mesglimit + 3:
                 oldmessage = textWrap(oldmessage)[0]
-                libtcod.console_set_default_foreground(wiwindow, oldmessage[1])
-                libtcod.console_print_ex(wiwindow, VIEW_WIDTH / 2, mesgcount, libtcod.BKGND_NONE, libtcod.CENTER, oldmessage[0])
+                libtcod.console_set_default_foreground(screen.wiwindow, oldmessage[1])
+                libtcod.console_print_ex(screen.wiwindow, screen.view_width / 2, mesgcount, libtcod.BKGND_NONE, libtcod.CENTER, oldmessage[0])
                 mesgcount += oldmessage[0].count('\n')
             else:
                 break
@@ -13516,8 +13490,8 @@ class PlayWorld(threading.Thread):
             GameWorld.windowswitch = True
             adjustScreen()
             self.addMesg('Generating map, one moment...',col = libtcod.light_orange)
-            libtcod.console_set_default_background(LoadScreen,libtcod.magenta)
-            libtcod.console_clear(LoadScreen)
+            libtcod.console_set_default_background(screen.LoadScreen,libtcod.magenta)
+            libtcod.console_clear(screen.LoadScreen)
             DoLoadScreen = True
             GameWorld.rswitch = True
             self.genMap(rtypes)
@@ -14794,8 +14768,8 @@ class PlayWorld(threading.Thread):
                                     self.rheightmap['%s,%s' % (x + cx,y + cy)]
                                 except KeyError:
                                     continue
-                                if libtcod.image_get_pixel(fontinfo,(copse[0] + cx) * finfomod, \
-                                                           (copse[1] + cy) * finfomod) == libtcod.Color(125,255,255):
+                                if libtcod.image_get_pixel(screen.fontinfo,(copse[0] + cx) * screen.finfomod, \
+                                                           (copse[1] + cy) * screen.finfomod) == libtcod.Color(125,255,255):
                                     continue
                                 if not (hperc[1] < self.rheightmap['%s,%s' % (x + cx,y + cy)] < hperc[2]):
                                     blocked = True
@@ -14816,11 +14790,11 @@ class PlayWorld(threading.Thread):
                                     self.rheightmap['%s,%s' % (x + cx,y + cy)]
                                 except KeyError:
                                     continue
-                                if libtcod.image_get_pixel(fontinfo,(copse[0] + cx) * finfomod, \
-                                                           (copse[1] + cy) * finfomod) == libtcod.Color(125,255,255):
+                                if libtcod.image_get_pixel(screen.fontinfo,(copse[0] + cx) * screen.finfomod, \
+                                                           (copse[1] + cy) * screen.finfomod) == libtcod.Color(125,255,255):
                                     continue
-                                if libtcod.image_get_pixel(fontinfo,(copse[0] + cx) * finfomod, \
-                                                           (copse[1] + cy) * finfomod) == libtcod.Color(200,0,200):
+                                if libtcod.image_get_pixel(screen.fontinfo,(copse[0] + cx) * screen.finfomod, \
+                                                           (copse[1] + cy) * screen.finfomod) == libtcod.Color(200,0,200):
                                     self.wobstructed[self.curz]['%s,%s' % (x + cx,y + cy)] = 'copse'
                                     tchar = choice(trunkchars)
                                     rlist = []
@@ -14846,8 +14820,8 @@ class PlayWorld(threading.Thread):
                                     self.rheightmap['%s,%s' % (x + cx,y + cy)]
                                 except KeyError:
                                     continue
-                                if libtcod.image_get_pixel(fontinfo,(copse[0] + cx) * finfomod, \
-                                                           (copse[1] + cy) * finfomod) == libtcod.Color(125,255,255):
+                                if libtcod.image_get_pixel(screen.fontinfo,(copse[0] + cx) * screen.finfomod, \
+                                                           (copse[1] + cy) * screen.finfomod) == libtcod.Color(125,255,255):
                                     continue
                                 self.tallgrassdict['%s,%s' %  (x + cx,y + cy)] = True
                                 tcol = self.rterraindict['%s,%s' % (x + cx,y + cy)]
@@ -14868,7 +14842,7 @@ class PlayWorld(threading.Thread):
         self.leaftreecenter = tree['LEAF'][varnum]
         self.dirttreecenter = tree['DIRT'][varnum]
         self.watertreecenter = tree['WATER'][varnum]
-        if libtcod.image_get_pixel(fontinfo,(self.treecenter[0] + self.num) * finfomod,(self.treecenter[1] + self.num2) * finfomod) == libtcod.Color(125,255,255):
+        if libtcod.image_get_pixel(screen.fontinfo,(self.treecenter[0] + self.num) * screen.finfomod,(self.treecenter[1] + self.num2) * screen.finfomod) == libtcod.Color(125,255,255):
             return False
         self.tcol = self.rterraindict['%s,%s' % (self.x + self.num,self.y + self.num2)]
         if type(self.rheightmap['%s,%s' % (self.x + self.num,self.y + self.num2)]) == str and not self.tempzone == 'Arctic':
@@ -14900,7 +14874,7 @@ class PlayWorld(threading.Thread):
         self.leaftreecenter = tree['LEAF'][varnum]
         self.dirttreecenter = tree['DIRT'][varnum]
         self.watertreecenter = tree['WATER'][varnum]
-        if libtcod.image_get_pixel(fontinfo,(self.treecenter[0] + self.num) * finfomod,(self.treecenter[1] + self.num2) * finfomod) == libtcod.Color(125,255,255):
+        if libtcod.image_get_pixel(screen.fontinfo,(self.treecenter[0] + self.num) * screen.finfomod,(self.treecenter[1] + self.num2) * screen.finfomod) == libtcod.Color(125,255,255):
             return False
         self.tcol = self.rterraindict['%s,%s' % (self.x + self.num,self.y + self.num2)]
         if type(self.rheightmap['%s,%s' % (self.x + self.num,self.y + self.num2)]) == str and not self.tempzone == 'Arctic':
@@ -14930,7 +14904,7 @@ class PlayWorld(threading.Thread):
         self.leaftreecenter = tree['LEAF'][varnum]
         self.dirttreecenter = tree['DIRT'][varnum]
         self.watertreecenter = tree['WATER'][varnum]
-        if libtcod.image_get_pixel(fontinfo,(self.treecenter[0] + self.num) * finfomod,(self.treecenter[1] + self.num2) * finfomod) == libtcod.Color(125,255,255):
+        if libtcod.image_get_pixel(screen.fontinfo,(self.treecenter[0] + self.num) * screen.finfomod,(self.treecenter[1] + self.num2) * screen.finfomod) == libtcod.Color(125,255,255):
             return False
         self.tcol = self.rterraindict['%s,%s' % (self.x + self.num,self.y + self.num2)]
         if type(self.rheightmap['%s,%s' % (self.x + self.num,self.y + self.num2)]) == str:
@@ -15331,7 +15305,7 @@ class PlayWorld(threading.Thread):
                         for sx in range(shrub[0]):
                             for sy in range(shrub[1]):
                                 shchar = [shrub[2] + sx,shrub[3] + sy,255]
-                                if libtcod.image_get_pixel(fontinfo,shchar[0] * finfomod,shchar[1] * finfomod) == libtcod.Color(125,255,255):
+                                if libtcod.image_get_pixel(screen.fontinfo,shchar[0] * screen.finfomod,shchar[1] * screen.finfomod) == libtcod.Color(125,255,255):
                                     continue
                                 try:
                                     self.dirtdict['%s,%s' % (x + sx,y + sy)]
@@ -15377,7 +15351,7 @@ class PlayWorld(threading.Thread):
                                 shchar = [shrub[2] + sx,shrub[3] + sy,255]
                                 shdict['%s,%s' % (x + sx,y + sy)] = [shcol,shchar,shrubtype]
 
-                                if not libtcod.image_get_pixel(fontinfo,shchar[0] * finfomod,shchar[1] * finfomod) == libtcod.Color(200,0,200):
+                                if not libtcod.image_get_pixel(screen.fontinfo,shchar[0] * screen.finfomod,shchar[1] * screen.finfomod) == libtcod.Color(200,0,200):
                                     if 'cactus' in shrubtype:
                                         self.wobstructed[self.curz]['%s,%s' % (x + sx,y + sy)] = 'cactus'
                                     else:
@@ -15426,7 +15400,7 @@ class PlayWorld(threading.Thread):
                                 for by in range(boulder[1]):
                                     boulder = grassboulder
                                     bchar = [boulder[2] + bx,boulder[3] + by,255]
-                                    if libtcod.image_get_pixel(fontinfo,bchar[0] * finfomod,bchar[1] * finfomod) == libtcod.Color(125,255,255):
+                                    if libtcod.image_get_pixel(screen.fontinfo,bchar[0] * screen.finfomod,bchar[1] * screen.finfomod) == libtcod.Color(125,255,255):
                                         continue
                                     self.boulderdict['%s,%s' % (x + bx,y + by)] = True
                                     if self.leafgrounddict.get('%s,%s' % (x + bx,y + by)):
@@ -15446,7 +15420,7 @@ class PlayWorld(threading.Thread):
                                     elif self.dirtdict.get('%s,%s' % (x + bx,y + by)):
                                         boulder = dirtboulder
                                     bchar = [boulder[2] + bx,boulder[3] + by,255]
-                                    if not libtcod.image_get_pixel(fontinfo,bchar[0] * finfomod,bchar[1] * finfomod) == libtcod.Color(200,0,200):
+                                    if not libtcod.image_get_pixel(screen.fontinfo,bchar[0] * screen.finfomod,bchar[1] * screen.finfomod) == libtcod.Color(200,0,200):
                                         self.wobstructed[self.curz]['%s,%s' % (x + bx,y + by)] = 'boulder'
                                     libtcod.console_print_ex(wrwindow, x + bx, y + by, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bchar)))
                                     self.rtextdict['%s,%s' % (x + bx,y + by)] = [bchar,fcol]
@@ -15491,7 +15465,7 @@ class PlayWorld(threading.Thread):
                                 for ly in range(log[1]):
                                     log = grasslog
                                     lchar = [log[2] + lx,log[3] + ly,255]
-                                    if libtcod.image_get_pixel(fontinfo,lchar[0] * finfomod,lchar[1] * finfomod) == libtcod.Color(125,255,255):
+                                    if libtcod.image_get_pixel(screen.fontinfo,lchar[0] * screen.finfomod,lchar[1] * screen.finfomod) == libtcod.Color(125,255,255):
                                         continue
                                     self.logdict['%s,%s' % (x + lx,y + ly)] = True
                                     if self.leafgrounddict.get('%s,%s' % (x + lx,y + ly)):
@@ -15511,77 +15485,77 @@ class PlayWorld(threading.Thread):
                                     elif self.dirtdict.get('%s,%s' % (x + lx,y + ly)):
                                         log = dirtlog
                                     lchar = [log[2] + lx,log[3] + ly,255]
-                                    if not libtcod.image_get_pixel(fontinfo,lchar[0] * finfomod,lchar[1] * finfomod) == libtcod.Color(200,0,200):
+                                    if not libtcod.image_get_pixel(screen.fontinfo,lchar[0] * screen.finfomod,lchar[1] * screen.finfomod) == libtcod.Color(200,0,200):
                                         self.wobstructed[self.curz]['%s,%s' % (x + lx,y + ly)] = 'log'
                                     libtcod.console_print_ex(wrwindow, x + lx, y + ly, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(lchar)))
                                     self.rtextdict['%s,%s' % (x + lx,y + ly)] = [lchar,fcol]
 
 
     def doLoadScreen(self,stage):
-        global LoadScreen, NoUpdate
+        global NoUpdate
         NoUpdate = True
-        libtcod.console_set_default_background(LoadScreen,libtcod.magenta)
-        libtcod.console_clear(LoadScreen)
-        DrawScroll(LoadScreen,(VIEW_WIDTH / 2) - 17,(VIEW_HEIGHT / 2) - 11,33,20,1)
+        libtcod.console_set_default_background(screen.LoadScreen,libtcod.magenta)
+        libtcod.console_clear(screen.LoadScreen)
+        DrawScroll(screen.LoadScreen,(screen.view_width / 2) - 17,(screen.view_height / 2) - 11,33,20,1)
         for x in range(34):
             for y in range(21):
-                libtcod.console_set_char_background(LoadScreen,x + (VIEW_WIDTH / 2) - 17,y + (VIEW_HEIGHT / 2) - 11,scrollcolor2,libtcod.BKGND_SET)
+                libtcod.console_set_char_background(screen.LoadScreen,x + (screen.view_width / 2) - 17,y + (screen.view_height / 2) - 11,scrollcolor2,libtcod.BKGND_SET)
         if stage == 'world':
             for x in range(32):
                 for y in range(19):
                     char = [x,1509 + y,255]
-                    coords = [(VIEW_WIDTH / 2) - 16,(VIEW_HEIGHT / 2) - 10]
-                    libtcod.console_set_default_foreground(LoadScreen,libtcod.white)
-                    libtcod.console_print_ex(LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    coords = [(screen.view_width / 2) - 16,(screen.view_height / 2) - 10]
+                    libtcod.console_set_default_foreground(screen.LoadScreen,libtcod.white)
+                    libtcod.console_print_ex(screen.LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
         elif stage == 'terrain':
             for x in range(32):
                 for y in range(19):
                     char = [x,1395 + y,255]
-                    coords = [(VIEW_WIDTH / 2) - 16,(VIEW_HEIGHT / 2) - 10]
-                    libtcod.console_set_default_foreground(LoadScreen,libtcod.white)
-                    libtcod.console_print_ex(LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    coords = [(screen.view_width / 2) - 16,(screen.view_height / 2) - 10]
+                    libtcod.console_set_default_foreground(screen.LoadScreen,libtcod.white)
+                    libtcod.console_print_ex(screen.LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
         elif stage == 'trees':
             for x in range(32):
                 for y in range(19):
                     char = [x,1414 + y,255]
-                    coords = [(VIEW_WIDTH / 2) - 16,(VIEW_HEIGHT / 2) - 10]
-                    libtcod.console_set_default_foreground(LoadScreen,libtcod.white)
-                    libtcod.console_print_ex(LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    coords = [(screen.view_width / 2) - 16,(screen.view_height / 2) - 10]
+                    libtcod.console_set_default_foreground(screen.LoadScreen,libtcod.white)
+                    libtcod.console_print_ex(screen.LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
         elif stage == 'scrub':
             for x in range(32):
                 for y in range(19):
                     char = [x,1433 + y,255]
-                    coords = [(VIEW_WIDTH / 2) - 16,(VIEW_HEIGHT / 2) - 10]
-                    libtcod.console_set_default_foreground(LoadScreen,libtcod.white)
-                    libtcod.console_print_ex(LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    coords = [(screen.view_width / 2) - 16,(screen.view_height / 2) - 10]
+                    libtcod.console_set_default_foreground(screen.LoadScreen,libtcod.white)
+                    libtcod.console_print_ex(screen.LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
         elif stage == 'misc':
             for x in range(32):
                 for y in range(19):
                     char = [x,1452 + y,255]
-                    coords = [(VIEW_WIDTH / 2) - 16,(VIEW_HEIGHT / 2) - 10]
-                    libtcod.console_set_default_foreground(LoadScreen,libtcod.white)
-                    libtcod.console_print_ex(LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    coords = [(screen.view_width / 2) - 16,(screen.view_height / 2) - 10]
+                    libtcod.console_set_default_foreground(screen.LoadScreen,libtcod.white)
+                    libtcod.console_print_ex(screen.LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
         elif stage == 'river':
             for x in range(32):
                 for y in range(19):
                     char = [x,1471 + y,255]
-                    coords = [(VIEW_WIDTH / 2) - 16,(VIEW_HEIGHT / 2) - 10]
-                    libtcod.console_set_default_foreground(LoadScreen,libtcod.white)
-                    libtcod.console_print_ex(LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    coords = [(screen.view_width / 2) - 16,(screen.view_height / 2) - 10]
+                    libtcod.console_set_default_foreground(screen.LoadScreen,libtcod.white)
+                    libtcod.console_print_ex(screen.LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
         elif stage == 'vectors':
             for x in range(32):
                 for y in range(19):
                     char = [x,1490 + y,255]
-                    coords = [(VIEW_WIDTH / 2) - 16,(VIEW_HEIGHT / 2) - 10]
-                    libtcod.console_set_default_foreground(LoadScreen,libtcod.white)
-                    libtcod.console_print_ex(LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    coords = [(screen.view_width / 2) - 16,(screen.view_height / 2) - 10]
+                    libtcod.console_set_default_foreground(screen.LoadScreen,libtcod.white)
+                    libtcod.console_print_ex(screen.LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
         elif stage == 'shores':
             for x in range(32):
                 for y in range(19):
                     char = [x,1528 + y,255]
-                    coords = [(VIEW_WIDTH / 2) - 16,(VIEW_HEIGHT / 2) - 10]
-                    libtcod.console_set_default_foreground(LoadScreen,libtcod.white)
-                    libtcod.console_print_ex(LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                    coords = [(screen.view_width / 2) - 16,(screen.view_height / 2) - 10]
+                    libtcod.console_set_default_foreground(screen.LoadScreen,libtcod.white)
+                    libtcod.console_print_ex(screen.LoadScreen,coords[0] + x,coords[1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
         NoUpdate = False
 
     def genMap(self,rtypes):
@@ -15894,8 +15868,8 @@ class PlayWorld(threading.Thread):
 
     def doLeave(self):
         global DoLoadScreen
-        libtcod.console_set_default_background(LoadScreen,libtcod.magenta)
-        libtcod.console_clear(LoadScreen)
+        libtcod.console_set_default_background(screen.LoadScreen,libtcod.magenta)
+        libtcod.console_clear(screen.LoadScreen)
         DoLoadScreen = True
         q.put('world')
         time.sleep(1.0)
@@ -15961,7 +15935,7 @@ class PlayWorld(threading.Thread):
         for Button in ButtonList:
             if Button.text == 'Begin Adventuring Here':
                 ButtonList.remove(Button)
-        libtcod.console_set_default_foreground(wiwindow,libtcod.white)
+        libtcod.console_set_default_foreground(screen.wiwindow,libtcod.white)
         if city:
             try:
                 wcitydict[city]
@@ -15973,13 +15947,13 @@ class PlayWorld(threading.Thread):
                     x = globals()['w%sdict' % (sitetype)][city][0][0] - (len(city) / 2) + tilex
                     y = globals()['w%sdict' % (sitetype)][city][0][1] - 1 + tiley
 
-            libtcod.console_clear(wiwindow)
-            #libtcod.console_print_ex(wiwindow, VIEW_WIDTH / 2, 2, libtcod.BKGND_NONE, libtcod.CENTER, 'The %s of %s' % (sitetype.capitalize(),city))
-            for x in range(VIEW_WIDTH):
+            libtcod.console_clear(screen.wiwindow)
+            #libtcod.console_print_ex(screen.wiwindow, screen.view_width / 2, 2, libtcod.BKGND_NONE, libtcod.CENTER, 'The %s of %s' % (sitetype.capitalize(),city))
+            for x in range(screen.view_width):
                 for y in range(7):
-                    libtcod.console_print_ex(0,20 + x,VIEW_HEIGHT + 3 + y,libtcod.BKGND_NONE,libtcod.LEFT,' ')
+                    libtcod.console_print_ex(0,20 + x,screen.view_height + 3 + y,libtcod.BKGND_NONE,libtcod.LEFT,' ')
             bannertext = 'The %s of %s' % (sitetype.capitalize(),city)
-            DrawBanner(wiwindow,VIEW_WIDTH / 2,2,bannertext)
+            DrawBanner(screen.wiwindow,screen.view_width / 2,2,bannertext)
             civname = globals()['w%sdict' % (sitetype)][city][1]
             fcol = wcivdict[civname + '-civcol2']
             cx = globals()['w%sdict' % (sitetype)][city][0][0] - 1
@@ -15993,7 +15967,7 @@ class PlayWorld(threading.Thread):
             DrawScroll(wpfxwindow, cx - (len(city) / 2), cy, len(city) + 1, 2)
             libtcod.console_set_default_foreground(wpfxwindow,fcol)
             libtcod.console_print_ex(wpfxwindow, cx + 1, cy + 1, libtcod.BKGND_NONE, libtcod.CENTER, city)
-            selectbutton = ButtonBox(wiwindow, (VIEW_WIDTH / 2) - 11, 8, 'Begin Adventuring Here', 'b', offx = SCREEN_WIDTH - VIEW_WIDTH - 2, offy = VIEW_HEIGHT)
+            selectbutton = ButtonBox(screen.wiwindow, (screen.view_width / 2) - 11, 8, 'Begin Adventuring Here', 'b', offx = screen.width - screen.view_width - 2, offy = screen.view_height)
             self.startregion = [globals()['w%sdict' % (sitetype)][city][0][0],globals()['w%sdict' % (sitetype)][city][0][1]]
             self.curregion = self.startregion
             self.startcity = city
@@ -16013,15 +15987,15 @@ class PlayWorld(threading.Thread):
                 Button.drawButton()
 
         MenuSetting = 'PWStartLoc'
-        StartLocMenu = Menu(wswindow, 2, 4, optionlist, title = 'Starting Sites:', talign = 'center', tx = 9, ty = 2, \
+        StartLocMenu = Menu(screen.wswindow, 2, 4, optionlist, title = 'Starting Sites:', talign = 'center', tx = 9, ty = 2, \
                             MethodList = [('Cities',self.loadCities),('Villages',self.loadVillages)], BMethodList = [doIntroSetup], \
                             drawbox = True, tback = True).start()
 
         pwtext = 'Select a location in which to begin your journey in the world of ' + worldname + ', adventurer.'
-        CurText = FadeText(textWrap(pwtext)[0], VIEW_WIDTH / 2, 4, con=wiwindow, speed=50, align='center').start()
+        CurText = FadeText(textWrap(pwtext)[0], screen.view_width / 2, 4, con=screen.wiwindow, speed=50, align='center').start()
         pwtext = 'You may choose from any city or town by selecting its entry from the list on the left, or by left-clicking its icon on the world map. ' \
                  + 'You can navigate the world map with directional keys or by left-clicking and dragging the map directly.'
-        CurText = FadeText(textWrap(pwtext)[0], VIEW_WIDTH / 2, 6, con=wiwindow, speed=50, align='center').start()
+        CurText = FadeText(textWrap(pwtext)[0], screen.view_width / 2, 6, con=screen.wiwindow, speed=50, align='center').start()
 
     def loadCities(self):
         global MenuSetting, MenuList
@@ -16031,7 +16005,7 @@ class PlayWorld(threading.Thread):
         doScreenSetup()
         for Button in ButtonList:
             Button.drawButton()
-        StartLocCities = Menu(wswindow, 2, 4, optionlist, title = 'Cities:', talign = 'center', tx = 9, ty = 2, \
+        StartLocCities = Menu(screen.wswindow, 2, 4, optionlist, title = 'Cities:', talign = 'center', tx = 9, ty = 2, \
                               MethodList = [(True,self.viewSite)], BMethodList = [doScreenSetup,self.siteMenu], \
                               drawbox = True, tback = True)
         StartLocCities.start()
@@ -16045,7 +16019,7 @@ class PlayWorld(threading.Thread):
         doScreenSetup()
         for Button in ButtonList:
             Button.drawButton()
-        StartLocCities = Menu(wswindow, 2, 4, optionlist, title = 'Villages:', talign = 'center', tx = 9, ty = 2, \
+        StartLocCities = Menu(screen.wswindow, 2, 4, optionlist, title = 'Villages:', talign = 'center', tx = 9, ty = 2, \
                               MethodList = [(True,self.viewSite)], BMethodList = [doScreenSetup,self.siteMenu], \
                               drawbox = True, tback = True)
         StartLocCities.start()
@@ -16054,10 +16028,10 @@ class PlayWorld(threading.Thread):
     def viewSite(self):
         global PX, PY
         try:
-            PX,PY = wcitydict[self.optionlist[mplayery - 1]][0][0] - (VIEW_WIDTH / 2),wcitydict[self.optionlist[mplayery - 1]][0][1] - (VIEW_HEIGHT / 2)
+            PX,PY = wcitydict[self.optionlist[mplayery - 1]][0][0] - (screen.view_width / 2),wcitydict[self.optionlist[mplayery - 1]][0][1] - (screen.view_height / 2)
             GameWorld.displayCity(city = self.optionlist[mplayery - 1])
         except KeyError:
-            PX,PY = wvillagedict[self.optionlist[mplayery - 1]][0][0] - (VIEW_WIDTH / 2),wvillagedict[self.optionlist[mplayery - 1]][0][1] - (VIEW_HEIGHT / 2)
+            PX,PY = wvillagedict[self.optionlist[mplayery - 1]][0][0] - (screen.view_width / 2),wvillagedict[self.optionlist[mplayery - 1]][0][1] - (screen.view_height / 2)
             GameWorld.displayCity(city = self.optionlist[mplayery - 1])
 
     def setupStart(self):
@@ -16070,15 +16044,15 @@ class PlayWorld(threading.Thread):
         Clouds.killswitch = True
         MenuSetting = None
         MenuList = []
-        PX,PY = (RMAP_WIDTH / 2) - (VIEW_WIDTH / 2),(RMAP_HEIGHT / 2) - (VIEW_HEIGHT / 2)
+        PX,PY = (RMAP_WIDTH / 2) - (screen.view_width / 2),(RMAP_HEIGHT / 2) - (screen.view_height / 2)
         PCX,PCY = (RMAP_WIDTH / 2) - 1,(RMAP_HEIGHT / 2)
         OPCX,OPCY = PCX,PCY
         libtcod.console_set_default_foreground(0, libtcod.white)
-        libtcod.console_print_ex(0, (SCREEN_WIDTH - (VIEW_WIDTH / 2)) - 9, VIEW_HEIGHT + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
-        libtcod.console_print_ex(0, (SCREEN_WIDTH - (VIEW_WIDTH / 2)) - 8, VIEW_HEIGHT + 2, libtcod.BKGND_NONE, libtcod.LEFT, ' Message Log ')
-        libtcod.console_print_ex(0, (SCREEN_WIDTH - (VIEW_WIDTH / 2)) + 5, VIEW_HEIGHT + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapw)))
+        libtcod.console_print_ex(0, (screen.width - (screen.view_width / 2)) - 9, screen.view_height + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
+        libtcod.console_print_ex(0, (screen.width - (screen.view_width / 2)) - 8, screen.view_height + 2, libtcod.BKGND_NONE, libtcod.LEFT, ' Message Log ')
+        libtcod.console_print_ex(0, (screen.width - (screen.view_width / 2)) + 5, screen.view_height + 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapw)))
         libtcod.console_flush()
-        MLogBar = ScrollBar(wiwindow, VIEW_WIDTH - 1, 0, SCREEN_HEIGHT - VIEW_HEIGHT - 3, SCREEN_WIDTH - 3, VIEW_HEIGHT + 3, \
+        MLogBar = ScrollBar(screen.wiwindow, screen.view_width - 1, 0, screen.height - screen.view_height - 3, screen.width - 3, screen.view_height + 3, \
                             arrowcolor = libtcod.Color(173,230,116), bgcolor = bgcolor, \
                             hcolor = libtcod.Color(173,230,116), ID = 'MLogBar')
         MLogBar.start()
@@ -16087,8 +16061,8 @@ class PlayWorld(threading.Thread):
         audio.playMusic('music/ogg/Cult-spring.ogg',-1)
         self.addMesg('Generating map, one moment...',col = libtcod.light_orange)
         rtypes = wbiomedict['%s,%s' % (self.curregion[0],self.curregion[1])]
-        libtcod.console_set_default_background(LoadScreen,libtcod.magenta)
-        libtcod.console_clear(LoadScreen)
+        libtcod.console_set_default_background(screen.LoadScreen,libtcod.magenta)
+        libtcod.console_clear(screen.LoadScreen)
         DoLoadScreen = True
         self.rswitch = True
         self.genMap(rtypes)
@@ -16864,7 +16838,7 @@ class PlayWorld(threading.Thread):
                 x = int(key.split(',')[0])
                 y = int(key.split(',')[1])
                 libtcod.console_set_char_background(self.zconsole, x, y, libtcod.magenta, libtcod.BKGND_SET)
-            self.zconlist = [self.zconsole,PX,PY,VIEW_WIDTH,VIEW_HEIGHT,(SCREEN_WIDTH - VIEW_WIDTH) - 2,2,1.0,zmod]
+            self.zconlist = [self.zconsole,PX,PY,screen.view_width,screen.view_height,(screen.width - screen.view_width) - 2,2,1.0,zmod]
             WeatherLayer.append(self.zconlist)
 
     # PC Movement
@@ -17991,16 +17965,16 @@ class PlayWorld(threading.Thread):
             GameWorld.windowswitch = False
             MouseLock,MoveLock = True,True
 
-            DrawScroll(wpwindow,VIEW_WIDTH / 2 - 7,VIEW_HEIGHT / 2 - 1, 13, 2, 1)
+            DrawScroll(wpwindow,screen.view_width / 2 - 7,screen.view_height / 2 - 1, 13, 2, 1)
             libtcod.console_set_default_foreground(wpwindow,libtcod.black)
-            libtcod.console_print_ex(wpwindow,VIEW_WIDTH / 2,VIEW_HEIGHT / 2,libtcod.BKGND_NONE,libtcod.CENTER,'Loading...')
+            libtcod.console_print_ex(wpwindow,screen.view_width / 2,screen.view_height / 2,libtcod.BKGND_NONE,libtcod.CENTER,'Loading...')
             time.sleep(1.0)
 
             audio.playMusic('music/ogg/Cult-summer.ogg',-1)
 
             libtcod.console_set_default_background(wrwindow, libtcod.black)
-            libtcod.console_clear(wiwindow)
-            libtcod.console_clear(wswindow)
+            libtcod.console_clear(screen.wiwindow)
+            libtcod.console_clear(screen.wswindow)
             time.sleep(0.1)
             libtcod.console_clear(wpwindow)
 
@@ -18088,7 +18062,7 @@ class PlayWorld(threading.Thread):
 
             self.rdictSetup()
             self.siteMenu()
-            borderbutton = ButtonBox(wswindow, 5, 44, '+ Borders', '+')
+            borderbutton = ButtonBox(screen.wswindow, 5, 44, '+ Borders', '+')
             self.ocity = {}
 
             self.doGUIMenu(page = 1)
@@ -18121,9 +18095,9 @@ class PlayWorld(threading.Thread):
                 NoGraphics,NoMenus,NoButtons = True,True,True
                 lock.acquire()
                 if drawclock:
-                    libtcod.console_set_default_background(TimeLayer,scrollcolor2)
-                    libtcod.console_clear(TimeLayer)
-                    libtcod.console_set_default_foreground(TimeLayer,libtcod.white)
+                    libtcod.console_set_default_background(screen.TimeLayer,scrollcolor2)
+                    libtcod.console_clear(screen.TimeLayer)
+                    libtcod.console_set_default_foreground(screen.TimeLayer,libtcod.white)
                     xmod = self.hours % 6
                     ymod = self.hours / 6
                     xpos = xmod * 5
@@ -18131,14 +18105,14 @@ class PlayWorld(threading.Thread):
                     for x in range(5):
                         for y in range(5):
                             char = [x + xpos,y + ypos,255]
-                            libtcod.console_print_ex(TimeLayer,x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                            libtcod.console_print_ex(screen.TimeLayer,x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
                     for x in range(11):
                         for y in range(5):
                             if y == 0 or y == 4 or x == 10:
                                 char = [x,2030 + y,255]
-                                libtcod.console_print_ex(TimeLayer,5 + x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
-                libtcod.console_set_default_foreground(TimeLayer,libtcod.black)
-                libtcod.console_print_ex(TimeLayer,6,2,libtcod.BKGND_NONE,libtcod.LEFT,self.timestr)
+                                libtcod.console_print_ex(screen.TimeLayer,5 + x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                libtcod.console_set_default_foreground(screen.TimeLayer,libtcod.black)
+                libtcod.console_print_ex(screen.TimeLayer,6,2,libtcod.BKGND_NONE,libtcod.LEFT,self.timestr)
                 lock.release()
                 NoGraphics,NoMenus,NoButtons = False,False,False
             # Status updates.
@@ -18428,63 +18402,61 @@ class Pathfinder(threading.Thread):
 ####################################
 
 def doWorldGen():
-    global VIEW_HEIGHT, VIEW_WIDTH, SCREEN_HEIGHT, DoScaleLayer
-    libtcod.console_blit(wgwindow,0 + playerx,0 + playery,VIEW_WIDTH,VIEW_HEIGHT,0,20,2,1.0,1.0)
-    libtcod.console_blit(wiwindow,0,0,VIEW_WIDTH,SCREEN_HEIGHT - VIEW_HEIGHT - 3,0,20,VIEW_HEIGHT + 3,1.0,0.5)
-    libtcod.console_blit(wswindow,0,0,SCREEN_WIDTH - VIEW_WIDTH - 3,SCREEN_HEIGHT - 2,0,0,2,1.0,0.5)
+    global DoScaleLayer
+    libtcod.console_blit(wgwindow,0 + playerx,0 + playery,screen.view_width,screen.view_height,0,20,2,1.0,1.0)
+    libtcod.console_blit(screen.wiwindow,0,0,screen.view_width,screen.height - screen.view_height - 3,0,20,screen.view_height + 3,1.0,0.5)
+    libtcod.console_blit(screen.wswindow,0,0,screen.width - screen.view_width - 3,screen.height - 2,0,0,2,1.0,0.5)
     if DoScaleLayer:
-        libtcod.console_blit(toplayer,0,0,VIEW_WIDTH,VIEW_HEIGHT,0,20,2,1.0,1.0)
+        libtcod.console_blit(screen.toplayer,0,0,screen.view_width,screen.view_height,0,20,2,1.0,1.0)
 
 ####################################
 # XVII. Main World Atlas Loop      #
 ####################################
 
 def doWorldAtlas():
-    global VIEW_HEIGHT, VIEW_WIDTH, SCREEN_HEIGHT
-
-    libtcod.console_blit(wawindow,0,0,VIEW_WIDTH,VIEW_HEIGHT,0,20,2,1.0,1.0)
-    libtcod.console_blit(wswindow,0,0,SCREEN_WIDTH - VIEW_WIDTH - 3,SCREEN_HEIGHT - 2,0,0,2,1.0,0.5)
+    libtcod.console_blit(wawindow,0,0,screen.view_width,screen.view_height,0,20,2,1.0,1.0)
+    libtcod.console_blit(screen.wswindow,0,0,screen.width - screen.view_width - 3,screen.height - 2,0,0,2,1.0,0.5)
 
 ####################################
 # XVIII. Main Game Loop            #
 ####################################
 
 def doMainGame():
-    global VIEW_HEIGHT, VIEW_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH, MAP_HEIGHT, SCREEN_HEIGHT, PY, PX, GameWorld, hpcswitch, \
+    global MAP_HEIGHT, PY, PX, GameWorld, hpcswitch, \
            XConsoles, TopWindow, freeze, PCRlayer, PCWlayer, DoLoadScreen
     if not freeze:
         if GameWorld.rswitch == True:
             limitx,limity = RMAP_WIDTH,RMAP_HEIGHT
         else:
             limitx,limity = MAP_WIDTH,MAP_HEIGHT
-        MPX = max(min(PX,limitx - VIEW_WIDTH),0)
-        MPY = max(min(PY,limity - VIEW_HEIGHT),0)
+        MPX = max(min(PX,limitx - screen.view_width),0)
+        MPY = max(min(PY,limity - screen.view_height),0)
         if GameWorld.windowswitch:
-            libtcod.console_blit(wrwindow,0 + MPX,0 + MPY,VIEW_WIDTH,VIEW_HEIGHT,0,20,2,1.0,1.0)
+            libtcod.console_blit(wrwindow,0 + MPX,0 + MPY,screen.view_width,screen.view_height,0,20,2,1.0,1.0)
         else:
-            libtcod.console_blit(wpwindow,0 + MPX,0 + MPY,VIEW_WIDTH,VIEW_HEIGHT,0,20,2,1.0,1.0)
-            libtcod.console_blit(wpfxwindow,0 + MPX,0 + MPY,VIEW_WIDTH,VIEW_HEIGHT,0,20,2,1.0,1.0)
+            libtcod.console_blit(wpwindow,0 + MPX,0 + MPY,screen.view_width,screen.view_height,0,20,2,1.0,1.0)
+            libtcod.console_blit(wpfxwindow,0 + MPX,0 + MPY,screen.view_width,screen.view_height,0,20,2,1.0,1.0)
         for console in WeatherLayer:
             libtcod.console_blit(console[0],MPX,MPY,console[3],console[4],0,console[5],console[6],console[7],console[8])
         if GameWorld.windowswitch:
-            libtcod.console_blit(PCRlayer,MPX,MPY,VIEW_WIDTH,VIEW_HEIGHT,0,20,2,1.0,0.0)
+            libtcod.console_blit(PCRlayer,MPX,MPY,screen.view_width,screen.view_height,0,20,2,1.0,0.0)
         else:
-            libtcod.console_blit(PCWlayer,MPX,MPY,VIEW_WIDTH,VIEW_HEIGHT,0,20,2,1.0,0.0)
+            libtcod.console_blit(PCWlayer,MPX,MPY,screen.view_width,screen.view_height,0,20,2,1.0,0.0)
         if GameWorld.showclock:
-            libtcod.console_blit(TimeLayer,0,0,16,5,0,22,3,1.0,1.0)
+            libtcod.console_blit(screen.TimeLayer,0,0,16,5,0,22,3,1.0,1.0)
         if GameWorld.paused:
-            libtcod.console_blit(PauseLayer,0,0,5,5,0,SCREEN_WIDTH - 9,3,1.0,1.0)
+            libtcod.console_blit(screen.PauseLayer,0,0,5,5,0,screen.width - 9,3,1.0,1.0)
         for console in XConsoles:
             libtcod.console_blit(console[0],console[1],console[2],console[3],console[4],0,console[5],console[6],console[7],console[8])
         for console in TopWindow:
             libtcod.console_blit(console[0],console[1],console[2],console[3],console[4],0,console[5],console[6],console[7],console[8])
-        libtcod.console_blit(toplayer,0,0,VIEW_WIDTH,VIEW_HEIGHT,0,20,2,1.0,0.0)
+        libtcod.console_blit(screen.toplayer,0,0,screen.view_width,screen.view_height,0,20,2,1.0,0.0)
         if DoLoadScreen:
-            libtcod.console_blit(LoadScreen,0,0,VIEW_WIDTH,VIEW_HEIGHT,0,20,2,1.0,1.0)
+            libtcod.console_blit(screen.LoadScreen,0,0,screen.view_width,screen.view_height,0,20,2,1.0,1.0)
         if hpcswitch:
             GameWorld.handlePC()
-        libtcod.console_blit(wiwindow,0,0,VIEW_WIDTH,SCREEN_HEIGHT - VIEW_HEIGHT - 3,0,20,VIEW_HEIGHT + 3,1.0,0.5)
-        libtcod.console_blit(wswindow,0,0,SCREEN_WIDTH - VIEW_WIDTH - 3,SCREEN_HEIGHT - 2,0,0,2,1.0,0.5)
+        libtcod.console_blit(screen.wiwindow,0,0,screen.view_width,screen.height - screen.view_height - 3,0,20,screen.view_height + 3,1.0,0.5)
+        libtcod.console_blit(screen.wswindow,0,0,screen.width - screen.view_width - 3,screen.height - 2,0,0,2,1.0,0.5)
     else:
         time.sleep(0.1)
 
@@ -18493,27 +18465,12 @@ def doMainGame():
 ####################################
 
 if __name__ == '__main__':
-    libtcod.mouse_show_cursor(True)
-
-    fontimage = libtcod.image_load('fonts/' + init['FONT'])
-
-    if init['FONT TYPE'] == 'GREYSCALE':
-        libtcod.console_set_custom_font('fonts/' + init['FONT'],libtcod.FONT_LAYOUT_TCOD | libtcod.FONT_TYPE_GREYSCALE,fontx,fonty)
-    else:
-        libtcod.console_set_custom_font('fonts/' + init['FONT'],libtcod.FONT_LAYOUT_TCOD,fontx,fonty)
-    libtcod.console_init_root(SCREEN_WIDTH,SCREEN_HEIGHT,'Empyrea ' + __version__,False)
-
-    finfomod = libtcod.image_get_size(fontimage)
-    finfomod = finfomod[0] / 32
-    fontinfo = libtcod.image_load('fonts/fontinfo%s.png' % finfomod)
-
-    libtcod.sys_set_fps(LIMIT_FPS)
 
     # GUI Layer Location
 
     GUITiles = {}
-    GUIxloc = 20 + (VIEW_WIDTH / 2) - 16
-    GUIyloc = 2 + VIEW_HEIGHT - 10
+    GUIxloc = 20 + (screen.view_width / 2) - 16
+    GUIyloc = 2 + screen.view_height - 10
     for x in range(GUIxloc + 12,GUIxloc + 20):
         for y in range(GUIyloc,GUIyloc + 4):
             GUITiles['%s,%s' % (x,y)] = True
@@ -18583,28 +18540,28 @@ if __name__ == '__main__':
     GUIMenu['battle'] = {}
     GUIMenu['task'] = {}
     GUIMenu['group'] = {}
-    libtcod.console_set_key_color(GUILayer,libtcod.magenta)
-    libtcod.console_set_default_background(GUILayer,libtcod.magenta)
-    libtcod.console_clear(GUILayer)
-    libtcod.console_set_default_background(GUILayer,libtcod.black)
-    libtcod.console_set_default_foreground(GUILayer,libtcod.white)
+    libtcod.console_set_key_color(screen.GUILayer,libtcod.magenta)
+    libtcod.console_set_default_background(screen.GUILayer,libtcod.magenta)
+    libtcod.console_clear(screen.GUILayer)
+    libtcod.console_set_default_background(screen.GUILayer,libtcod.black)
+    libtcod.console_set_default_foreground(screen.GUILayer,libtcod.white)
     for x in range(12,20):
         for y in range(2021,2025):
             char = [x,y,255]
-            libtcod.console_print_ex(GUILayer,x,y - 2021,libtcod.BKGND_SET,libtcod.LEFT,chr(DoChar(char)))
+            libtcod.console_print_ex(screen.GUILayer,x,y - 2021,libtcod.BKGND_SET,libtcod.LEFT,chr(DoChar(char)))
     for x in range(32):
         for y in range(2025,2030):
             char = [x,y,255]
-            libtcod.console_print_ex(GUILayer,x,y - 2021,libtcod.BKGND_SET,libtcod.LEFT,chr(DoChar(char)))
+            libtcod.console_print_ex(screen.GUILayer,x,y - 2021,libtcod.BKGND_SET,libtcod.LEFT,chr(DoChar(char)))
     for x in range(3):
         for y in range(3):
             char = [icon_battleh[0] + x,icon_battleh[1] + y,255]
-            libtcod.console_print_ex(GUILayer,GUITiles['battle'][0][0] + x,GUITiles['battle'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
-    libtcod.console_set_default_foreground(GUILayer,libtcod.black)
-    libtcod.console_set_default_background(GUILayer,scrollcolor2)
-    libtcod.console_print_ex(GUILayer,15,4,libtcod.BKGND_SET,libtcod.LEFT,'%02d' % GUIMenu['page'])
-    GUICon = [GUILayer,0,0,32,9,GUIxloc,GUIyloc,1.0,1.0]
-    libtcod.console_set_default_foreground(GUILayer,libtcod.white)
+            libtcod.console_print_ex(screen.GUILayer,GUITiles['battle'][0][0] + x,GUITiles['battle'][0][1] + y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+    libtcod.console_set_default_foreground(screen.GUILayer,libtcod.black)
+    libtcod.console_set_default_background(screen.GUILayer,scrollcolor2)
+    libtcod.console_print_ex(screen.GUILayer,15,4,libtcod.BKGND_SET,libtcod.LEFT,'%02d' % GUIMenu['page'])
+    GUICon = [screen.GUILayer,0,0,32,9,GUIxloc,GUIyloc,1.0,1.0]
+    libtcod.console_set_default_foreground(screen.GUILayer,libtcod.white)
 
     # Actions Setup
 
@@ -18654,25 +18611,25 @@ if __name__ == '__main__':
     GUIMenu['group'][6] = [None,None,None,None,None,None]
 
     # Initial time setup.
-    libtcod.console_set_default_background(TimeLayer,scrollcolor2)
-    libtcod.console_clear(TimeLayer)
+    libtcod.console_set_default_background(screen.TimeLayer,scrollcolor2)
+    libtcod.console_clear(screen.TimeLayer)
     for x in range(5):
         for y in range(5):
             char = [x,2035 + y,255]
-            libtcod.console_set_default_foreground(TimeLayer,libtcod.white)
-            libtcod.console_print_ex(TimeLayer,x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+            libtcod.console_set_default_foreground(screen.TimeLayer,libtcod.white)
+            libtcod.console_print_ex(screen.TimeLayer,x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
     for x in range(11):
         for y in range(5):
             if y == 0 or y == 4 or x == 10:
                 char = [x,2030 + y,255]
-                libtcod.console_print_ex(TimeLayer,5 + x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+                libtcod.console_print_ex(screen.TimeLayer,5 + x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
 
     # Pause icon setup.
-    libtcod.console_set_default_foreground(PauseLayer,libtcod.white)
+    libtcod.console_set_default_foreground(screen.PauseLayer,libtcod.white)
     for x in range(5):
         for y in range(5):
             char = [11 + x,2030 + y ,255]
-            libtcod.console_print_ex(PauseLayer,x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
+            libtcod.console_print_ex(screen.PauseLayer,x,y,libtcod.BKGND_NONE,libtcod.LEFT,chr(DoChar(char)))
 
     # Color Scheme Settings
     colorscheme = {}
@@ -18703,76 +18660,6 @@ if __name__ == '__main__':
     hlite = colorscheme[init['COLOR SCHEME']]['hlite']
     buttonback = colorscheme[init['COLOR SCHEME']]['buttonback']
 
-
-    ## NOTE TO SELF - Blit2x reserves characters 226-232 ##
-
-    libtcod.console_map_ascii_code_to_font(157,4,5) # Deciduous
-    libtcod.console_map_ascii_code_to_font(156,1,5) # Shrubland
-    libtcod.console_map_ascii_code_to_font(154,2,5) # Cacti
-    libtcod.console_map_ascii_code_to_font(153,3,5) # Heathland
-    libtcod.console_map_ascii_code_to_font(151,0,5) # Broadleaf
-    libtcod.console_map_ascii_code_to_font(150,5,5) # Mixed Forest
-    libtcod.console_map_ascii_code_to_font(149,13,5) # Coniferous
-    libtcod.console_map_ascii_code_to_font(148,6,5) # Evergreen
-    libtcod.console_map_ascii_code_to_font(147,7,5) # Caves
-    libtcod.console_map_ascii_code_to_font(146,8,5) # Tropical Forest
-
-    libtcod.console_map_ascii_code_to_font(145,9,5) # Human
-    libtcod.console_map_ascii_code_to_font(144,10,5) # Castle
-    libtcod.console_map_ascii_code_to_font(143,11,5) # Village
-    libtcod.console_map_ascii_code_to_font(142,12,5) # City
-
-    libtcod.console_map_ascii_code_to_font(159,16,2) # 4-way wall.
-
-    # Skip chr. 160 - return key?
-    libtcod.console_map_ascii_code_to_font(161,19,6) # Conifer 1
-    libtcod.console_map_ascii_code_to_font(162,19,7) # Conifer 2
-    libtcod.console_map_ascii_code_to_font(163,20,6) # Conifer 3
-    libtcod.console_map_ascii_code_to_font(164,20,7) # Conifer 4
-    libtcod.console_map_ascii_code_to_font(165,21,6) # Conifer 5
-    libtcod.console_map_ascii_code_to_font(166,21,7) # Conifer 6
-    libtcod.console_map_ascii_code_to_font(167,22,6) # Conifer 7
-    libtcod.console_map_ascii_code_to_font(168,22,7) # Conifer 8
-    libtcod.console_map_ascii_code_to_font(169,23,7) # Conifer Tree-Top
-
-    libtcod.console_map_ascii_code_to_font(170,23,6) # Tree Trunk
-
-    libtcod.console_map_ascii_code_to_font(171,14,5) # Cactus
-    libtcod.console_map_ascii_code_to_font(172,15,5) # Cactus Branch 1
-    libtcod.console_map_ascii_code_to_font(173,16,5) # Cactus Branch 2
-    libtcod.console_map_ascii_code_to_font(174,17,5) # Cactus Branch 3
-    libtcod.console_map_ascii_code_to_font(175,18,5) # Cactus Branch 4
-
-    libtcod.console_map_ascii_code_to_font(219,0,6) # Vertical river.
-    libtcod.console_map_ascii_code_to_font(220,1,6) # Horizontal river.
-    libtcod.console_map_ascii_code_to_font(221,2,6) # 4-way river.
-    libtcod.console_map_ascii_code_to_font(222,3,6) # 3-way west river.
-    libtcod.console_map_ascii_code_to_font(223,4,6) # 3-way north river.
-    libtcod.console_map_ascii_code_to_font(224,5,6) # 3-way east river.
-    libtcod.console_map_ascii_code_to_font(225,6,6) # 3-way south river.
-
-    libtcod.console_map_ascii_code_to_font(233,7,6) # Corner north/east river.
-    libtcod.console_map_ascii_code_to_font(234,8,6) # Corner south/east river.
-    libtcod.console_map_ascii_code_to_font(235,9,6) # Corner south/west river.
-    libtcod.console_map_ascii_code_to_font(236,10,6) # Corner north/west river.
-    libtcod.console_map_ascii_code_to_font(237,11,6) # Glacier 1
-    libtcod.console_map_ascii_code_to_font(238,12,6) # Glacier 2
-    libtcod.console_map_ascii_code_to_font(239,11,7) # Glacier 3
-    libtcod.console_map_ascii_code_to_font(240,12,7) # Glacier 4
-    libtcod.console_map_ascii_code_to_font(245,17,6) # Grass 1
-    libtcod.console_map_ascii_code_to_font(246,18,6) # Grass 2
-    libtcod.console_map_ascii_code_to_font(247,17,7) # Grass 3
-    libtcod.console_map_ascii_code_to_font(248,18,7) # Grass 4
-    libtcod.console_map_ascii_code_to_font(249,17,6) # Leaves 1
-    libtcod.console_map_ascii_code_to_font(250,18,6) # Leaves 2
-    libtcod.console_map_ascii_code_to_font(251,17,7) # Leaves 3
-    libtcod.console_map_ascii_code_to_font(252,18,7) # Leaves 4
-
-    libtcod.console_map_ascii_code_to_font(253,4,2) # Up Scroll Arrow
-    libtcod.console_map_ascii_code_to_font(254,5,2) # Down Scroll Arrow
-
-    if init['FULLSCREEN'] == 'yes':
-        libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
     doIntroSetup()
     movetime = time.time()
@@ -18811,7 +18698,8 @@ if __name__ == '__main__':
         elif DOSCREEN == 4:
             doWorldAtlas()
         renderGraphics()
-        libtcod.console_blit(GraphicsLayer,0,0,SCREEN_WIDTH,SCREEN_HEIGHT,0,0,0,1.0,0.0)
+        libtcod.console_blit(screen.GraphicsLayer, 0, 0, screen.width,
+                    screen.height, 0, 0, 0, 1.0, 0.0)
         if not NoRefresh:
             libtcod.console_flush()
     for thread in threading.enumerate():

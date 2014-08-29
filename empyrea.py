@@ -10,6 +10,7 @@ import fnmatch
 import copy
 import gc
 import Queue
+import ConfigParser
 
 import empyrea.audio
 from empyrea.chardefs import *
@@ -21,10 +22,17 @@ from empyrea.thesaurus import t
 
 sys.setrecursionlimit(50000)
 
-init = LoadInit('init.txt')
-audio = empyrea.audio.audio(int(init['MUSIC VOLUME']), int(init['SFX VOLUME']))
-screen = Screen(int(init['SCREEN WIDTH']), int(init['SCREEN HEIGHT']),
-        init['FULLSCREEN'] == 'yes', init['FONT'], init['FONT TYPE'])
+config = ConfigParser.ConfigParser()
+config.readfp(open('empyrea.cfg'))
+
+audio = empyrea.audio.audio(config.getint('Audio', 'MUSIC VOLUME'),
+            config.getint('Audio', 'SFX VOLUME'))
+
+screen = Screen(config.getint('Video', 'SCREEN WIDTH'),
+            config.getint('Video', 'SCREEN HEIGHT'),
+            config.getboolean('Video', 'FULLSCREEN'),
+            config.get('Video', 'FONT'),
+            config.get('Video', 'FONT TYPE'))
 
 p = inflect.engine()
 __author__ = 'D.M. Hagar'
@@ -84,10 +92,10 @@ __version__ = '0.3 Alpha Tech Demo by ' + __author__
 
 DOSCREEN = 0
 
-MAP_WIDTH = int(init['WORLD MAP WIDTH'])
-MAP_HEIGHT = int(init['WORLD MAP HEIGHT'])
-RMAP_WIDTH = int(init['REGION MAP WIDTH'])
-RMAP_HEIGHT = int(init['REGION MAP HEIGHT'])
+MAP_WIDTH = config.getint('Game Settings', 'WORLD MAP WIDTH')
+MAP_HEIGHT = config.getint('Game Settings', 'WORLD MAP HEIGHT')
+RMAP_WIDTH = config.getint('Game Settings', 'REGION MAP WIDTH')
+RMAP_HEIGHT = config.getint('Game Settings', 'REGION MAP HEIGHT')
 
 NoRefresh = False
 
@@ -7836,7 +7844,7 @@ class World(threading.Thread):
 
         while True:
             try:
-                if init['WORLDGEN PICS'] == 'YES':
+                if config.getboolean('Game Settings', 'WORLDGEN PICS'):
                     wgpic = libtcod.image_from_console(wgwindow)
                     libtcod.image_save(wgpic,'./image/gfx/worldgen.png')
                 break
@@ -8737,7 +8745,7 @@ class WorldNaming(threading.Thread):
 
         while True:
             try:
-                if init['WORLDGEN PICS'] == 'YES':
+                if config.getboolean('Game Settings', 'WORLDGEN PICS'):
                     wgnpic = libtcod.image_from_console(wgwindow)
                     libtcod.image_save(wgnpic,'./image/gfx/worldgenpn.png')
                 break
@@ -11556,7 +11564,7 @@ class WorldHistory(threading.Thread):
 
         while True:
             try:
-                if init['WORLDGEN PICS'] == 'YES':
+                if config.getboolean('Game Settings', 'WORLDGEN PICS'):
                     wgcpic = libtcod.image_from_console(wgwindow)
                     libtcod.image_save(wgcpic,'./image/gfx/worldgenpc.png')
                 break
@@ -18647,18 +18655,19 @@ if __name__ == '__main__':
     colorscheme['GREEN']['bgcolor2'] = libtcod.Color(43,80,41)
     colorscheme['GREEN']['buttonback'] = libtcod.Color(30,43,30)
 
-    bordercol = colorscheme[init['COLOR SCHEME']]['bordercol']
-    bordercol2 = colorscheme[init['COLOR SCHEME']]['bordercol2']
-    bordercolh2 = colorscheme[init['COLOR SCHEME']]['bordercolh2']
-    candlecolor = colorscheme[init['COLOR SCHEME']]['candlecolor']
-    bgcolor = colorscheme[init['COLOR SCHEME']]['bgcolor']
-    bgcolor2 = colorscheme[init['COLOR SCHEME']]['bgcolor2']
-    hcolor = colorscheme[init['COLOR SCHEME']]['hcolor']
-    hcolor2 = colorscheme[init['COLOR SCHEME']]['hcolor2']
-    buttonh = colorscheme[init['COLOR SCHEME']]['buttonh']
-    buttont = colorscheme[init['COLOR SCHEME']]['buttont']
-    hlite = colorscheme[init['COLOR SCHEME']]['hlite']
-    buttonback = colorscheme[init['COLOR SCHEME']]['buttonback']
+    cs = config.get('Game Settings', 'COLOR SCHEME')
+    bordercol = colorscheme[cs]['bordercol']
+    bordercol2 = colorscheme[cs]['bordercol2']
+    bordercolh2 = colorscheme[cs]['bordercolh2']
+    candlecolor = colorscheme[cs]['candlecolor']
+    bgcolor = colorscheme[cs]['bgcolor']
+    bgcolor2 = colorscheme[cs]['bgcolor2']
+    hcolor = colorscheme[cs]['hcolor']
+    hcolor2 = colorscheme[cs]['hcolor2']
+    buttonh = colorscheme[cs]['buttonh']
+    buttont = colorscheme[cs]['buttont']
+    hlite = colorscheme[cs]['hlite']
+    buttonback = colorscheme[cs]['buttonback']
 
 
     doIntroSetup()

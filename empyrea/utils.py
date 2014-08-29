@@ -1,24 +1,6 @@
 from random import choice
 
 
-def LoadInit(filename):
-    initdict = {}
-    initfile = open(filename, 'r')
-    init = initfile.readlines()
-    initfile.close()
-    for line in init:
-        line = line.strip('\n')
-        if line.startswith('===') or line.startswith('*'):
-            continue
-        if not line.strip(' '):
-            continue
-        else:
-            sname = line.split(': ')[0]
-            setting = line.split(': ')[1]
-            initdict[sname] = setting
-    return initdict
-
-
 def wchoice(lst):
     total = 0
     for pair in lst:

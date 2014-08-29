@@ -12,7 +12,7 @@ import gc
 import Queue
 import ConfigParser
 
-import empyrea.audio
+from empyrea.audio import Audio
 from empyrea.chardefs import *
 from empyrea.namegen import MakeLang, MakeName
 import empyrea.inflect as inflect
@@ -25,7 +25,7 @@ sys.setrecursionlimit(50000)
 config = ConfigParser.ConfigParser()
 config.readfp(open('empyrea.cfg'))
 
-audio = empyrea.audio.audio(config.getint('Audio', 'MUSIC VOLUME'),
+audio = Audio(config.getint('Audio', 'MUSIC VOLUME'),
             config.getint('Audio', 'SFX VOLUME'))
 
 screen = Screen(config.getint('Video', 'SCREEN WIDTH'),

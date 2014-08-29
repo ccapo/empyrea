@@ -4,7 +4,7 @@
 
 import pygame
 
-class audio:
+class Audio:
     def __init__(self, mvolume, svolume):
         self.__class__.MVolume = ((mvolume * 1.0) / 100)
         self.__class__.SVolume = ((svolume * 1.0) / 100)

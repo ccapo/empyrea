@@ -1443,7 +1443,7 @@ class InvWindow(threading.Thread):
         self.items = {}
 
     def run(self):
-        global PX, PY, MenuSetting, Clouds, pathlock, MenuList, moveclouds, hoveropt, MoveLock, XConsoles
+        global PX, PY, MenuSetting, pathlock, MenuList, moveclouds, hoveropt, MoveLock, XConsoles
         if not GameWorld.windowlock:
             GameWorld.windowlock = True
             self.mcloudstate = moveclouds
@@ -1587,7 +1587,7 @@ class InvWindow(threading.Thread):
                             self.reDraw()
 
     def reDraw(self,redrawbox = False):
-        global Clouds, NoGraphics, NoMenus, NoButtons
+        global NoGraphics, NoMenus, NoButtons
         NoGraphics,NoMenus,NoButtons = True,True,True
         lock.acquire()
         libtcod.console_set_default_background(self.invconsole, bgcolor2)
@@ -1654,7 +1654,7 @@ class InvWindow(threading.Thread):
         lock.release()
 
     def Drop(self,item = None,number = None):
-        global PCX, PCY, Clouds
+        global PCX, PCY
         if not item:
             item = self.moveitem
         dodrop = False
@@ -1747,7 +1747,7 @@ class Dialogue(threading.Thread):
         self.talign = talign
 
     def run(self):
-        global PX, PY, Clouds, pathlock, TopWindow, moveclouds, MoveLock, MouseLock, lock
+        global PX, PY, pathlock, TopWindow, moveclouds, MoveLock, MouseLock, lock
         lock.acquire()
         pathlock = True
         self.mcloudstate = moveclouds
@@ -2065,7 +2065,7 @@ class OptWindow(threading.Thread):
                     libtcod.console_set_char_background(self.oconsole, tile, 15, scrollcolor, libtcod.BKGND_SET)
 
     def doAudio(self):
-        global XConsoles, WeatherLayer, TopWindow, Clouds, GameWorld, \
+        global XConsoles, WeatherLayer, TopWindow, GameWorld, \
                Nographics, NoButtons, NoMenus
 
         time.sleep(0.1)
@@ -5278,7 +5278,7 @@ def handle_keys():
            scaleswitch, NoKeys, MenuSetting, PX, PY, GameWorld, MenuList, \
            MouseLock, TextList, PCX, PCY, pathclass, pathlock, lastmove, \
            movekeys, MoveLock, relswitch, marker, \
-           Cursor, killkeycheck, DoScaleLayer, NoButtons, NoMenus, \
+           killkeycheck, DoScaleLayer, NoButtons, NoMenus, \
            q, GUITiles, GUICon, XConsoles, GUIBlurbCon
 
     if not NoKeys:
@@ -15567,7 +15567,7 @@ class PlayWorld(threading.Thread):
         NoUpdate = False
 
     def genMap(self,rtypes):
-        global MouseLock, rheightmap, Clouds, NoKeys, rmap
+        global MouseLock, rheightmap, NoKeys, rmap
 
         self.doLoadScreen('vectors')
 
@@ -15883,8 +15883,8 @@ class PlayWorld(threading.Thread):
         time.sleep(1.0)
 
     def doLeaveProc(self):
-        global MenuList, Clouds, PX, PY, PCX, PCY, MouseLock, MoveLock, pathlock, moveclouds, pathclass, \
-               OPCX, OPCY, hpcswitch, Cursor, WeatherLayer, NoUpdate, DoLoadScreen
+        global MenuList, Clouds, PCX, PCY, MouseLock, pathlock, moveclouds, pathclass, \
+               OPCX, OPCY, hpcswitch, WeatherLayer, NoUpdate, DoLoadScreen
         NoUpdate = True
         self.packMap()
         Clouds.killswitch = True
@@ -16906,7 +16906,7 @@ class PlayWorld(threading.Thread):
             OPY = PY
 
     def handlePCchar(self):
-        global Clouds, PCX, PCY, PX, PY, OPCX, OPCY, PCcol, WeatherLayer, lock, PCRlayer, PCWlayer
+        global PCX, PCY, PCcol, lock, PCRlayer, PCWlayer
         libtcod.console_clear(PCRlayer)
         libtcod.console_clear(PCWlayer)
         lock.acquire()

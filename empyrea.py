@@ -47,7 +47,7 @@ __version__ = '0.3 Alpha Tech Demo by ' + __author__
 # Coder's Guide                    #
 ####################################
 ##     I. Misc. Functions
-##       - f.dchoice, f. HeightSort, f. getRivChar, f. queryTile, f. DoChar
+##       - f.dchoice, f. getRivChar, f. queryTile, f. DoChar
 ##    II. Graphical/Menu Classes
 ##       - c. IntroGraphics, c. CloudNoise, c. WCloudNoise, c. FadeText,
 ##         c. ButtonBox, c. Menu, c. RelMap c. LeaveWindow, c. ScrollBar,
@@ -230,15 +230,6 @@ def dchoice(choicelist,capitalize = 0,possessive = 0):
             return 'It' + poss
         else:
             return 'it' + poss
-
-def HeightSort(x, y):
-    if wheightdict['%s,%s' % (x[0],x[1])] > wheightdict['%s,%s' % (y[0],y[1])]:
-        return -1
-    elif wheightdict['%s,%s' % (x[0],x[1])] == wheightdict['%s,%s' % (y[0],y[1])]:
-        return 0
-    else:
-        return 1
-
 
 def getRivChar(adjdirs, tributes):
     if len(adjdirs) == 1:

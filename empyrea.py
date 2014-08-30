@@ -309,65 +309,66 @@ def getRivChar(adjdirs, tributes):
         return [2,6,255]
 
 
-def queryTile(x, y, checklist):
-    global wheightdict, wfeaturedict, tivar
-
+def queryTile(x, y, checklist, heightdict, featuredict, tivar):
     qcheck = {}
 
     if 'Shrubland' in checklist:
-        qcheck['Shrubland'] = 'sl' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Shrubland'] = 'sl' in featuredict['%s,%s' % (x,y)]
     if 'Heathland' in checklist:
-        qcheck['Heathland'] = 'hl' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Heathland'] = 'hl' in featuredict['%s,%s' % (x,y)]
     if 'Marshland' in checklist:
-        qcheck['Marshland'] = 'ml' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Marshland'] = 'ml' in featuredict['%s,%s' % (x,y)]
     if 'Cacti Forest' in checklist:
-        qcheck['Cacti Forest'] = 'dl' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Cacti Forest'] = 'dl' in featuredict['%s,%s' % (x,y)]
     if 'Broadleaf Forest' in checklist:
-        qcheck['Broadleaf Forest'] = 'bf' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Broadleaf Forest'] = 'bf' in featuredict['%s,%s' % (x,y)]
     if 'Deciduous Forest' in checklist:
-        qcheck['Deciduous Forest'] = 'df' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Deciduous Forest'] = 'df' in featuredict['%s,%s' % (x,y)]
     if 'Mixed Forest' in checklist:
-        qcheck['Mixed Forest'] = 'mf' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Mixed Forest'] = 'mf' in featuredict['%s,%s' % (x,y)]
     if 'Coniferous Forest' in checklist:
-        qcheck['Coniferous Forest'] = 'cf' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Coniferous Forest'] = 'cf' in featuredict['%s,%s' % (x,y)]
     if 'Evergreen Forest' in checklist:
-        qcheck['Evergreen Forest'] = 'ef' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Evergreen Forest'] = 'ef' in featuredict['%s,%s' % (x,y)]
     if 'Tropical Forest' in checklist:
-        qcheck['Tropical Forest'] = 'tf' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Tropical Forest'] = 'tf' in featuredict['%s,%s' % (x,y)]
     if 'Swamp' in checklist:
-        qcheck['Swamp'] = 'sw' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Swamp'] = 'sw' in featuredict['%s,%s' % (x,y)]
     if 'Desert' in checklist:
-        qcheck['Desert'] = 'd' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Desert'] = 'd' in featuredict['%s,%s' % (x,y)]
     if 'Cave' in checklist:
-        qcheck['Cave'] = 'c' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Cave'] = 'c' in featuredict['%s,%s' % (x,y)]
     if 'Beach' in checklist:
-        qcheck['Beach'] = 'b' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Beach'] = 'b' in featuredict['%s,%s' % (x,y)]
     if 'River' in checklist:
-        qcheck['River'] = 'r' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['River'] = 'r' in featuredict['%s,%s' % (x,y)]
     if 'Highland' in checklist:
-        qcheck['Highland'] = wmlev - 8 < wheightdict['%s,%s' % (x,y)] < wmlev
+        qcheck['Highland'] = wmlev - 8 < heightdict['%s,%s' % (x,y)] < wmlev
     if 'Mountain' in checklist:
-        qcheck['Mountain'] = wmlev < wheightdict['%s,%s' % (x,y)]
+        qcheck['Mountain'] = wmlev < heightdict['%s,%s' % (x,y)]
     if 'Plain' in checklist:
-        qcheck['Plain'] = 'pl' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Plain'] = 'pl' in featuredict['%s,%s' % (x,y)]
     if 'Tundra' in checklist:
-        qcheck['Tundra'] = wfeaturedict['%s,%s' % (x,y)] == 's' and 152 < wheightdict['%s,%s' % (x,y)] < 168
+        qcheck['Tundra'] = featuredict['%s,%s' % (x,y)] == 's' \
+                and 152 < heightdict['%s,%s' % (x,y)] < 168
     if 'Savannah' in checklist:
-        qcheck['Savannah'] = len(wfeaturedict['%s,%s' % (x,y)]) == 0 and 152 < wheightdict['%s,%s' % (x,y)] < 168 and \
-                             y > (((MAP_HEIGHT / 4) * 3) + tivar[x])
+        qcheck['Savannah'] = len(featuredict['%s,%s' % (x,y)]) == 0\
+                and 152 < heightdict['%s,%s' % (x,y)] < 168 \
+                and y > (((MAP_HEIGHT / 4) * 3) + tivar[x])
     if 'Glacier' in checklist:
-        qcheck['Glacier'] = 'g' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Glacier'] = 'g' in featuredict['%s,%s' % (x,y)]
     if 'River Bank' in checklist:
-        qcheck['River Bank'] = 'r' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['River Bank'] = 'r' in featuredict['%s,%s' % (x,y)]
     if 'Pond' in checklist:
-        qcheck['Pond'] = (float(y) / MAP_HEIGHT * 102) > ivar[x] and 'd' not in wfeaturedict['%s,%s' % (x,y)] and \
-                         152 < wheightdict['%s,%s' % (x,y)] < wmlev
+        qcheck['Pond'] = (float(y) / MAP_HEIGHT * 102) > ivar[x] \
+                and 'd' not in featuredict['%s,%s' % (x,y)] \
+                and 152 < heightdict['%s,%s' % (x,y)] < wmlev
     if 'Ocean' in checklist:
-        qcheck['Ocean'] = 'o' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Ocean'] = 'o' in featuredict['%s,%s' % (x,y)]
     if 'Lake' in checklist:
-        qcheck['Lake'] = 'l' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Lake'] = 'l' in featuredict['%s,%s' % (x,y)]
     if 'Lakeshore' in checklist:
-        qcheck['Lakeshore'] = 'ls' in wfeaturedict['%s,%s' % (x,y)]
+        qcheck['Lakeshore'] = 'ls' in featuredict['%s,%s' % (x,y)]
 
     condition = True
 
@@ -11205,7 +11206,7 @@ class WorldCreatures(threading.Thread):
             vars()[check] = []
             for x in range(MAP_WIDTH):
                 for y in range(MAP_HEIGHT):
-                    if queryTile(x, y, [check]):
+                    if queryTile(x, y, [check], wheightdict, wfeaturedict, tivar):
                         vars()[check] += [[x,y]]
                         wbiomedict['%s,%s' % (x,y)] += [check]
 

@@ -378,13 +378,15 @@ def queryTile(x, y, checklist, heightdict, featuredict, tivar):
     return condition
 
 
-def DoChar(char,charnum = None,store = False,x = None,y = None):
+def DoChar(char, charnum = None, store = False, x = None, y = None):
+    global GameWorld
+
     if not charnum:
         try:
             charnum = char[2]
         except TypeError:
             print char
-    #libtcod.sys_update_char(charnum, 11, 1, fontimage, char[0] * 14, char[1] * 14)
+
     libtcod.console_map_ascii_code_to_font(charnum,char[0],char[1])
     if store:
         GameWorld.wcdict[GameWorld.curz]['%s,%s' % (x,y)] = char

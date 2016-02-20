@@ -39,7 +39,7 @@ p = inflect.engine()
 __author__ = 'D.M. Hagar'
 __version__ = '0.3 Alpha Tech Demo by ' + __author__
 
-### List of Reserved ASCII Character Numbers and Their Corresponding Layers ###
+# List of Reserved ASCII Character Numbers and Their Corresponding Layers ###
 # 255 - Main play window
 # 189 - Inventory/Construction windows
 # 190 - Pathmarker (possibly other miscellaneous graphical features if
@@ -48,44 +48,44 @@ __version__ = '0.3 Alpha Tech Demo by ' + __author__
 ####################################
 # Coder's Guide                    #
 ####################################
-##     I. Misc. Functions
-##       - f.dchoice, f. getRivChar, f. queryTile, f. DoChar
+#     I. Misc. Functions
+#       - f.dchoice, f. getRivChar, f. queryTile, f. DoChar
 # II. Graphical/Menu Classes
-##       - c. IntroGraphics, c. CloudNoise, c. WCloudNoise, c. FadeText,
+#       - c. IntroGraphics, c. CloudNoise, c. WCloudNoise, c. FadeText,
 # c. ButtonBox, c. Menu, c. RelMap c. LeaveWindow, c. ScrollBar,
-##         c. InvWindow, c. Dialogue, c. NDialogue, c.OptWindow, c. CWindow,
-##         c. ProgressBar
+#         c. InvWindow, c. Dialogue, c. NDialogue, c.OptWindow, c. CWindow,
+#         c. ProgressBar
 # III. Misc. Graphical Functions
-##       - f. renderButtons, f. renderMenus, f. renderText, f. renderGraphics,
-##         f. drawBox, f. doMenu, f. solidScale, f. textWrap, f. killMenus
+#       - f. renderButtons, f. renderMenus, f. renderText, f. renderGraphics,
+#         f. drawBox, f. doMenu, f. solidScale, f. textWrap, f. killMenus
 # IV. Input Functions
-##       - f. handle_mouse, f. mouse_isvisible, f. handle_keys, f. adjustScreen
+#       - f. handle_mouse, f. mouse_isvisible, f. handle_keys, f. adjustScreen
 # V. Screen Change Functions
-##       - f. doIntroSetup, f. doWorldGenSetup, f. doWorldAtlasSetup
-##    VI. Intro
-##       - f. doIntro
+#       - f. doIntroSetup, f. doWorldGenSetup, f. doWorldAtlasSetup
+#    VI. Intro
+#       - f. doIntro
 # VII. Intro Transition
-##       - f. wipeIntro
+#       - f. wipeIntro
 # VIII. World Drawing Functions
 # - f. LoadWorld, f. Draw[type]...
 # IX. Land Generation
-##       - c. World
+#       - c. World
 # X. Terrain Feature Naming
-##       - c. WorldNaming
+#       - c. WorldNaming
 # XI. Entity Generation
-##       - c. WorldCreatures
+#       - c. WorldCreatures
 # XII. History Generation
-##       - c. WorldHistory
+#       - c. WorldHistory
 # XIII. World Atlas
-##       - c. WorldAtlas
+#       - c. WorldAtlas
 # XIV. Main Game Architecture
-##       - c. PlayWorld, c. Pathfinder
+#       - c. PlayWorld, c. Pathfinder
 # XVI. Main Worldgen Loop
-##       - f. doWorldGen
+#       - f. doWorldGen
 # XVII. Main World Atlas Loop
-##       - f. doWorldAtlas
+#       - f. doWorldAtlas
 # XVIII. Main Game Loop
-##       - c. MainGame
+#       - c. MainGame
 # XIX. Main Application Loop
 
 ####################################
@@ -1471,7 +1471,7 @@ class Menu(threading.Thread):
 
     def doCommandList(self):
         for method in self.MethodList:
-            if method[0] == self.moptionlist[mplayery - 1 - (25 * self.moffset)] or method[0] == True:
+            if method[0] == self.moptionlist[mplayery - 1 - (25 * self.moffset)] or method[0] is True:
                 try:
                     method[1](method[2], method[3])
                 except:
@@ -3534,7 +3534,7 @@ class CWindow(threading.Thread):
                 self.reDraw(redrawbox=False)
                 self.zdec = False
 
-            ## FG/BG Color Selection ##
+            # FG/BG Color Selection
             if [handle_mouse('cx'), handle_mouse('cy')] == [self.tcrx + 5, self.tcry + 21]:
                 if not self.colswitch == 'fore':
                     if handle_mouse('lbutton'):
@@ -3606,7 +3606,7 @@ class CWindow(threading.Thread):
                         libtcod.console_set_char_foreground(
                             self.tconsole, 11, 21, bordercol)
 
-            ## RGB Selector ##
+            # RGB Selector
             # Individual Colors
             # Red
             if handle_mouse('cx') == self.tcrx + 4 and handle_mouse('cy') == self.tcry + 16:
@@ -3867,7 +3867,7 @@ class CWindow(threading.Thread):
                     libtcod.console_print_ex(
                         self.tconsole, x, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(blankchar)))
 
-            ## Tile Switching ##
+            # Tile Switching
             if [handle_mouse('cx'), handle_mouse('cy')] == [self.tcrx + 2, self.tcry + 24]:
                 if handle_mouse('lbutton'):
                     libtcod.console_set_char_foreground(
@@ -4005,15 +4005,14 @@ class CWindow(threading.Thread):
                     bg = libtcod.Color(self.br, self.bg, self.bb)
                     libtcod.console_set_default_foreground(self.tconsole, fg)
                     libtcod.console_set_default_background(self.tconsole, bg)
-                    if not 'NOBG' in self.curentry.keys():
+                    if 'NOBG' not in self.curentry.keys():
                         libtcod.console_print_ex(
                             self.tconsole, 3 + tile, 23, libtcod.BKGND_SET, libtcod.LEFT, chr(DoChar(char)))
                     else:
                         libtcod.console_print_ex(
                             self.tconsole, 3 + tile, 23, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
 
-            ## Now for the actual construction window stuff. ##
-
+            # Now for the actual construction window stuff.
             if handle_mouse('cx') > self.rx and handle_mouse('cx') < self.rx + self.conw - 1 and \
                handle_mouse('cy') > self.ry and handle_mouse('cy') < self.ry + self.conh - 1:
                 if (hasattr(self, 'HBar') and handle_mouse('cx') == self.rx + self.conw - 2) or \
@@ -5446,7 +5445,7 @@ class ScrollBar(threading.Thread):
                         GameWorld.dispMesgLog()
                     else:
                         if self.hookmethod:
-                            if self.hookarg != None:
+                            if self.hookarg is not None:
                                 self.hookmethod(self.hookarg)
                             else:
                                 self.hookmethod()
@@ -5464,7 +5463,7 @@ class ScrollBar(threading.Thread):
                         GameWorld.dispMesgLog()
                     else:
                         if self.hookmethod:
-                            if self.hookarg != None:
+                            if self.hookarg is not None:
                                 self.hookmethod(self.hookarg)
                             else:
                                 self.hookmethod()
@@ -5475,7 +5474,7 @@ class ScrollBar(threading.Thread):
                         self.window, self.x, self.bpos, self.hcolor)
                     self.movescroll = True
                     if self.hookmethod:
-                        if self.hookarg != None:
+                        if self.hookarg is not None:
                             self.hookmethod(self.hookarg)
                         else:
                             self.hookmethod()
@@ -5484,7 +5483,7 @@ class ScrollBar(threading.Thread):
                                                   (self.ry + self.h > handle_mouse('cy') > self.ry)) and self.movescroll:
                     self.binc += handle_mouse('cy') - self.rbpos
                     if self.hookmethod:
-                        if self.hookarg != None:
+                        if self.hookarg is not None:
                             self.hookmethod(self.hookarg)
                         else:
                             self.hookmethod()
@@ -5501,7 +5500,7 @@ class ScrollBar(threading.Thread):
                         self.inc += max(1, self.max / 5)
                         self.inc = min(self.inc, self.max)
                         if self.hookmethod:
-                            if self.hookarg != None:
+                            if self.hookarg is not None:
                                 self.hookmethod(self.hookarg)
                             else:
                                 self.hookmethod()
@@ -5510,7 +5509,7 @@ class ScrollBar(threading.Thread):
                         self.inc -= max(1, self.max / 5)
                         self.inc = max(self.inc, 0)
                         if self.hookmethod:
-                            if self.hookarg != None:
+                            if self.hookarg is not None:
                                 self.hookmethod(self.hookarg)
                             else:
                                 self.hookmethod()
@@ -5530,7 +5529,7 @@ class ScrollBar(threading.Thread):
                         if handle_mouse('wheel_up'):
                             self.inc = max(0, self.inc - 1)
                             if self.hookmethod:
-                                if self.hookarg != None:
+                                if self.hookarg is not None:
                                     self.hookmethod(self.hookarg)
                                 else:
                                     self.hookmethod()
@@ -5538,7 +5537,7 @@ class ScrollBar(threading.Thread):
                         elif handle_mouse('wheel_down'):
                             self.inc = min(self.max, self.inc + 1)
                             if self.hookmethod:
-                                if self.hookarg != None:
+                                if self.hookarg is not None:
                                     self.hookmethod(self.hookarg)
                                 else:
                                     self.hookmethod()
@@ -5661,7 +5660,7 @@ class WScrollBar(threading.Thread):
                     self.inc = max(0, self.inc - 1)
                     self.binc = 0
                     if self.hookmethod:
-                        if self.hookarg != None:
+                        if self.hookarg is not None:
                             self.hookmethod(self.hookarg)
                         else:
                             self.hookmethod()
@@ -5678,7 +5677,7 @@ class WScrollBar(threading.Thread):
                     self.inc = min(self.max, self.inc + 1)
                     self.binc = 0
                     if self.hookmethod:
-                        if self.hookarg != None:
+                        if self.hookarg is not None:
                             self.hookmethod(self.hookarg)
                         else:
                             self.hookmethod()
@@ -5694,7 +5693,7 @@ class WScrollBar(threading.Thread):
                                                   (self.rx + self.w > handle_mouse('cx') > self.rx)) and self.movescroll:
                     self.binc += handle_mouse('cx') - self.rbpos
                     if self.hookmethod:
-                        if self.hookarg != None:
+                        if self.hookarg is not None:
                             self.hookmethod(self.hookarg)
                         else:
                             self.hookmethod()
@@ -5711,7 +5710,7 @@ class WScrollBar(threading.Thread):
                         self.inc += max(1, self.max / 5)
                         self.inc = min(self.inc, self.max)
                         if self.hookmethod:
-                            if self.hookarg != None:
+                            if self.hookarg is not None:
                                 self.hookmethod(self.hookarg)
                             else:
                                 self.hookmethod()
@@ -5720,7 +5719,7 @@ class WScrollBar(threading.Thread):
                         self.inc -= max(1, self.max / 5)
                         self.inc = max(self.inc, 0)
                         if self.hookmethod:
-                            if self.hookarg != None:
+                            if self.hookarg is not None:
                                 self.hookmethod(self.hookarg)
                             else:
                                 self.hookmethod()
@@ -6546,7 +6545,7 @@ def handle_keys():
 
             elif movekeys.get(key.vk):
                 if DOSCREEN == 1:
-                    if NoKeys == False:
+                    if NoKeys is False:
                         playerx = max(
                             min(playerx + movekeys[key.vk][0], MAP_WIDTH - screen.view_width), 0)
                         playery = max(
@@ -6575,7 +6574,7 @@ def handle_keys():
                     playery = playery + movekeys[key.vk][1]
 
             elif (key.vk == libtcod.KEY_ESCAPE or handle_mouse('rbutton_pressed')) and (DOSCREEN == 1 or MenuSetting == 'NoWorlds'):
-                if NoKeys == False:
+                if NoKeys is False:
                     playery = 1
                     DOSCREEN = 0
                     libtcod.console_clear(0)
@@ -6587,7 +6586,7 @@ def handle_keys():
                         GameWorld.doPause()
 
             elif handle_mouse('rbutton_pressed') and DOSCREEN == 2:
-                if GameWorld.rswitch == True:
+                if GameWorld.rswitch is True:
                     if not GameWorld.windowlock:
                         if handle_mouse('cx') > (screen.width - screen.view_width) - 3 and handle_mouse('cx') < (screen.width - 2) and \
                            handle_mouse('cy') > 1 and handle_mouse('cy') < 2 + screen.view_height:
@@ -6724,8 +6723,8 @@ def handle_keys():
 
             elif key.c == ord('c'):
                 if DOSCREEN == 1:
-                    if WorldGoing == False:
-                        if NamingDone == True and CreatureDone == False:
+                    if WorldGoing is False:
+                        if NamingDone is True and CreatureDone is False:
                             libtcod.console_set_default_background(
                                 screen.wswindow, bgcolor)
                             ButtonList = []
@@ -6736,7 +6735,7 @@ def handle_keys():
 
             elif key.c == ord('g'):
                 if DOSCREEN == 1:
-                    if WorldGoing == False:
+                    if WorldGoing is False:
                         CreatureDone = False
                         NamingDone = False
                         DoScaleLayer = False
@@ -6755,9 +6754,9 @@ def handle_keys():
 
             elif key.c == ord('h'):
                 if DOSCREEN == 1:
-                    if WorldGoing == False:
-                        if WorldDone == True:
-                            if CreatureDone == True:
+                    if WorldGoing is False:
+                        if WorldDone is True:
+                            if CreatureDone is True:
                                 libtcod.console_set_default_background(
                                     screen.wswindow, bgcolor)
                                 ButtonList = []
@@ -6781,8 +6780,8 @@ def handle_keys():
 
             elif key.c == ord('n'):
                 if DOSCREEN == 1:
-                    if WorldGoing == False:
-                        if WorldDone == True and NamingDone == False:
+                    if WorldGoing is False:
+                        if WorldDone is True and NamingDone is False:
                             scaleswitch = False
                             DoScaleLayer = False
                             doScreenSetup()
@@ -6799,9 +6798,9 @@ def handle_keys():
 
             elif key.c == ord('s'):
                 if DOSCREEN == 1:
-                    if WorldGoing == False:
-                        if WorldDone == True and NamingDone == False:
-                            if scaleswitch == False:
+                    if WorldGoing is False:
+                        if WorldDone is True and NamingDone is False:
+                            if scaleswitch is False:
                                 playerx, playery = 0, 0
                                 scalepic = libtcod.image_from_console(wgwindow)
                                 libtcod.image_scale(
@@ -6862,7 +6861,7 @@ def handle_keys():
                                 scaleswitch = False
 
         if DOSCREEN == 2:
-            if GameWorld.rswitch == True:
+            if GameWorld.rswitch is True:
                 limitx, limity = RMAP_WIDTH, RMAP_HEIGHT
             else:
                 limitx, limity = MAP_WIDTH, MAP_HEIGHT
@@ -6874,7 +6873,7 @@ def handle_keys():
 
 def adjustScreen():
     global PX, PY, PCX, PCY, GameWorld
-    if GameWorld.rswitch == True:
+    if GameWorld.rswitch is True:
         limitx, limity = RMAP_WIDTH, RMAP_HEIGHT
     else:
         limitx, limity = MAP_WIDTH, MAP_HEIGHT
@@ -8144,7 +8143,7 @@ class World(threading.Thread):
                             alphperc = min(alphperc, 1.0)
                 if isbeach:
                     if wfeaturedict.get('%s,%s' % (x, y)):
-                        if not 'b' in wfeaturedict['%s,%s' % (x, y)]:
+                        if 'b' not in wfeaturedict['%s,%s' % (x, y)]:
                             wfeaturedict['%s,%s' % (x, y)] = wfeaturedict[
                                 '%s,%s' % (x, y)] + ['b']
                     else:
@@ -8209,9 +8208,9 @@ class World(threading.Thread):
 
         for y in range(MAP_HEIGHT):
             for x in range(MAP_WIDTH):
-                if wheightdict['%s,%s' % (x, y)] in range(152, wmlev) and not \
-                   'b' in wfeaturedict.get('%s,%s' % (x, y)) and not \
-                   'd' in wfeaturedict.get('%s,%s' % (x, y)):
+                if wheightdict['%s,%s' % (x, y)] in range(152, wmlev) and \
+                   'b' not in wfeaturedict.get('%s,%s' % (x, y)) and \
+                   'd' not in wfeaturedict.get('%s,%s' % (x, y)):
                     char = choice(grasschars)
                     libtcod.console_set_default_foreground(
                         wgwindow, libtcod.white)
@@ -8248,7 +8247,7 @@ class World(threading.Thread):
                                                                         libtcod.BKGND_SET)
                         if alphperc > 0.5:
                             if wfeaturedict.get('%s,%s' % (x, y)):
-                                if not 'd' in wfeaturedict['%s,%s' % (x, y)]:
+                                if 'd' not in wfeaturedict['%s,%s' % (x, y)]:
                                     wfeaturedict['%s,%s' % (x, y)] = wfeaturedict[
                                         '%s,%s' % (x, y)] + ['d']
                             else:
@@ -8310,7 +8309,7 @@ class World(threading.Thread):
                         if swamp:
                             swcol = swcolmap[-(randrange(1, 500))]
                             if wfeaturedict.get('%s,%s' % (x, y)):
-                                if not 'sw' in wfeaturedict['%s,%s' % (x, y)]:
+                                if 'sw' not in wfeaturedict['%s,%s' % (x, y)]:
                                     wfeaturedict['%s,%s' % (x, y)] = wfeaturedict[
                                         '%s,%s' % (x, y)] + ['sw']
                             else:
@@ -8368,7 +8367,7 @@ class World(threading.Thread):
                                     libtcod.console_set_char_background(wgwindow, x, y, libtcod.color_lerp(
                                         libtcod.black, libtcod.console_get_char_background(wgwindow, x, y), 0.9))
                                 if wfeaturedict.get('%s,%s' % (x, y)):
-                                    if not ftype in wfeaturedict['%s,%s' % (x, y)]:
+                                    if ftype not in wfeaturedict['%s,%s' % (x, y)]:
                                         wfeaturedict['%s,%s' % (x, y)] = wfeaturedict[
                                             '%s,%s' % (x, y)] + [ftype]
                                 else:
@@ -8403,7 +8402,7 @@ class World(threading.Thread):
                         wgwindow, x, y, scol, libtcod.BKGND_ALPHA(alphperc))
                     if alphperc > 0.1:
                         if wfeaturedict.get('%s,%s' % (x, y)):
-                            if not 's' in wfeaturedict['%s,%s' % (x, y)]:
+                            if 's' not in wfeaturedict['%s,%s' % (x, y)]:
                                 wfeaturedict['%s,%s' % (x, y)] = wfeaturedict[
                                     '%s,%s' % (x, y)] + ['s']
                         else:
@@ -8505,7 +8504,7 @@ class World(threading.Thread):
                     (gperc > 320 and (float(y) / MAP_HEIGHT * 102) < (gvar[x] + randrange(-1, 2)))) and \
                    altperc < wmlev + 1:
                     if wfeaturedict.get('%s,%s' % (x, y)):
-                        if not 'g' in wfeaturedict['%s,%  s' % (x, y)]:
+                        if 'g' not in wfeaturedict['%s,%  s' % (x, y)]:
                             wfeaturedict['%s,%s' % (x, y)] = wfeaturedict[
                                 '%s,%s' % (x, y)] + ['g']
                     else:
@@ -8743,11 +8742,11 @@ class World(threading.Thread):
 
                 breakloop = False
                 for river in riverlist:
-                    if [curpos[0], curpos[1]] in river or killriv == True:
+                    if [curpos[0], curpos[1]] in river or killriv is True:
                         breakloop = True
 
                 curriv.append(curpos)
-                if breakloop == True:
+                if breakloop is True:
                     break
 
             if not len(curriv) > 2 or killriv:
@@ -8763,7 +8762,7 @@ class World(threading.Thread):
             wriverdict[rivname] = curriv
             for pos in curriv:
                 if wfeaturedict.get('%s,%s' % (pos[0], pos[1])):
-                    if not 'r' in wfeaturedict['%s,%s' % (pos[0], pos[1])]:
+                    if 'r' not in wfeaturedict['%s,%s' % (pos[0], pos[1])]:
                         wfeaturedict['%s,%s' % (pos[0], pos[1])] = wfeaturedict[
                             '%s,%s' % (pos[0], pos[1])] + ['r']
                 else:
@@ -8799,7 +8798,7 @@ class World(threading.Thread):
                 if item[0] in map(lambda x: x[0], triblist):
                     tribendlist.append([item[1][-1], item[1][-2]])
             tributes = tribdict.values().count(river[0]) + tribcount
-            if tribdict.has_key(river[0]):
+            if river[0] in tribdict:
                 istrib = True
             else:
                 istrib = False
@@ -8914,7 +8913,7 @@ class World(threading.Thread):
                             malpha = max(malpha - 0.1, 0.0)
                     if malpha > 0.1:
                         if wfeaturedict.get('%s,%s' % (x, y)):
-                            if not 's' in wfeaturedict['%s,%s' % (x, y)]:
+                            if 's' not in wfeaturedict['%s,%s' % (x, y)]:
                                 wfeaturedict['%s,%s' % (x, y)] = wfeaturedict[
                                     '%s,%s' % (x, y)] + ['s']
                     libtcod.console_set_char_background(
@@ -9006,7 +9005,7 @@ class World(threading.Thread):
                 wcavedict[cavename] = [x, y]
                 cavelist.append([x, y])
                 if wfeaturedict.get('%s,%s' % (x, y)):
-                    if not 'c' in wfeaturedict['%s,%s' % (x, y)]:
+                    if 'c' not in wfeaturedict['%s,%s' % (x, y)]:
                         wfeaturedict['%s,%s' % (x, y)] = wfeaturedict[
                             '%s,%s' % (x, y)] + ['c']
                 else:
@@ -9291,7 +9290,7 @@ class WorldNaming(threading.Thread):
             for x in range(xgrid - 10, xgrid):
                 for y in range(ygrid - 10, ygrid):
                     if wfeaturedict.get('%s,%s' % (x, y)):
-                        if ('d' in wfeaturedict['%s,%s' % (x, y)] and not 's' in wfeaturedict['%s,%s' % (x, y)]):
+                        if ('d' in wfeaturedict['%s,%s' % (x, y)] and 's' not in wfeaturedict['%s,%s' % (x, y)]):
                             dcount += 1
                             dposlist[grid] += [(x, y)]
             ddendict[grid] = dcount
@@ -11837,7 +11836,7 @@ class WorldCreatures(threading.Thread):
                         frontexttype = wchoice(
                             [(backexttype, 0.97), ('pincers', 0.02), ('claws', 0.01)])
                         creature['type-frontext'] = frontexttype
-                        if not frontexttype in ['hooves', 'pincers']:
+                        if frontexttype not in ['hooves', 'pincers']:
                             frontextdigits = wchoice(
                                 [(2, .02), (3, .3), (4, .3), (5, .3), (randrange(5, 21), .08)])
                             creature['frontextdigits'] = frontextdigits
@@ -11893,7 +11892,7 @@ class WorldCreatures(threading.Thread):
                         creature['feathers'] = 1
 
                 # Body Covering
-                if not 'type-cover' in creature.keys():
+                if 'type-cover' not in creature.keys():
                     if bodytype == 'segmented':
                         cover = wchoice(
                             [('exoskeleton', .8), ('skin', .02), ('fur', .03), ('scales', .12), ('feathers', .03)])
@@ -12040,7 +12039,7 @@ class WorldCreatures(threading.Thread):
                         frontexttype = wchoice(
                             [(backexttype, 0.97), ('pincers', 0.02), ('claws', 0.01)])
                         creature['type-frontext'] = frontexttype
-                        if not frontexttype in ['claws', 'pincers']:
+                        if frontexttype not in ['claws', 'pincers']:
                             frontextdigits = wchoice(
                                 [(2, .02), (3, .3), (4, .3), (5, .3), (randrange(5, 21), .08)])
                             creature['frontextdigits'] = frontextdigits
@@ -12096,7 +12095,7 @@ class WorldCreatures(threading.Thread):
                         creature['feathers'] = 1
 
                 # Body Covering
-                if not 'type-cover' in creature.keys():
+                if 'type-cover' not in creature.keys():
                     if bodytype == 'segmented':
                         cover = wchoice(
                             [('exoskeleton', .4), ('skin', .4), ('scales', .2)])
@@ -12644,7 +12643,7 @@ class WorldCreatures(threading.Thread):
                         line = choice(['%s front legs have %s %s.' % (dchoice(ctitles, 1, 1), p.join(chosentraits), frontexttype),
                                        '%s has %s %s on its front legs.' % (dchoice(ctitles, 1), p.join(chosentraits), frontexttype)])
                         para2[-1] += ' ' + line
-                        if not frontexttype in ['hooves', 'pincers', 'claws']:
+                        if frontexttype not in ['hooves', 'pincers', 'claws']:
                             chosentraits = self.ptraits(creature, 'digits')
                             chosentraits2 = self.ptraits(creature, 'claws')
                             line = choice(['Each %s has %s %s toes that %s in %s %s.' % (p.singular_noun(frontexttype), p.number_to_words(creature['frontextdigits']),
@@ -12657,7 +12656,7 @@ class WorldCreatures(threading.Thread):
                         line = choice(['%s back legs have %s %s.' % (dchoice(ctitles, 1, 1), p.join(chosentraits), backexttype),
                                        '%s has %s %s on its back legs.' % (dchoice(ctitles, 1), p.join(chosentraits), backexttype)])
                         para2[-1] += ' ' + line
-                        if not backexttype in ['hooves', 'claws', 'pincers']:
+                        if backexttype not in ['hooves', 'claws', 'pincers']:
                             chosentraits = self.ptraits(creature, 'digits')
                             chosentraits2 = self.ptraits(creature, 'claws')
                             line = choice(['Each %s has %s %s toes that %s in %s %s.' % (p.singular_noun(backexttype), p.number_to_words(creature['backextdigits']),
@@ -14756,44 +14755,44 @@ class PlayWorld(threading.Thread):
         # Some various lists to help with my faulty memory.
 
         # Main terrain types:
-        ## 'Deciduous Forest','Shrubland','Desert','Heathland','Broadleaf Forest',
-        ## 'Mixed Forest','Coniferous Forest','Evergreen Forest','Swamp', 'Plain', 'Highland','Mountain',
-        ## 'Marshland','Tundra','Glacier','Tropical Forest','Savannah','Ocean','Lake'
+        # 'Deciduous Forest','Shrubland','Desert','Heathland','Broadleaf Forest',
+        # 'Mixed Forest','Coniferous Forest','Evergreen Forest','Swamp', 'Plain', 'Highland','Mountain',
+        # 'Marshland','Tundra','Glacier','Tropical Forest','Savannah','Ocean','Lake'
 
         # Shrub types:
         # Generic:
-        ### smallyellow1, smallyellow2, smallwhite1, smallgreen1, smallgreen2, smallgreen3, midgreen1,
-        ### hugegreen1, hugegreen2, hugeyellow1
+        # smallyellow1, smallyellow2, smallwhite1, smallgreen1, smallgreen2, smallgreen3, midgreen1,
+        # hugegreen1, hugegreen2, hugeyellow1
         # Flowering/Berry:
-        ### largeberry1, largepurpleflower1, midpinkberry1, largepinkflower1
+        # largeberry1, largepurpleflower1, midpinkberry1, largepinkflower1
         # Primarily tropical:
         # largetropical1, largetropical2 (bright orange), spikyflower1
         # Best for dirt/dead areas:
-        ### deadtree1, deadtree2, bentsapling1, twistedyellow1
+        # deadtree1, deadtree2, bentsapling1, twistedyellow1
         # Fungus:
-        ### mushroom1, mushroom2, mushroom3, mushroom4, mushroom5
+        # mushroom1, mushroom2, mushroom3, mushroom4, mushroom5
         # Cacti/Desert:
-        ### tinycactus1, fatcactus1, largecactus1, tinycactus2, desertflower1
+        # tinycactus1, fatcactus1, largecactus1, tinycactus2, desertflower1
         # Tuber/random:
-        ### midtuber1, smalltuber1
+        # midtuber1, smalltuber1
 
         # Log types:
         # Logs - plain:
-        ### largelog1, largelog2, midlog1, midlog2, midlog3
+        # largelog1, largelog2, midlog1, midlog2, midlog3
         # Logs - mossy:
-        ### largelog3, largelog4
+        # largelog3, largelog4
         # Stumps:
         # stump1
 
         # Tree types:
         # Deciduous:
-        ### smallgreen1, smallgreen2, smallyellow1, smallyellow2, smallred, poplar1
-        ### largegreen1, largegreen2, largered1, largeyellow1, largewillow1
+        # smallgreen1, smallgreen2, smallyellow1, smallyellow2, smallred, poplar1
+        # largegreen1, largegreen2, largered1, largeyellow1, largewillow1
         # Coniferous:
-        ### smallneedle1, patchpine1, patchfir1, smallfir1, smallcedar1
-        ### largecedar1, largeneedle1, largepine1
+        # smallneedle1, patchpine1, patchfir1, smallfir1, smallcedar1
+        # largecedar1, largeneedle1, largepine1
         # Tropical:
-        ### smallpalm1, smallpalm2, smallpalm3, largepalm1, largepalm2
+        # smallpalm1, smallpalm2, smallpalm3, largepalm1, largepalm2
 
         # Desert
 
@@ -15762,9 +15761,9 @@ class PlayWorld(threading.Thread):
                 mainpath.start()
                 while mainpath.pathgoing:
                     time.sleep(0.1)
-                    if mainpath.path == False:
+                    if mainpath.path is False:
                         mainpath.pathgoing = False
-                while mainpath.path == False:
+                while mainpath.path is False:
                     p1 = choice(dir1)
                     p2 = choice(dir2)
                     mainpath = Pathfinder(rivobdict, self.flood, p1[0], p1[1], p2[0], p2[
@@ -15772,7 +15771,7 @@ class PlayWorld(threading.Thread):
                     mainpath.start()
                     while mainpath.pathgoing:
                         time.sleep(0.1)
-                        if mainpath.path == False:
+                        if mainpath.path is False:
                             mainpath.pathgoing = False
                 pathlen = len(mainpath.path)
             for pathtile in mainpath.path:
@@ -15850,7 +15849,7 @@ class PlayWorld(threading.Thread):
                 splitpath.start()
                 while splitpath.pathgoing:
                     time.sleep(0.1)
-                    if splitpath.path == False:
+                    if splitpath.path is False:
                         splitpath.pathgoing = False
                 while dist > len(mainpath.path) or (not splitpath.path):
                     splitend = (randrange(MAP_WIDTH), randrange(MAP_HEIGHT))
@@ -15860,7 +15859,7 @@ class PlayWorld(threading.Thread):
                                            1], actor='River', domove=False, notify=False, skipareas=True, canswim=True)
                     splitpath.start()
                     while splitpath.pathgoing:
-                        if splitpath.path == False:
+                        if splitpath.path is False:
                             splitpath.pathgoing = False
                         time.sleep(0.1)
                 for pathtile in splitpath.path:
@@ -15942,9 +15941,9 @@ class PlayWorld(threading.Thread):
             path.start()
             while path.pathgoing:
                 time.sleep(0.1)
-                if path.path == False:
+                if path.path is False:
                     path.pathgoing = False
-            while path.path == False:
+            while path.path is False:
                 p1 = choice(dir1)
                 p2 = choice(dir2)
                 path = Pathfinder(rivobdict, self.flood, p1[0], p1[1], p2[0], p2[
@@ -15952,7 +15951,7 @@ class PlayWorld(threading.Thread):
                 path.start()
                 while path.pathgoing:
                     time.sleep(0.1)
-                    if path.path == False:
+                    if path.path is False:
                         path.pathgoing = False
             for pathtile in copy.copy(path.path):
                 try:
@@ -16039,9 +16038,9 @@ class PlayWorld(threading.Thread):
                 path.start()
                 while path.pathgoing:
                     time.sleep(0.1)
-                    if path.path == False:
+                    if path.path is False:
                         path.pathgoing = False
-                while path.path == False:
+                while path.path is False:
                     jointile = choice(rtiledict.keys())
                     jointile = [int(jointile.split(',')[0]),
                                 int(jointile.split(',')[1])]
@@ -16051,7 +16050,7 @@ class PlayWorld(threading.Thread):
                     path.start()
                     while path.pathgoing:
                         time.sleep(0.1)
-                        if path.path == False:
+                        if path.path is False:
                             path.pathgoing = False
                 for pathtile in path.path:
                     try:
@@ -16239,9 +16238,9 @@ class PlayWorld(threading.Thread):
             path.start()
             while path.pathgoing:
                 time.sleep(0.1)
-                if path.path == False:
+                if path.path is False:
                     path.pathgoing = False
-            while path.path == False:
+            while path.path is False:
                 etile = choice(edgetiles['e'][0:(len(edgetiles['e']) / 4)])
                 wtile = choice(edgetiles['w'][0:(len(edgetiles['w']) / 4)])
                 path = Pathfinder(mshobdict, self.flood, etile[0], etile[1], wtile[0], wtile[
@@ -16249,7 +16248,7 @@ class PlayWorld(threading.Thread):
                 path.start()
                 while path.pathgoing:
                     time.sleep(0.1)
-                    if path.path == False:
+                    if path.path is False:
                         path.pathgoing = False
             for pathtile in path.path:
                 for tile in range(pathtile[1] + 1):
@@ -16299,9 +16298,9 @@ class PlayWorld(threading.Thread):
             path.start()
             while path.pathgoing:
                 time.sleep(0.1)
-                if path.path == False:
+                if path.path is False:
                     path.pathgoing = False
-            while path.path == False:
+            while path.path is False:
                 etile = choice(edgetiles['e'][(len(edgetiles['e']) / 4) * 3:])
                 wtile = choice(edgetiles['w'][(len(edgetiles['w']) / 4) * 3:])
                 path = Pathfinder(mshobdict, self.flood, etile[0], etile[1], wtile[0], wtile[
@@ -16309,7 +16308,7 @@ class PlayWorld(threading.Thread):
                 path.start()
                 while path.pathgoing:
                     time.sleep(0.1)
-                    if path.path == False:
+                    if path.path is False:
                         path.pathgoing = False
             for pathtile in path.path:
                 for tile in range(pathtile[1], RMAP_HEIGHT):
@@ -16360,9 +16359,9 @@ class PlayWorld(threading.Thread):
             path.start()
             while path.pathgoing:
                 time.sleep(0.1)
-                if path.path == False:
+                if path.path is False:
                     path.pathgoing = False
-            while path.path == False:
+            while path.path is False:
                 ntile = choice(edgetiles['n'][0:(len(edgetiles['n']) / 4)])
                 stile = choice(edgetiles['s'][0:(len(edgetiles['s']) / 4)])
                 path = Pathfinder(mshobdict, self.flood, ntile[0], ntile[1], stile[0], stile[
@@ -16370,7 +16369,7 @@ class PlayWorld(threading.Thread):
                 path.start()
                 while path.pathgoing:
                     time.sleep(0.1)
-                    if path.path == False:
+                    if path.path is False:
                         path.pathgoing = False
             for pathtile in path.path:
                 for tile in range(pathtile[0]):
@@ -16420,9 +16419,9 @@ class PlayWorld(threading.Thread):
             path.start()
             while path.pathgoing:
                 time.sleep(0.1)
-                if path.path == False:
+                if path.path is False:
                     path.pathgoing = False
-            while path.path == False:
+            while path.path is False:
                 ntile = choice(edgetiles['n'][(len(edgetiles['n']) / 4) * 3:])
                 stile = choice(edgetiles['s'][(len(edgetiles['s']) / 4) * 3:])
                 path = Pathfinder(mshobdict, self.flood, ntile[0], ntile[1], stile[0], stile[
@@ -16430,7 +16429,7 @@ class PlayWorld(threading.Thread):
                 path.start()
                 while path.pathgoing:
                     time.sleep(0.1)
-                    if path.path == False:
+                    if path.path is False:
                         path.pathgoing = False
             for pathtile in path.path:
                 for tile in range(pathtile[0], RMAP_WIDTH):
@@ -16481,9 +16480,9 @@ class PlayWorld(threading.Thread):
             path.start()
             while path.pathgoing:
                 time.sleep(0.1)
-                if path.path == False:
+                if path.path is False:
                     path.pathgoing = False
-            while path.path == False:
+            while path.path is False:
                 ntile = choice(edgetiles['n'][0:(len(edgetiles['n']) / 2)])
                 wtile = choice(edgetiles['w'][0:(len(edgetiles['w']) / 2)])
                 path = Pathfinder(mshobdict, self.flood, ntile[0], ntile[1], wtile[0], wtile[
@@ -16491,7 +16490,7 @@ class PlayWorld(threading.Thread):
                 path.start()
                 while path.pathgoing:
                     time.sleep(0.1)
-                    if path.path == False:
+                    if path.path is False:
                         path.pathgoing = False
             for pathtile in path.path:
                 for tile in range(pathtile[0]):
@@ -16544,9 +16543,9 @@ class PlayWorld(threading.Thread):
             path.start()
             while path.pathgoing:
                 time.sleep(0.1)
-                if path.path == False:
+                if path.path is False:
                     path.pathgoing = False
-            while path.path == False:
+            while path.path is False:
                 ntile = choice(edgetiles['n'][0:(len(edgetiles['n']) / 2)])
                 etile = choice(edgetiles['e'][(len(edgetiles['e']) / 2):])
                 path = Pathfinder(mshobdict, self.flood, ntile[0], ntile[1], etile[0], etile[
@@ -16554,7 +16553,7 @@ class PlayWorld(threading.Thread):
                 path.start()
                 while path.pathgoing:
                     time.sleep(0.1)
-                    if path.path == False:
+                    if path.path is False:
                         path.pathgoing = False
             for pathtile in path.path:
                 for tile in range(pathtile[0], RMAP_WIDTH):
@@ -16608,9 +16607,9 @@ class PlayWorld(threading.Thread):
             path.start()
             while path.pathgoing:
                 time.sleep(0.1)
-                if path.path == False:
+                if path.path is False:
                     path.pathgoing = False
-            while path.path == False:
+            while path.path is False:
                 stile = choice(edgetiles['s'][0:(len(edgetiles['s']) / 2)])
                 wtile = choice(edgetiles['w'][(len(edgetiles['w']) / 2):])
                 path = Pathfinder(mshobdict, self.flood, stile[0], stile[1], wtile[0], wtile[
@@ -16618,7 +16617,7 @@ class PlayWorld(threading.Thread):
                 path.start()
                 while path.pathgoing:
                     time.sleep(0.1)
-                    if path.path == False:
+                    if path.path is False:
                         path.pathgoing = False
             for pathtile in path.path:
                 for tile in range(pathtile[0]):
@@ -16672,9 +16671,9 @@ class PlayWorld(threading.Thread):
             path.start()
             while path.pathgoing:
                 time.sleep(0.1)
-                if path.path == False:
+                if path.path is False:
                     path.pathgoing = False
-            while path.path == False:
+            while path.path is False:
                 stile = choice(edgetiles['s'][(len(edgetiles['s']) / 2):])
                 etile = choice(edgetiles['e'][(len(edgetiles['e']) / 2):])
                 path = Pathfinder(mshobdict, self.flood, stile[0], stile[1], etile[0], etile[
@@ -16682,7 +16681,7 @@ class PlayWorld(threading.Thread):
                 path.start()
                 while path.pathgoing:
                     time.sleep(0.1)
-                    if path.path == False:
+                    if path.path is False:
                         path.pathgoing = False
             for pathtile in path.path:
                 for tile in range(pathtile[0], RMAP_WIDTH):
@@ -17431,7 +17430,6 @@ class PlayWorld(threading.Thread):
                                                 wrwindow, x + num, y + num2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
 
         # Now add in leaves for forest floors.
-
         for key in self.treedict.keys():
             if self.treedict[key][0][3] == 'Tropical':
                 continue
@@ -21058,7 +21056,7 @@ class Pathfinder(threading.Thread):
             except KeyError:
                 pass
 
-        if GameWorld.rswitch == True:
+        if GameWorld.rswitch is True:
             limitx, limity = RMAP_WIDTH, RMAP_HEIGHT
         else:
             limitx, limity = MAP_WIDTH, MAP_HEIGHT
@@ -21287,7 +21285,7 @@ def doMainGame():
     global MAP_HEIGHT, PY, PX, GameWorld, hpcswitch, \
         XConsoles, TopWindow, freeze, PCRlayer, PCWlayer, DoLoadScreen
     if not freeze:
-        if GameWorld.rswitch == True:
+        if GameWorld.rswitch is True:
             limitx, limity = RMAP_WIDTH, RMAP_HEIGHT
         else:
             limitx, limity = MAP_WIDTH, MAP_HEIGHT

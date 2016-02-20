@@ -48,11 +48,11 @@ __version__ = '0.3 Alpha Tech Demo by ' + __author__
 ####################################
 # Coder's Guide                    #
 ####################################
-#     I. Misc. Functions
+# I. Misc. Functions
 #       - f.dchoice, f. getRivChar, f. queryTile, f. DoChar
 # II. Graphical/Menu Classes
 #       - c. IntroGraphics, c. CloudNoise, c. WCloudNoise, c. FadeText,
-# c. ButtonBox, c. Menu, c. RelMap c. LeaveWindow, c. ScrollBar,
+#         c. ButtonBox, c. Menu, c. RelMap c. LeaveWindow, c. ScrollBar,
 #         c. InvWindow, c. Dialogue, c. NDialogue, c.OptWindow, c. CWindow,
 #         c. ProgressBar
 # III. Misc. Graphical Functions
@@ -62,12 +62,12 @@ __version__ = '0.3 Alpha Tech Demo by ' + __author__
 #       - f. handle_mouse, f. mouse_isvisible, f. handle_keys, f. adjustScreen
 # V. Screen Change Functions
 #       - f. doIntroSetup, f. doWorldGenSetup, f. doWorldAtlasSetup
-#    VI. Intro
+# VI. Intro
 #       - f. doIntro
 # VII. Intro Transition
 #       - f. wipeIntro
 # VIII. World Drawing Functions
-# - f. LoadWorld, f. Draw[type]...
+#       - f. LoadWorld, f. Draw[type]...
 # IX. Land Generation
 #       - c. World
 # X. Terrain Feature Naming

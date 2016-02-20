@@ -6078,36 +6078,6 @@ def doIntroSetup():
     IntroBG = IntroGraphics((screen.width / 2),(screen.height / 2),14,30,60,color=candlecolor,con = introwindow,lightcon = lightwindow, \
                             xmod = 6, ymod = 4)
     IntroBG.start()
-##    libtcod.console_set_default_foreground(introwindow, libtcod.white)
-##    libtcod.console_print_ex(introwindow, 0, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapw)))
-##    libtcod.console_print_ex(introwindow, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapn)))
-##    libtcod.console_print_ex(introwindow, 1, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
-##    libtcod.console_print_ex(introwindow, 0, screen.height - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapw)))
-##    libtcod.console_print_ex(introwindow, 1, screen.height - 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercaps)))
-##    libtcod.console_print_ex(introwindow, 1, screen.height - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
-##    libtcod.console_print_ex(introwindow, screen.width - 1, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
-##    libtcod.console_print_ex(introwindow, screen.width - 2, 0, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercapn)))
-##    libtcod.console_print_ex(introwindow, screen.width - 2, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
-##    libtcod.console_print_ex(introwindow, screen.width - 1, screen.height - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercape)))
-##    libtcod.console_print_ex(introwindow, screen.width - 2, screen.height - 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercaps)))
-##    libtcod.console_print_ex(introwindow, screen.width - 2, screen.height - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(bordercorner)))
-##    libtcod.console_set_default_foreground(introwindow, libtcod.white)
-##    for y in range(screen.height)[2:-2]:
-##        libtcod.console_set_default_foreground(introwindow, libtcod.white)
-##        borderv = bordervchars[y % 3]
-##        libtcod.console_print_ex(introwindow, 1, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderv)))
-##    for y in range(screen.height)[2:-2]:
-##        libtcod.console_set_default_foreground(introwindow, libtcod.white)
-##        borderv = bordervchars[y % 3]
-##        libtcod.console_print_ex(introwindow, screen.width - 2, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderv)))
-##    for x in range(screen.width)[2:-2]:
-##        libtcod.console_set_default_foreground(introwindow, libtcod.white)
-##        borderh = borderhchars[x % 3]
-##        libtcod.console_print_ex(introwindow, x, 1, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderh)))
-##    for x in range(screen.width)[2:-2]:
-##        libtcod.console_set_default_foreground(introwindow, libtcod.white)
-##        borderh = borderhchars[x % 3]
-##        libtcod.console_print_ex(introwindow, x, screen.height - 2, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(borderh)))
 
 def IntroHoverWipe():
     global IntroHover,IntroBG

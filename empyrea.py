@@ -1,24 +1,25 @@
+import ConfigParser
+import Queue
+import cPickle
+import copy
+import fnmatch
+import gc
 import os
 import sys
-import libtcodpy as libtcod
+import threading
 import time
 from math import sqrt
 from random import choice, randrange, shuffle
-import threading
-import cPickle
-import fnmatch
-import copy
-import gc
-import Queue
-import ConfigParser
+
+import libtcodpy as libtcod
 
 from empyrea.audio import Audio
 from empyrea.chardefs import *
-from empyrea.namegen import MakeLang, MakeName
 import empyrea.inflect as inflect
+from empyrea.namegen import MakeLang, MakeName
 from empyrea.screen import Screen
-from empyrea.utils import *
 from empyrea.thesaurus import t
+from empyrea.utils import *
 
 sys.setrecursionlimit(50000)
 

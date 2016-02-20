@@ -3342,8 +3342,6 @@ class CWindow(threading.Thread):
                     tcol2 = libtcod.Color(int(GameWorld.matstruct[tmat]['COLOR'][0]), int(GameWorld.matstruct[tmat]['COLOR'][1]),
                                           int(GameWorld.matstruct[tmat]['COLOR'][2]))
                     tcol = libtcod.white
-# if buildtype == 'floor' or buildtype == 'ceiling':
-##                        tcol = tcol / 2
                     self.fr, self.fg, self.fb = tcol.r, tcol.g, tcol.b
                     self.br, self.bg, self.bb = tcol2.r, tcol2.g, tcol2.b
                     for y in range(16, 19):
@@ -3402,8 +3400,6 @@ class CWindow(threading.Thread):
                     tcol2 = libtcod.Color(int(GameWorld.matstruct[tmat]['COLOR'][0]), int(GameWorld.matstruct[tmat]['COLOR'][1]),
                                           int(GameWorld.matstruct[tmat]['COLOR'][2]))
                     tcol = libtcod.white
-# if buildtype == 'floor' or buildtype == 'ceiling':
-##                        tcol = tcol / 2
                     self.fr, self.fg, self.fb = tcol.r, tcol.g, tcol.b
                     self.br, self.bg, self.bb = tcol2.r, tcol2.g, tcol2.b
                     for y in range(16, 19):
@@ -3899,8 +3895,6 @@ class CWindow(threading.Thread):
                     tcol2 = libtcod.Color(int(GameWorld.matstruct[tmat]['COLOR'][0]), int(GameWorld.matstruct[tmat]['COLOR'][1]),
                                           int(GameWorld.matstruct[tmat]['COLOR'][2]))
                     tcol = libtcod.white
-# if buildtype == 'floor' or buildtype == 'ceiling':
-##                        tcol = tcol / 2
                     self.fr, self.fg, self.fb = tcol.r, tcol.g, tcol.b
                     self.br, self.bg, self.bb = tcol2.r, tcol2.g, tcol2.b
                     for y in range(16, 19):
@@ -3960,8 +3954,6 @@ class CWindow(threading.Thread):
                     tcol2 = libtcod.Color(int(GameWorld.matstruct[tmat]['COLOR'][0]), int(GameWorld.matstruct[tmat]['COLOR'][1]),
                                           int(GameWorld.matstruct[tmat]['COLOR'][2]))
                     tcol = libtcod.white
-# if buildtype == 'floor' or buildtype == 'ceiling':
-##                        tcol = tcol / 2
                     self.fr, self.fg, self.fb = tcol.r, tcol.g, tcol.b
                     self.br, self.bg, self.bb = tcol2.r, tcol2.g, tcol2.b
                     for y in range(16, 19):
@@ -8033,7 +8025,6 @@ class World(threading.Thread):
         libtcod.heightmap_add_fbm(
             desertmap, dnoise, 1.0, 1.0, 0.5, 0.5, 22, 0.4, 0.8)
         libtcod.heightmap_lerp_hm(desertmap, worldmap, desertmap, 0.1)
-        #libtcod.heightmap_rain_erosion(desertmap, MAP_WIDTH * 142 * rainfall, 0.0, 0.02)
         dminmax = list(libtcod.heightmap_get_minmax(desertmap))
         dcolmap = libtcod.color_gen_map(dkeycols, dkeyidx)
 
@@ -17079,7 +17070,6 @@ class PlayWorld(threading.Thread):
                                 wrwindow, x + num, y + num2, libtcod.BKGND_ALPHA(alphperc), libtcod.LEFT, chr(DoChar(char)))
                             rtextdict['%s,%s' %
                                       (x + num, y + num2)] = [char, col]
-##                                self.rterraindict['%s,%s' % (x + num,y + num2)] = bcol
                             self.dirtdict['%s,%s' % (x + num, y + num2)] = True
                     except KeyError:
                         pass
@@ -17501,65 +17491,7 @@ class PlayWorld(threading.Thread):
                                     self.leafgrounddict[
                                         '%s,%s' % (x + num, y + num2)] = True
 
-# for x in range(RMAP_WIDTH):
-# for y in range(RMAP_HEIGHT):
-# try:
-##                    self.ldict['%s,%s' % (x,y)]
-# except KeyError:
-# if (hperc[1] < self.rheightmap['%s,%s' % (x,y)] < hperc[2]) and \
-# isinstance(self.rheightmap['%s,%s' % (x,y)],int):
-##                        lchance = 0
-# for num in range(-10,11):
-# for num2 in range(-10,11):
-# try:
-##                                    self.ldict['%s,%s' % (x + num,y + num2)]
-# try:
-##                                        self.dirtdict['%s,%s' % (x + num,y + num2)]
-# except KeyError:
-# try:
-# if not self.treedict['%s,%s' % (self.ldict['%s,%s' % (x + num,y + num2)][0],self.ldict['%s,%s' % (x + num,y + num2)][1])][0][3] == 'Tropical':
-##                                                lchance += 1
-# except KeyError:
-# pass
-# except KeyError:
-# pass
-# try:
-##                            self.tallgrassdict['%s,%s' % (x,y)]
-# if randrange(5) == 1:
-##                                doleaves = wchoice(self.rdict['%s-%s' % (self.maintype,self.tempzone)]['leafchance'])
-# else:
-##                                doleaves = False
-# except KeyError:
-##                            doleaves = wchoice(self.rdict['%s-%s' % (self.maintype,self.tempzone)]['leafchance'])
-# try:
-##                            self.dirtdict['%s,%s' %(x,y)]
-##                            neg = randrange(-7,-3)
-##                            pos = randrange(3,7)
-# for num in range(neg,pos):
-# for num2 in range(neg,pos):
-# try:
-##                                        self.ldict['%s,%s' % (x + num,y + num2)]
-##                                        self.dirtdict['%s,%s' % (x + num,y + num2)]
-##                                        doleaves = False
-# except KeyError:
-# pass
-# except KeyError:
-# pass
-# if randrange(100) < lchance and doleaves:
-##                            fcol = libtcod.color_lerp(self.rterraindict['%s,%s' % (x,y)],libtcod.white,0.75)
-##                            libtcod.console_set_default_foreground(wrwindow, fcol)
-##                            char = choice(leafchars)
-# try:
-##                                self.dirtdict['%s,%s' % (x,y)]
-##                                char = choice(dirtleafchars)
-# except KeyError:
-# pass
-##                            libtcod.console_print_ex(wrwindow, x, y, libtcod.BKGND_NONE, libtcod.LEFT, chr(DoChar(char)))
-##                            self.rtextdict['%s,%s' % (x,y)] = [char,fcol]
-##                            self.leafgrounddict['%s,%s' % (x,y)] = True
-
         # Also, trees in/by tall grass need to be modified a bit...
-
         for x in range(RMAP_WIDTH):
             for y in range(RMAP_HEIGHT):
                 try:
@@ -18175,9 +18107,6 @@ class PlayWorld(threading.Thread):
         self.mlev = self.rdict['%s-%s' %
                                (self.maintype, self.tempzone)]['mlev']
 
-# for subtype in self.subtypes:
-##            dosub = getattr(self,'Sub%s' % subtype.replace(' ',''))(mapgen)
-
         self.colmap = libtcod.color_gen_map(self.rdict['%s-%s' % (self.maintype, self.tempzone)]['keycols'],
                                             self.rdict['%s-%s' % (self.maintype, self.tempzone)]['keyidx'])
         self.wcolmap = libtcod.color_gen_map(self.rdict['%s-%s' % (self.maintype, self.tempzone)]['wkeycols'],
@@ -18512,7 +18441,6 @@ class PlayWorld(threading.Thread):
                         city][0][1] - 1 + tiley
 
             libtcod.console_clear(screen.wiwindow)
-            #libtcod.console_print_ex(screen.wiwindow, screen.view_width / 2, 2, libtcod.BKGND_NONE, libtcod.CENTER, 'The %s of %s' % (sitetype.capitalize(),city))
             for x in range(screen.view_width):
                 for y in range(7):
                     libtcod.console_print_ex(
@@ -19865,9 +19793,6 @@ class PlayWorld(threading.Thread):
                                                 char[2] = 255
                                             except IndexError:
                                                 char = [0, 0, 255]
-##                                    shadperc = max(self.shadowdict['%s,%s' % (PCX + num,PCY + num2)][0],self.shadowdict['%s,%s' % (PCX + num,PCY + num2)][1])
-                                    #fcol = libtcod.color_lerp(fcol, libtcod.black, shadperc)
-                                    #bcol = libtcod.color_lerp(bgcol, libtcod.black, shadperc)
                                 if self.itemdict[self.curz].get('%s,%s' % (PCX + num, PCY + num2)):
                                     shadperc = max(self.shadowdict['%s,%s' % (
                                         PCX + num, PCY + num2)][0], self.shadowdict['%s,%s' % (PCX + num, PCY + num2)][1])

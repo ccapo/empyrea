@@ -1,6 +1,9 @@
-import os, random, re
+import os
+import random
+import re
 
-def MakeLang(langfile = None,MINLEN = 3,MAXLEN = 9,caphy = True):
+
+def MakeLang(langfile=None, MINLEN=3, MAXLEN=9, caphy=True):
     langdict = {}
     startpairs = []
     starttrios = []
@@ -33,7 +36,7 @@ def MakeLang(langfile = None,MINLEN = 3,MAXLEN = 9,caphy = True):
 
         for l in range(len(name)):
             if l > 2:
-                if keydict.get(name[l -3:l]):
+                if keydict.get(name[l - 3:l]):
                     keydict[name[l - 3:l]] += name[l]
                 else:
                     keydict[name[l - 3:l]] = name[l]
@@ -43,10 +46,10 @@ def MakeLang(langfile = None,MINLEN = 3,MAXLEN = 9,caphy = True):
                 else:
                     keydict[name[l]] = name[l + 1]
             if l < len(name) - 2:
-                if keydict.get(name[l:l+2]):
-                    keydict[name[l:l+2]] += name[l + 2]
+                if keydict.get(name[l:l + 2]):
+                    keydict[name[l:l + 2]] += name[l + 2]
                 else:
-                    keydict[name[l:l+2]] = name[l + 2]
+                    keydict[name[l:l + 2]] = name[l + 2]
 
     langdict['keydict'] = keydict
     langdict['startpairs'] = startpairs
@@ -57,15 +60,17 @@ def MakeLang(langfile = None,MINLEN = 3,MAXLEN = 9,caphy = True):
 
     return langdict
 
+
 def MakeName(langdict):
 
-    conlist = ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','z']
-    vowlist = ['a','e','i','o','u','y']
+    conlist = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+               'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z']
+    vowlist = ['a', 'e', 'i', 'o', 'u', 'y']
 
     while True:
         startpair = random.choice(langdict['startpairs']).capitalize()
         name = startpair
-        for l in range(random.randrange(langdict['MINLEN'],langdict['MAXLEN'] + 1) - 2):
+        for l in range(random.randrange(langdict['MINLEN'], langdict['MAXLEN'] + 1) - 2):
             try:
                 curpair = name[-2:]
                 name += random.choice(list(langdict['keydict'][curpair]))
@@ -97,10 +102,11 @@ def MakeName(langdict):
             name = list(name)
             for letter in range(len(name)):
                 if name[letter] == '-':
-                    name[min(letter + 1,len(name) - 1)] = name[min(letter + 1,len(name) - 1)].upper()
+                    name[min(letter + 1, len(name) - 1)
+                         ] = name[min(letter + 1, len(name) - 1)].upper()
             name = ''.join(name)
 
-        if re.search('[aeiou]{3}',name):
+        if re.search('[aeiou]{3}', name):
             continue
 
         if name[-2:] not in langdict['endpairs']:

@@ -53,7 +53,7 @@ def doNothing():
     pass
 
 
-def throwSwitches(subject,switches):
+def throwSwitches(subject, switches):
     for switch in switches:
-        case = getattr(subject,switch)
-        setattr(subject,switch,not case)
+        case = getattr(subject, switch)
+        setattr(subject, switch, not case)
